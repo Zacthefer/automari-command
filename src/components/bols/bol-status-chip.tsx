@@ -6,27 +6,27 @@ const statusConfig: Record<
   { label: string; className: string }
 > = {
   received: {
-    label: "Received",
+    label: "received",
     className: "bg-slate-100 text-slate-700 hover:bg-slate-100",
   },
   processing: {
-    label: "Processing",
-    className: "bg-blue-50 text-blue-700 hover:bg-blue-50",
+    label: "processing",
+    className: "bg-slate-100 text-slate-700 hover:bg-slate-100",
   },
   extracted: {
-    label: "Extracted",
+    label: "extracted",
     className: "bg-emerald-50 text-emerald-700 hover:bg-emerald-50",
   },
   review: {
-    label: "Needs Review",
+    label: "needs review",
     className: "bg-amber-50 text-amber-700 hover:bg-amber-50",
   },
   failed: {
-    label: "Failed",
+    label: "failed",
     className: "bg-red-50 text-red-700 hover:bg-red-50",
   },
   invoiced: {
-    label: "Invoiced",
+    label: "invoiced",
     className: "bg-emerald-50 text-emerald-700 hover:bg-emerald-50",
   },
 };
@@ -34,7 +34,10 @@ const statusConfig: Record<
 export function BolStatusChip({ status }: { status: BOL["status"] }) {
   const config = statusConfig[status];
   return (
-    <Badge variant="secondary" className={config.className}>
+    <Badge
+      variant="secondary"
+      className={`rounded-full px-2.5 py-0.5 text-[11px] font-medium tracking-[0.01em] ${config.className}`}
+    >
       {config.label}
     </Badge>
   );

@@ -45,7 +45,7 @@ export function Sidebar() {
       </div>
 
       {/* Navigation */}
-      <nav className="flex-1 space-y-1 px-3 py-4">
+      <nav className="flex-1 space-y-1 py-4 pr-3">
         {navItems.map((item) => {
           const isActive =
             pathname === item.href ||
@@ -55,10 +55,10 @@ export function Sidebar() {
               key={item.href}
               href={item.href}
               className={cn(
-                "flex items-center gap-3 rounded-lg px-3 py-2.5 text-sm font-medium transition-colors",
+                "flex items-center gap-3 border-l-2 py-2.5 pl-[22px] pr-3 text-sm font-medium transition-colors",
                 isActive
-                  ? "bg-white/10 text-white"
-                  : "text-slate-400 hover:bg-white/5 hover:text-white"
+                  ? "border-blue-600 text-white"
+                  : "border-transparent text-slate-400 hover:text-white"
               )}
             >
               <item.icon className="h-[18px] w-[18px]" />
