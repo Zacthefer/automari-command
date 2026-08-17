@@ -110,6 +110,36 @@ export async function getBol(id: string) {
   return request<import("@/types").BOL>(`/api/bol/${id}`);
 }
 
+export async function uploadBol(file: File): Promise<import("@/types").BOL> {
+  const token = getToken();
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const response = await fetch(`${API_BASE}/api/bol/upload`, {
+    method: "POST",
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+    body: formData,
+  });
+
+  if (response.status === 401) {
+    clearToken();
+    if (typeof window !== "undefined") {
+      window.location.href = "/login";
+    }
+    throw new ApiError("Unauthorized", 401);
+  }
+
+  if (!response.ok) {
+    const body = await response.json().catch(() => ({}));
+    throw new ApiError(
+      body.detail || `Upload failed with status ${response.status}`,
+      response.status
+    );
+  }
+
+  return response.json();
+}
+
 // ── Invoices ──────────────────────────────────────────
 
 export async function getInvoices(params?: {
