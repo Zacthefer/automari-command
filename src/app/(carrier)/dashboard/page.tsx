@@ -59,7 +59,7 @@ export default function DashboardPage() {
   if (loading) return <PageSkeleton />;
 
   return (
-    <div className="space-y-8">
+    <div className="space-y-10">
       <PageHeader
         title={isAdmin ? "Admin Overview" : "Dashboard"}
         description={
@@ -125,7 +125,7 @@ export default function DashboardPage() {
 
       {/* Recent BOLs */}
       <div className="space-y-4">
-        <h2 className="text-lg font-semibold text-slate-900">Recent BOLs</h2>
+        <h2 className="text-[17px] font-semibold tracking-[-0.01em] text-slate-900">Recent BOLs</h2>
         <BolTable bols={recentBols} />
       </div>
     </div>

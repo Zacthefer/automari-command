@@ -47,12 +47,12 @@ export default function LoginPage() {
           </span>
         </div>
         <div>
-          <h2 className="text-3xl font-semibold leading-tight tracking-tight">
+          <h2 className="text-[40px] font-semibold leading-[1.15] tracking-[-0.03em]">
             Freight operations,
             <br />
             automated.
           </h2>
-          <p className="mt-4 max-w-md text-slate-400">
+          <p className="mt-5 max-w-md leading-relaxed text-slate-400">
             BOL capture, invoice generation, and carrier management — all from
             one command center.
           </p>
@@ -64,7 +64,7 @@ export default function LoginPage() {
 
       {/* Right panel — form */}
       <div className="flex flex-1 items-center justify-center px-6">
-        <div className="w-full max-w-sm space-y-8">
+        <div className="w-full max-w-sm space-y-9">
           <div className="lg:hidden flex items-center gap-2.5 justify-center">
             <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#0f172a]">
               <Command className="h-5 w-5 text-white" />
@@ -75,10 +75,10 @@ export default function LoginPage() {
           </div>
 
           <div className="text-center lg:text-left">
-            <h1 className="text-2xl font-semibold tracking-tight text-slate-900">
+            <h1 className="text-2xl font-bold tracking-[-0.025em] text-slate-900">
               Sign in
             </h1>
-            <p className="mt-1 text-sm text-slate-500">
+            <p className="mt-1.5 text-sm leading-relaxed text-slate-500">
               Enter your credentials to access the dashboard.
             </p>
           </div>
@@ -89,7 +89,7 @@ export default function LoginPage() {
             </div>
           )}
 
-          <form onSubmit={handleSubmit} className="space-y-4">
+          <form onSubmit={handleSubmit} className="space-y-6">
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -112,13 +112,15 @@ export default function LoginPage() {
                 placeholder="Enter your password"
               />
             </div>
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={loading}
-            >
-              {loading ? "Signing in..." : "Sign in"}
-            </Button>
+            <div className="border-t border-slate-200 pt-6">
+              <Button
+                type="submit"
+                className="w-full"
+                disabled={loading}
+              >
+                {loading ? "Signing in..." : "Sign in"}
+              </Button>
+            </div>
           </form>
         </div>
       </div>

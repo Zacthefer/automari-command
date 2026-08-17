@@ -24,7 +24,7 @@ export function Header() {
     : "?";
 
   return (
-    <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-slate-200 bg-white px-8">
+    <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-slate-200 bg-white px-10">
       <div />
       <DropdownMenu>
         <DropdownMenuTrigger

@@ -28,11 +28,11 @@ function AuthGate({ children }: { children: React.ReactNode }) {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-slate-50">
+    <div className="min-h-screen bg-white">
       <Sidebar />
       <div className="pl-64">
         <Header />
-        <main className="px-8 py-8">{children}</main>
+        <main className="px-10 py-10">{children}</main>
       </div>
     </div>
   );
