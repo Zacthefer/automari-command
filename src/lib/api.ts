@@ -172,6 +172,122 @@ export async function markInvoicePaid(id: string, paidAt?: string) {
   });
 }
 
+export async function updateInvoice(
+  id: string,
+  data: {
+    rate?: number;
+    accessorial_charges?: number;
+    bill_to_name?: string;
+    bill_to_email?: string;
+    net_days?: number;
+  }
+) {
+  return request<import("@/types").Invoice>(`/api/invoices/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+}
+
+export async function downloadInvoicePdf(id: string): Promise<Blob> {
+  const token = getToken();
+  const headers: Record<string, string> = {};
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  const response = await fetch(`${API_BASE}/api/invoices/${id}/pdf`, {
+    headers,
+  });
+
+  if (response.status === 401) {
+    clearToken();
+    if (typeof window !== "undefined") {
+      window.location.href = "/login";
+    }
+    throw new ApiError("Unauthorized", 401);
+  }
+
+  if (!response.ok) {
+    throw new ApiError("Failed to download PDF", response.status);
+  }
+
+  return response.blob();
+}
+
+export function getBolImageUrl(bolId: string): string {
+  const token = getToken();
+  const base = `${API_BASE}/api/bol/${bolId}/image`;
+  return token ? `${base}?token=${token}` : base;
+}
+
+// ── Compliance ────────────────────────────────────────
+
+export async function getComplianceDocuments(params?: {
+  holder_type?: string;
+  document_type?: string;
+  skip?: number;
+  limit?: number;
+}) {
+  const query = new URLSearchParams();
+  if (params?.holder_type) query.set("holder_type", params.holder_type);
+  if (params?.document_type) query.set("document_type", params.document_type);
+  if (params?.skip) query.set("skip", String(params.skip));
+  if (params?.limit) query.set("limit", String(params.limit));
+  const qs = query.toString();
+  return request<import("@/types").ComplianceDocument[]>(
+    `/api/compliance/${qs ? `?${qs}` : ""}`
+  );
+}
+
+export async function getComplianceDocument(id: string) {
+  return request<import("@/types").ComplianceDocument>(`/api/compliance/${id}`);
+}
+
+export async function createComplianceDocument(data: {
+  document_type: string;
+  holder_type: string;
+  holder_name: string;
+  document_number?: string;
+  issuing_authority?: string;
+  effective_date?: string;
+  expiration_date?: string;
+  notes?: string;
+}) {
+  return request<import("@/types").ComplianceDocument>("/api/compliance/", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export async function updateComplianceDocument(
+  id: string,
+  data: {
+    document_type?: string;
+    holder_type?: string;
+    holder_name?: string;
+    document_number?: string;
+    issuing_authority?: string;
+    effective_date?: string;
+    expiration_date?: string;
+    notes?: string;
+  }
+) {
+  return request<import("@/types").ComplianceDocument>(`/api/compliance/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deleteComplianceDocument(id: string) {
+  return request<void>(`/api/compliance/${id}`, {
+    method: "DELETE",
+  });
+}
+
+export async function getComplianceSummary() {
+  return request<import("@/types").ComplianceSummary>("/api/compliance/summary");
+}
+
 // ── Tenants (Admin) ───────────────────────────────────
 
 export async function getTenants(params?: {
