@@ -33,6 +33,8 @@ export interface BOL {
   status: "received" | "processing" | "extracted" | "review" | "failed" | "invoiced";
   confidence: number | null;
   driver_phone: string | null;
+  image_content_type: string | null;
+  has_image: boolean;
   shipper_name: string | null;
   consignee_name: string | null;
   pro_number: string | null;
@@ -72,6 +74,29 @@ export interface Invoice {
   updated_at: string;
 }
 
+export interface ComplianceDocument {
+  id: string;
+  tenant_id: string;
+  document_type: "cdl" | "medical_card" | "insurance_liability" | "insurance_cargo" | "vehicle_registration" | "ifta_permit" | "drug_test" | "mvr_report" | "other";
+  holder_type: "driver" | "vehicle" | "company";
+  holder_name: string;
+  document_number: string | null;
+  issuing_authority: string | null;
+  effective_date: string | null;
+  expiration_date: string | null;
+  status: "valid" | "expiring_soon" | "expired";
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface ComplianceSummary {
+  total: number;
+  valid: number;
+  expiring_soon: number;
+  expired: number;
+}
+
 export interface DashboardStats {
   bols_total: number;
   bols_this_week: number;
@@ -82,6 +107,9 @@ export interface DashboardStats {
   invoices_overdue: number;
   total_outstanding: number;
   total_collected: number;
+  compliance_total: number;
+  compliance_expiring_soon: number;
+  compliance_expired: number;
 }
 
 export interface AdminStats {

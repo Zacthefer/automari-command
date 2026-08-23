@@ -6,6 +6,7 @@ import {
   Receipt,
   DollarSign,
   AlertTriangle,
+  ShieldCheck,
 } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
 import { PageSkeleton } from "@/components/layout/page-skeleton";
@@ -119,6 +120,18 @@ export default function DashboardPage() {
             value={formatCurrency(carrierStats.total_outstanding)}
             icon={DollarSign}
             detail={`${formatCurrency(carrierStats.total_collected)} collected`}
+          />
+          <StatCard
+            label="Compliance"
+            value={carrierStats.compliance_total}
+            icon={ShieldCheck}
+            detail={
+              carrierStats.compliance_expired > 0
+                ? `${carrierStats.compliance_expired} expired, ${carrierStats.compliance_expiring_soon} expiring`
+                : carrierStats.compliance_expiring_soon > 0
+                  ? `${carrierStats.compliance_expiring_soon} expiring soon`
+                  : "All current"
+            }
           />
         </div>
       ) : null}

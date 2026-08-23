@@ -6,6 +6,7 @@ import {
   LayoutDashboard,
   FileText,
   Receipt,
+  ShieldCheck,
   Building2,
   LogOut,
   Command,
@@ -17,6 +18,7 @@ const carrierNav = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
   { label: "BOLs", href: "/bols", icon: FileText },
   { label: "Invoices", href: "/invoices", icon: Receipt },
+  { label: "Compliance", href: "/compliance", icon: ShieldCheck },
 ];
 
 const adminNav = [
@@ -24,6 +26,7 @@ const adminNav = [
   { label: "Clients", href: "/admin/clients", icon: Building2 },
   { label: "BOLs", href: "/bols", icon: FileText },
   { label: "Invoices", href: "/invoices", icon: Receipt },
+  { label: "Compliance", href: "/compliance", icon: ShieldCheck },
 ];
 
 export function Sidebar() {
