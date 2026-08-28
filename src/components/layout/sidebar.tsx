@@ -10,6 +10,7 @@ import {
   Building2,
   LogOut,
   Command,
+  TrendingUp,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { cn } from "@/lib/utils";
@@ -19,6 +20,7 @@ const carrierNav = [
   { label: "BOLs", href: "/bols", icon: FileText },
   { label: "Invoices", href: "/invoices", icon: Receipt },
   { label: "Compliance", href: "/compliance", icon: ShieldCheck },
+  { label: "Cost Per Mile", href: "/cost-per-mile", icon: TrendingUp },
 ];
 
 const adminNav = [
@@ -27,6 +29,7 @@ const adminNav = [
   { label: "BOLs", href: "/bols", icon: FileText },
   { label: "Invoices", href: "/invoices", icon: Receipt },
   { label: "Compliance", href: "/compliance", icon: ShieldCheck },
+  { label: "Cost Per Mile", href: "/cost-per-mile", icon: TrendingUp },
 ];
 
 export function Sidebar() {

@@ -10,7 +10,7 @@ interface StatCardProps {
 
 export function StatCard({ label, value, icon: Icon, detail }: StatCardProps) {
   return (
-    <Card className="cursor-pointer rounded-[20px] border border-slate-200 bg-white shadow-none ring-0 transition-all duration-150 hover:-translate-y-0.5 hover:border-slate-300 hover:shadow-[0_8px_24px_rgba(15,23,42,0.08)] active:translate-y-0 active:scale-[0.99] active:shadow-[0_3px_10px_rgba(15,23,42,0.06)]">
+    <Card className="cursor-pointer rounded-2xl border-0 bg-white shadow-[var(--shadow-elevated-1)] ring-0 transition-all duration-200 hover:-translate-y-1 hover:shadow-[var(--shadow-elevated-3)] active:translate-y-0 active:shadow-[var(--shadow-elevated-1)]">
       <CardContent className="p-7">
         <div className="flex items-start justify-between">
           <div>
@@ -22,8 +22,8 @@ export function StatCard({ label, value, icon: Icon, detail }: StatCardProps) {
               <p className="mt-2 text-xs text-slate-400 tabular-nums">{detail}</p>
             )}
           </div>
-          <div className="text-slate-400">
-            <Icon className="h-4 w-4" />
+          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-blue-50">
+            <Icon className="h-5 w-5 text-blue-600" />
           </div>
         </div>
       </CardContent>
