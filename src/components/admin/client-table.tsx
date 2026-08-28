@@ -20,7 +20,7 @@ interface ClientTableProps {
 export function ClientTable({ clients }: ClientTableProps) {
   if (clients.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-lg border border-dashed border-slate-200 py-16">
+      <div className="flex flex-col items-center justify-center rounded-2xl border-0 bg-white py-16 shadow-[var(--shadow-elevated-1)]">
         <p className="text-sm text-slate-500">No clients yet</p>
         <p className="mt-1 text-xs text-slate-400">
           Add your first client to get started.
@@ -30,7 +30,7 @@ export function ClientTable({ clients }: ClientTableProps) {
   }
 
   return (
-    <div className="rounded-lg border border-slate-200 bg-white">
+    <div className="overflow-hidden rounded-2xl border-0 bg-white shadow-[var(--shadow-elevated-1)]">
       <Table>
         <TableHeader>
           <TableRow className="hover:bg-transparent">

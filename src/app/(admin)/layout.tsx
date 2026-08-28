@@ -31,7 +31,7 @@ function AdminGate({ children }: { children: React.ReactNode }) {
   if (!user || user.role !== "admin") return null;
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="min-h-screen bg-background">
       <Sidebar />
       <div className="pl-64">
         <Header />

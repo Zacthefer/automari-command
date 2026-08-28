@@ -110,6 +110,9 @@ export interface DashboardStats {
   compliance_total: number;
   compliance_expiring_soon: number;
   compliance_expired: number;
+  fleet_avg_cpm: number;
+  fleet_total_miles: number;
+  fleet_total_expenses: number;
 }
 
 export interface AdminStats {

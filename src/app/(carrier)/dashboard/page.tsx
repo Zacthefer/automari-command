@@ -7,6 +7,8 @@ import {
   DollarSign,
   AlertTriangle,
   ShieldCheck,
+  Gauge,
+  Route,
 } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
 import { PageSkeleton } from "@/components/layout/page-skeleton";
@@ -133,12 +135,23 @@ export default function DashboardPage() {
                   : "All current"
             }
           />
+          <StatCard
+            label="Fleet CPM"
+            value={`$${carrierStats.fleet_avg_cpm.toFixed(2)}`}
+            icon={Gauge}
+            detail={`${new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(carrierStats.fleet_total_miles)} miles`}
+          />
+          <StatCard
+            label="Fleet Expenses"
+            value={formatCurrency(carrierStats.fleet_total_expenses)}
+            icon={Route}
+          />
         </div>
       ) : null}
 
       {/* Recent BOLs */}
       <div className="space-y-4">
-        <h2 className="text-[17px] font-semibold tracking-[-0.01em] text-slate-900">Recent BOLs</h2>
+        <h2 className="text-[17px] font-semibold tracking-[-0.01em] text-foreground">Recent BOLs</h2>
         <BolTable bols={recentBols} />
       </div>
     </div>

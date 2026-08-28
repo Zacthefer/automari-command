@@ -24,22 +24,22 @@ export function Header() {
     : "?";
 
   return (
-    <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-slate-200 bg-white px-10">
+    <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-border bg-background px-10">
       <div />
       <DropdownMenu>
         <DropdownMenuTrigger
-          className="flex items-center gap-3 rounded-lg px-2 py-1.5 transition-colors hover:bg-slate-50"
+          className="flex items-center gap-3 rounded-lg px-2 py-1.5 transition-colors hover:bg-secondary"
         >
           <div className="text-right hidden sm:block">
-            <p className="text-sm font-medium text-slate-900">
+            <p className="text-sm font-medium text-foreground">
               {user?.name}
             </p>
-            <p className="text-xs text-slate-500">
+            <p className="text-xs text-muted-foreground">
               {user?.tenant_name || "Admin"}
             </p>
           </div>
-          <Avatar className="h-8 w-8 bg-slate-900 text-white">
-            <AvatarFallback className="bg-slate-900 text-white text-xs">
+          <Avatar className="h-8 w-8 bg-blue-600 text-white">
+            <AvatarFallback className="bg-blue-600 text-white text-xs">
               {initials}
             </AvatarFallback>
           </Avatar>

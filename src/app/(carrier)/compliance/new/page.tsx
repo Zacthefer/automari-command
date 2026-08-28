@@ -71,11 +71,11 @@ export default function NewComplianceDocumentPage() {
       <div className="flex items-center gap-4">
         <Link
           href="/compliance"
-          className="flex h-9 w-9 items-center justify-center rounded-lg border border-slate-200 text-slate-600 transition-colors hover:bg-slate-50"
+          className="flex h-9 w-9 items-center justify-center rounded-lg border border-border text-muted-foreground transition-colors hover:bg-secondary"
         >
           <ArrowLeft className="h-4 w-4" />
         </Link>
-        <h1 className="text-2xl font-semibold tracking-tight text-slate-900">
+        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
           Add Compliance Document
         </h1>
       </div>
@@ -87,7 +87,7 @@ export default function NewComplianceDocumentPage() {
           </div>
         )}
 
-        <Card className="border-slate-200 shadow-sm">
+        <Card className="border-0 bg-white shadow-[var(--shadow-elevated-1)]">
           <CardHeader>
             <CardTitle className="text-base">Document Information</CardTitle>
           </CardHeader>
@@ -152,7 +152,7 @@ export default function NewComplianceDocumentPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-slate-200 shadow-sm">
+        <Card className="border-0 bg-white shadow-[var(--shadow-elevated-1)]">
           <CardHeader>
             <CardTitle className="text-base">Dates & Notes</CardTitle>
           </CardHeader>
