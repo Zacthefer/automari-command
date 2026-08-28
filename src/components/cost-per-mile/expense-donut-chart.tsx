@@ -100,8 +100,8 @@ export function ExpenseDonutChart({
                     boxShadow: "0 4px 16px rgba(0,0,0,0.12)",
                     fontSize: 13,
                   }}
-                  formatter={(value: number) => [
-                    formatCurrency(value),
+                  formatter={(value) => [
+                    formatCurrency(Number(value)),
                     "Amount",
                   ]}
                 />

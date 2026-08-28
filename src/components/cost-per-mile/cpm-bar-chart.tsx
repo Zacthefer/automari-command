@@ -74,8 +74,8 @@ export function CpmBarChart({
                   boxShadow: "0 4px 16px rgba(0,0,0,0.12)",
                   fontSize: 13,
                 }}
-                formatter={(value: number, name: string) => [
-                  `$${value.toFixed(4)}`,
+                formatter={(value, name) => [
+                  `$${Number(value).toFixed(4)}`,
                   name === "cpm"
                     ? "Cost/Mile"
                     : name === "rpm"
