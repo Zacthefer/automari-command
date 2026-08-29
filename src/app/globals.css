@@ -49,8 +49,8 @@
 }
 
 :root {
-  /* Dark canvas — deep navy-black */
-  --background: oklch(0.16 0.02 260);
+  /* Dark canvas — professional slate-navy */
+  --background: oklch(0.28 0.02 260);
   --foreground: oklch(0.93 0 0);
   /* Cards stay white — they "pop" against the dark canvas */
   --card: oklch(1 0 0);
@@ -85,11 +85,11 @@
   --sidebar-border: oklch(1 0 0 / 10%);
   --sidebar-ring: oklch(0.556 0 0);
 
-  /* Elevation shadow scale — white cards floating on dark canvas */
-  --shadow-elevated-1: 0 1px 3px rgba(0,0,0,0.3), 0 4px 12px rgba(0,0,0,0.2);
-  --shadow-elevated-2: 0 2px 8px rgba(0,0,0,0.3), 0 8px 24px rgba(0,0,0,0.25);
-  --shadow-elevated-3: 0 4px 16px rgba(0,0,0,0.35), 0 12px 40px rgba(0,0,0,0.3);
-  --shadow-elevated-4: 0 8px 32px rgba(0,0,0,0.4), 0 20px 60px rgba(0,0,0,0.35);
+  /* Elevation shadow scale — white cards floating on dark canvas with blue glow */
+  --shadow-elevated-1: 0 1px 3px rgba(0,0,0,0.2), 0 4px 16px rgba(0,0,0,0.15), 0 0 40px rgba(37,99,235,0.05);
+  --shadow-elevated-2: 0 2px 8px rgba(0,0,0,0.25), 0 8px 24px rgba(0,0,0,0.2), 0 0 50px rgba(37,99,235,0.06);
+  --shadow-elevated-3: 0 4px 16px rgba(0,0,0,0.25), 0 12px 40px rgba(0,0,0,0.2), 0 0 60px rgba(37,99,235,0.08);
+  --shadow-elevated-4: 0 8px 32px rgba(0,0,0,0.3), 0 20px 60px rgba(0,0,0,0.25), 0 0 80px rgba(37,99,235,0.1);
 }
 
 .dark {

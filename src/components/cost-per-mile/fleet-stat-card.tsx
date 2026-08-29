@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
 import type { LucideIcon } from "lucide-react";
 
@@ -7,6 +8,7 @@ interface FleetStatCardProps {
   icon: LucideIcon;
   detail?: string;
   accent?: "blue" | "green" | "amber" | "red";
+  href?: string;
 }
 
 const accentStyles = {
@@ -22,11 +24,12 @@ export function FleetStatCard({
   icon: Icon,
   detail,
   accent = "blue",
+  href,
 }: FleetStatCardProps) {
   const colors = accentStyles[accent];
 
-  return (
-    <Card className="rounded-2xl border-0 bg-white shadow-[var(--shadow-elevated-1)] transition-all duration-200 hover:-translate-y-1 hover:shadow-[var(--shadow-elevated-3)]">
+  const card = (
+    <Card className="cursor-pointer rounded-3xl border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.04)_0%,#FFFFFF_8%)] shadow-[var(--shadow-elevated-1)] transition-all duration-200 hover:-translate-y-1 hover:shadow-[var(--shadow-elevated-3)]">
       <CardContent className="p-6">
         <div className="flex items-start justify-between">
           <div>
@@ -49,4 +52,14 @@ export function FleetStatCard({
       </CardContent>
     </Card>
   );
+
+  if (href) {
+    return (
+      <Link href={href} className="block no-underline">
+        {card}
+      </Link>
+    );
+  }
+
+  return card;
 }

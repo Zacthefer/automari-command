@@ -105,23 +105,27 @@ export default function DashboardPage() {
             value={carrierStats.bols_total}
             icon={FileText}
             detail={`${carrierStats.bols_this_week} this week`}
+            href="/bols"
           />
           <StatCard
             label="Pending Review"
             value={carrierStats.bols_pending_review}
             icon={AlertTriangle}
+            href="/bols"
           />
           <StatCard
             label="Invoices Sent"
             value={carrierStats.invoices_sent}
             icon={Receipt}
             detail={`${carrierStats.invoices_overdue} overdue`}
+            href="/invoices"
           />
           <StatCard
             label="Outstanding"
             value={formatCurrency(carrierStats.total_outstanding)}
             icon={DollarSign}
             detail={`${formatCurrency(carrierStats.total_collected)} collected`}
+            href="/invoices"
           />
           <StatCard
             label="Compliance"
@@ -134,17 +138,20 @@ export default function DashboardPage() {
                   ? `${carrierStats.compliance_expiring_soon} expiring soon`
                   : "All current"
             }
+            href="/compliance"
           />
           <StatCard
             label="Fleet CPM"
             value={`$${carrierStats.fleet_avg_cpm.toFixed(2)}`}
             icon={Gauge}
             detail={`${new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(carrierStats.fleet_total_miles)} miles`}
+            href="/cost-per-mile"
           />
           <StatCard
             label="Fleet Expenses"
             value={formatCurrency(carrierStats.fleet_total_expenses)}
             icon={Route}
+            href="/cost-per-mile/expenses"
           />
         </div>
       ) : null}

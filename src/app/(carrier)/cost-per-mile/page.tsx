@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Link from "next/link";
 import {
   TrendingUp,
   Gauge,
@@ -67,24 +66,6 @@ export default function CostPerMilePage() {
         description="Fleet-wide cost analytics and expense tracking."
       />
 
-      {/* Quick nav */}
-      <div className="flex flex-wrap gap-2">
-        {[
-          { label: "Trucks", href: "/cost-per-mile/trucks" },
-          { label: "Drivers", href: "/cost-per-mile/drivers" },
-          { label: "Expenses", href: "/cost-per-mile/expenses" },
-          { label: "Trips", href: "/cost-per-mile/trips" },
-        ].map((link) => (
-          <Link
-            key={link.href}
-            href={link.href}
-            className="rounded-lg bg-white/10 px-4 py-2 text-sm font-medium text-foreground transition-colors hover:bg-white/20"
-          >
-            {link.label}
-          </Link>
-        ))}
-      </div>
-
       {overview && (
         <>
           {/* Stat cards */}
@@ -119,12 +100,14 @@ export default function CostPerMilePage() {
               value={overview.truck_count}
               icon={Truck}
               accent="blue"
+              href="/cost-per-mile/trucks"
             />
             <FleetStatCard
               label="Drivers"
               value={overview.driver_count}
               icon={Users}
               accent="blue"
+              href="/cost-per-mile/drivers"
             />
           </div>
 
@@ -145,7 +128,7 @@ export default function CostPerMilePage() {
 
           {/* Summary numbers */}
           <div className="grid gap-4 sm:grid-cols-3">
-            <div className="rounded-2xl border-0 bg-white p-6 shadow-[var(--shadow-elevated-1)]">
+            <div className="rounded-3xl border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.04)_0%,#FFFFFF_8%)] p-6 shadow-[var(--shadow-elevated-1)]">
               <p className="text-xs font-medium uppercase tracking-wider text-slate-400">
                 Total Revenue
               </p>
@@ -153,7 +136,7 @@ export default function CostPerMilePage() {
                 {formatCurrency(overview.total_revenue)}
               </p>
             </div>
-            <div className="rounded-2xl border-0 bg-white p-6 shadow-[var(--shadow-elevated-1)]">
+            <div className="rounded-3xl border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.04)_0%,#FFFFFF_8%)] p-6 shadow-[var(--shadow-elevated-1)]">
               <p className="text-xs font-medium uppercase tracking-wider text-slate-400">
                 Total Expenses
               </p>
@@ -161,7 +144,7 @@ export default function CostPerMilePage() {
                 {formatCurrency(overview.total_expenses)}
               </p>
             </div>
-            <div className="rounded-2xl border-0 bg-white p-6 shadow-[var(--shadow-elevated-1)]">
+            <div className="rounded-3xl border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.04)_0%,#FFFFFF_8%)] p-6 shadow-[var(--shadow-elevated-1)]">
               <p className="text-xs font-medium uppercase tracking-wider text-slate-400">
                 Completed Trips
               </p>
