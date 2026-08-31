@@ -28,9 +28,17 @@ function AuthGate({ children }: { children: React.ReactNode }) {
   if (!user) return null;
 
   return (
-    <div className="min-h-screen bg-white">
+    <div className="relative min-h-screen bg-background">
+      {/* Radial gradient glow overlay */}
+      <div
+        className="pointer-events-none fixed inset-0 z-0"
+        style={{
+          background:
+            "radial-gradient(ellipse at 50% 0%, rgba(37,99,235,0.08) 0%, transparent 60%)",
+        }}
+      />
       <Sidebar />
-      <div className="pl-64">
+      <div className="relative z-10 pl-64">
         <Header />
         <main className="px-10 py-10">{children}</main>
       </div>
