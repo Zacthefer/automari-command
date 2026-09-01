@@ -2,7 +2,7 @@
 
 import { useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
-import { Command } from "lucide-react";
+import { BrandMark } from "@/components/layout/brand-mark";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
@@ -38,14 +38,7 @@ export default function LoginPage() {
     <div className="flex min-h-screen">
       {/* Left panel — brand */}
       <div className="hidden lg:flex lg:w-1/2 flex-col justify-between bg-[#0f172a] p-12 text-white">
-        <div className="flex items-center gap-2.5">
-          <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-blue-600">
-            <Command className="h-5 w-5 text-white" />
-          </div>
-          <span className="text-lg font-semibold tracking-tight">
-            Automari
-          </span>
-        </div>
+        <BrandMark textClassName="text-white" />
         <div>
           <h2 className="text-[40px] font-semibold leading-[1.15] tracking-[-0.03em]">
             Freight operations,
@@ -65,13 +58,8 @@ export default function LoginPage() {
       {/* Right panel — form */}
       <div className="flex flex-1 items-center justify-center px-6">
         <div className="w-full max-w-sm space-y-9">
-          <div className="lg:hidden flex items-center gap-2.5 justify-center">
-            <div className="flex h-9 w-9 items-center justify-center rounded-lg bg-[#0f172a]">
-              <Command className="h-5 w-5 text-white" />
-            </div>
-            <span className="text-lg font-semibold tracking-tight text-slate-900">
-              Automari
-            </span>
+          <div className="lg:hidden flex justify-center">
+            <BrandMark />
           </div>
 
           <div className="text-center lg:text-left">
