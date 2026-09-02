@@ -288,6 +288,80 @@ export async function getComplianceSummary() {
   return request<import("@/types").ComplianceSummary>("/api/compliance/summary");
 }
 
+// ── Recruiting ────────────────────────────────────────
+
+export async function getApplicants(params?: {
+  status?: string;
+  skip?: number;
+  limit?: number;
+}) {
+  const query = new URLSearchParams();
+  if (params?.status) query.set("status", params.status);
+  if (params?.skip) query.set("skip", String(params.skip));
+  if (params?.limit) query.set("limit", String(params.limit));
+  const qs = query.toString();
+  return request<import("@/types").Applicant[]>(
+    `/api/recruiting/${qs ? `?${qs}` : ""}`
+  );
+}
+
+export async function getApplicant(id: string) {
+  return request<import("@/types").Applicant>(`/api/recruiting/${id}`);
+}
+
+export async function createApplicant(data: {
+  name: string;
+  phone?: string;
+  email?: string;
+  cdl_class?: string;
+  endorsements?: string[];
+  years_experience?: number;
+  accident_history?: string;
+  preferred_routes?: string;
+  availability?: string;
+  status?: string;
+  notes?: string;
+}) {
+  return request<import("@/types").Applicant>("/api/recruiting/", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export async function updateApplicant(
+  id: string,
+  data: {
+    name?: string;
+    phone?: string;
+    email?: string;
+    cdl_class?: string;
+    endorsements?: string[];
+    years_experience?: number;
+    accident_history?: string;
+    preferred_routes?: string;
+    availability?: string;
+    status?: string;
+    notes?: string;
+  }
+) {
+  return request<import("@/types").Applicant>(`/api/recruiting/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+}
+
+export async function deleteApplicant(id: string) {
+  return request<void>(`/api/recruiting/${id}`, {
+    method: "DELETE",
+  });
+}
+
+export async function getRecruitingSummary() {
+  return request<import("@/types").RecruitingSummary>(
+    "/api/recruiting/summary"
+  );
+}
+
 // ── Tenants (Admin) ───────────────────────────────────
 
 export async function getTenants(params?: {
