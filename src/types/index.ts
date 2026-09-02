@@ -124,3 +124,37 @@ export interface AdminStats {
   total_revenue_outstanding: number;
   total_revenue_collected: number;
 }
+
+export type ApplicantStatus =
+  | "new"
+  | "screening"
+  | "qualified"
+  | "rejected"
+  | "hired";
+
+export interface Applicant {
+  id: string;
+  tenant_id: string;
+  name: string;
+  phone: string | null;
+  email: string | null;
+  cdl_class: "A" | "B" | "C" | null;
+  endorsements: string[];
+  years_experience: number | null;
+  accident_history: string | null;
+  preferred_routes: string | null;
+  availability: string | null;
+  status: ApplicantStatus;
+  notes: string | null;
+  created_at: string;
+  updated_at: string;
+}
+
+export interface RecruitingSummary {
+  total: number;
+  new: number;
+  screening: number;
+  qualified: number;
+  rejected: number;
+  hired: number;
+}
