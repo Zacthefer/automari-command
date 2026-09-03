@@ -27,7 +27,7 @@ function formatCurrency(amount: number): string {
 export function InvoiceTable({ invoices }: InvoiceTableProps) {
   if (invoices.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-2xl border-0 bg-white py-16 shadow-[var(--shadow-elevated-1)]">
+      <div className="flex flex-col items-center justify-center rounded-2xl border border-white/10 bg-card py-16 shadow-[var(--shadow-elevated-1)]">
         <p className="text-sm text-slate-500">No invoices found</p>
         <p className="mt-1 text-xs text-slate-400">
           Invoices are auto-generated from processed BOLs.
@@ -37,7 +37,7 @@ export function InvoiceTable({ invoices }: InvoiceTableProps) {
   }
 
   return (
-    <div className="overflow-hidden rounded-2xl border-0 bg-white shadow-[var(--shadow-elevated-1)]">
+    <div className="overflow-hidden rounded-2xl border border-white/10 bg-card shadow-[var(--shadow-elevated-1)]">
       <Table>
         <TableHeader>
           <TableRow className="hover:bg-transparent">
@@ -67,7 +67,7 @@ export function InvoiceTable({ invoices }: InvoiceTableProps) {
               <TableCell>
                 <Link
                   href={`/invoices/${inv.id}`}
-                  className="font-medium text-slate-900 group-hover:text-blue-600 transition-colors"
+                  className="font-medium text-foreground group-hover:text-[var(--brand-cyan)] transition-colors"
                 >
                   {inv.invoice_number}
                 </Link>
@@ -78,7 +78,7 @@ export function InvoiceTable({ invoices }: InvoiceTableProps) {
               <TableCell className="text-slate-600">
                 {inv.pro_number || "—"}
               </TableCell>
-              <TableCell className="font-medium text-slate-900">
+              <TableCell className="font-medium text-foreground">
                 {formatCurrency(inv.total_amount)}
               </TableCell>
               <TableCell>

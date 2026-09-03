@@ -42,14 +42,12 @@ export function Sidebar() {
   const navItems = user?.role === "admin" ? adminNav : carrierNav;
 
   return (
-    <aside className="fixed inset-y-0 left-0 z-30 flex w-64 flex-col bg-[#0f172a] text-white">
-      {/* Brand */}
-      <div className="flex h-16 items-center px-6 border-b border-white/10">
+    <aside className="fixed inset-y-0 left-0 z-30 flex w-64 flex-col border-r border-[var(--sidebar-border)] bg-[var(--brand-navy)] text-[var(--sidebar-foreground)]">
+      <div className="flex h-[4.25rem] items-center px-5 border-b border-[var(--sidebar-border)]">
         <BrandMark size="sm" textClassName="text-white" />
       </div>
 
-      {/* Navigation */}
-      <nav className="flex-1 space-y-1 py-4 pr-3">
+      <nav className="flex-1 space-y-0.5 py-4 pr-3">
         {navItems.map((item) => {
           const isActive =
             pathname === item.href ||
@@ -59,31 +57,36 @@ export function Sidebar() {
               key={item.href}
               href={item.href}
               className={cn(
-                "flex items-center gap-3 border-l-2 py-2.5 pl-[22px] pr-3 text-sm font-medium transition-colors",
+                "group relative flex items-center gap-3 border-l-2 py-2.5 pl-[22px] pr-3 text-sm font-medium transition-all duration-200",
                 isActive
-                  ? "border-blue-600 text-white"
-                  : "border-transparent text-slate-400 hover:text-white"
+                  ? "border-[var(--brand-cyan)] bg-[var(--brand-cyan-dim)] text-white"
+                  : "border-transparent text-[#8aa3bd] hover:bg-white/[0.03] hover:text-white"
               )}
             >
-              <item.icon className="h-[18px] w-[18px]" />
+              <item.icon
+                className={cn(
+                  "h-[18px] w-[18px] transition-colors",
+                  isActive ? "text-[var(--brand-cyan)]" : "text-[#6f8aaa] group-hover:text-[#a8c4de]"
+                )}
+              />
               {item.label}
             </Link>
           );
         })}
       </nav>
 
-      {/* User footer */}
-      <div className="border-t border-white/10 p-4">
-        <div className="flex items-center justify-between">
+      <div className="border-t border-[var(--sidebar-border)] p-4">
+        <div className="flex items-center justify-between gap-2">
           <div className="min-w-0">
             <p className="truncate text-sm font-medium text-white">
               {user?.name}
             </p>
-            <p className="truncate text-xs text-slate-400">{user?.email}</p>
+            <p className="truncate text-xs text-[#6f8aaa]">{user?.email}</p>
           </div>
           <button
             onClick={logout}
-            className="ml-2 rounded-lg p-2 text-slate-400 transition-colors hover:bg-white/10 hover:text-white"
+            className="ml-1 rounded-lg p-2 text-[#6f8aaa] transition-colors hover:bg-white/5 hover:text-[var(--brand-cyan)]"
+            aria-label="Sign out"
           >
             <LogOut className="h-4 w-4" />
           </button>

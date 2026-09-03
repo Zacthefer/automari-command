@@ -31,7 +31,7 @@ const categoryLabels: Record<string, string> = {
 };
 
 const categoryStyles: Record<string, string> = {
-  fuel: "bg-blue-50 text-blue-700 hover:bg-blue-50",
+  fuel: "bg-[var(--brand-cyan-dim)] text-[var(--brand-cyan)] hover:bg-[var(--brand-cyan-dim)]",
   maintenance: "bg-amber-50 text-amber-700 hover:bg-amber-50",
   insurance: "bg-violet-50 text-violet-700 hover:bg-violet-50",
   truck_payment: "bg-slate-100 text-slate-600 hover:bg-slate-100",
@@ -78,14 +78,14 @@ export default function ExpensesPage() {
       </div>
 
       {expenses.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-2xl border-0 bg-white py-16 shadow-[var(--shadow-elevated-1)]">
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-white/10 bg-card py-16 shadow-[var(--shadow-elevated-1)]">
           <p className="text-sm text-slate-500">No expenses found</p>
           <p className="mt-1 text-xs text-slate-400">
             Log expenses to start tracking cost per mile.
           </p>
         </div>
       ) : (
-        <div className="overflow-hidden rounded-2xl border-0 bg-white shadow-[var(--shadow-elevated-1)]">
+        <div className="overflow-hidden rounded-2xl border border-white/10 bg-card shadow-[var(--shadow-elevated-1)]">
           <Table>
             <TableHeader>
               <TableRow className="hover:bg-transparent">
@@ -126,7 +126,7 @@ export default function ExpensesPage() {
                       {categoryLabels[expense.category] || expense.category}
                     </Badge>
                   </TableCell>
-                  <TableCell className="font-mono text-[13px] font-medium text-slate-900 tabular-nums">
+                  <TableCell className="font-mono text-[13px] font-medium text-foreground tabular-nums">
                     {formatCurrency(expense.amount)}
                   </TableCell>
                   <TableCell className="text-sm text-slate-600">

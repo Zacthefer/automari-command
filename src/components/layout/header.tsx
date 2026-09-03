@@ -24,11 +24,13 @@ export function Header() {
     : "?";
 
   return (
-    <header className="sticky top-0 z-20 flex h-16 items-center justify-between border-b border-border bg-background px-10">
-      <div />
+    <header className="sticky top-0 z-20 flex h-[4.25rem] items-center justify-between border-b border-border/80 bg-[rgba(7,17,31,0.82)] px-10 backdrop-blur-xl">
+      <div className="text-xs font-medium uppercase tracking-[0.18em] text-[#9eb6ce]">
+        Command
+      </div>
       <DropdownMenu>
         <DropdownMenuTrigger
-          className="flex items-center gap-3 rounded-lg px-2 py-1.5 transition-colors hover:bg-secondary"
+          className="flex items-center gap-3 rounded-xl border border-transparent px-2 py-1.5 transition-colors hover:border-white/10 hover:bg-white/[0.03]"
         >
           <div className="text-right hidden sm:block">
             <p className="text-sm font-medium text-foreground">
@@ -38,18 +40,18 @@ export function Header() {
               {user?.tenant_name || "Admin"}
             </p>
           </div>
-          <Avatar className="h-8 w-8 bg-blue-600 text-white">
-            <AvatarFallback className="bg-blue-600 text-white text-xs">
+          <Avatar className="h-8 w-8 bg-[var(--brand-cyan)] text-[#001018] ring-2 ring-[var(--brand-cyan)]/25">
+            <AvatarFallback className="bg-[var(--brand-cyan)] text-[#001018] text-xs font-semibold">
               {initials}
             </AvatarFallback>
           </Avatar>
         </DropdownMenuTrigger>
-        <DropdownMenuContent align="end" className="w-48">
+        <DropdownMenuContent align="end" className="w-48 border-white/10 bg-[#0c1a2e]">
           <DropdownMenuItem disabled>
             <User className="mr-2 h-4 w-4" />
             Profile
           </DropdownMenuItem>
-          <DropdownMenuSeparator />
+          <DropdownMenuSeparator className="bg-white/10" />
           <DropdownMenuItem onClick={logout}>
             <LogOut className="mr-2 h-4 w-4" />
             Sign out

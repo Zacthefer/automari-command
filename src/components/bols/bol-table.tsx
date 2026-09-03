@@ -20,7 +20,7 @@ interface BolTableProps {
 export function BolTable({ bols }: BolTableProps) {
   if (bols.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-2xl border-0 bg-white py-16 shadow-[var(--shadow-elevated-1)]">
+      <div className="flex flex-col items-center justify-center rounded-2xl border border-white/10 bg-card py-16 shadow-[var(--shadow-elevated-1)]">
         <p className="text-sm text-slate-500">No BOLs found</p>
         <p className="mt-1 text-xs text-slate-400">
           BOLs will appear here once drivers submit them via text.
@@ -30,7 +30,7 @@ export function BolTable({ bols }: BolTableProps) {
   }
 
   return (
-    <div className="overflow-hidden rounded-2xl border-0 bg-white shadow-[var(--shadow-elevated-1)]">
+    <div className="overflow-hidden rounded-2xl border border-white/10 bg-card shadow-[var(--shadow-elevated-1)]">
       <Table>
         <TableHeader>
           <TableRow className="hover:bg-transparent">
@@ -60,7 +60,7 @@ export function BolTable({ bols }: BolTableProps) {
               <TableCell>
                 <Link
                   href={`/bols/${bol.id}`}
-                  className="font-mono text-[13px] font-medium text-slate-900 transition-colors group-hover:text-blue-600"
+                  className="font-mono text-[13px] font-medium text-foreground transition-colors group-hover:text-[var(--brand-cyan)]"
                 >
                   {bol.pro_number || "—"}
                 </Link>

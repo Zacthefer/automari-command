@@ -37,7 +37,7 @@ function Field({
   return (
     <div>
       <p className="text-xs font-medium text-slate-500">{label}</p>
-      <p className="mt-0.5 text-sm text-slate-900">{value || "—"}</p>
+      <p className="mt-0.5 text-sm text-foreground">{value || "—"}</p>
     </div>
   );
 }
@@ -124,7 +124,7 @@ export default function ApplicantDetailPage() {
             <ArrowLeft className="h-4 w-4" />
           </Link>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-semibold tracking-tight text-slate-900">
+            <h1 className="text-2xl font-semibold tracking-tight text-foreground">
               {applicant.name}
             </h1>
             <ApplicantStatusChip status={applicant.status} />
@@ -208,7 +208,7 @@ export default function ApplicantDetailPage() {
                     onChange={(e) =>
                       setEditStatus(e.target.value as ApplicantStatus)
                     }
-                    className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"
+                    className="flex h-10 w-full rounded-md border border-white/10 bg-[#07111f]/70 px-3 text-foreground py-2 text-sm"
                   >
                     {statusOptions.map((opt) => (
                       <option key={opt.value} value={opt.value}>

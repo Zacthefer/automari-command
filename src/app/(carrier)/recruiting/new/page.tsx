@@ -92,7 +92,7 @@ export default function NewApplicantPage() {
           </div>
         )}
 
-        <Card className="border-0 bg-white shadow-[var(--shadow-elevated-1)]">
+        <Card className="border border-white/10 bg-card shadow-[var(--shadow-elevated-1)]">
           <CardHeader>
             <CardTitle className="text-base">Contact Information</CardTitle>
           </CardHeader>
@@ -117,7 +117,7 @@ export default function NewApplicantPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-0 bg-white shadow-[var(--shadow-elevated-1)]">
+        <Card className="border border-white/10 bg-card shadow-[var(--shadow-elevated-1)]">
           <CardHeader>
             <CardTitle className="text-base">Qualifications</CardTitle>
           </CardHeader>
@@ -127,7 +127,7 @@ export default function NewApplicantPage() {
               <select
                 id="cdl_class"
                 name="cdl_class"
-                className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm"
+                className="flex h-10 w-full rounded-md border border-white/10 bg-[#07111f]/70 px-3 text-foreground py-2 text-sm"
               >
                 <option value="">Select class...</option>
                 {cdlClasses.map((c) => (
@@ -157,7 +157,7 @@ export default function NewApplicantPage() {
                     onClick={() => toggleEndorsement(opt.value)}
                     className={`rounded-full px-3 py-1 text-sm transition-colors ${
                       selectedEndorsements.includes(opt.value)
-                        ? "bg-blue-600 text-white"
+                        ? "bg-[var(--brand-cyan)] text-[#001018]"
                         : "bg-slate-100 text-slate-600 hover:bg-slate-200"
                     }`}
                   >
