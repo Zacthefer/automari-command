@@ -128,27 +128,27 @@ export default function CostPerMilePage() {
 
           {/* Summary numbers */}
           <div className="grid gap-4 sm:grid-cols-3">
-            <div className="rounded-3xl border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.04)_0%,#FFFFFF_8%)] p-6 shadow-[var(--shadow-elevated-1)]">
+            <div className="rounded-3xl border border-white/8 bg-[linear-gradient(180deg,rgba(0,191,255,0.06)_0%,rgba(12,26,46,0.95)_28%)] p-6 shadow-[var(--shadow-elevated-1)]">
               <p className="text-xs font-medium uppercase tracking-wider text-slate-400">
                 Total Revenue
               </p>
-              <p className="mt-2 text-2xl font-semibold text-slate-900 tabular-nums">
+              <p className="mt-2 text-2xl font-semibold text-foreground tabular-nums">
                 {formatCurrency(overview.total_revenue)}
               </p>
             </div>
-            <div className="rounded-3xl border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.04)_0%,#FFFFFF_8%)] p-6 shadow-[var(--shadow-elevated-1)]">
+            <div className="rounded-3xl border border-white/8 bg-[linear-gradient(180deg,rgba(0,191,255,0.06)_0%,rgba(12,26,46,0.95)_28%)] p-6 shadow-[var(--shadow-elevated-1)]">
               <p className="text-xs font-medium uppercase tracking-wider text-slate-400">
                 Total Expenses
               </p>
-              <p className="mt-2 text-2xl font-semibold text-slate-900 tabular-nums">
+              <p className="mt-2 text-2xl font-semibold text-foreground tabular-nums">
                 {formatCurrency(overview.total_expenses)}
               </p>
             </div>
-            <div className="rounded-3xl border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.04)_0%,#FFFFFF_8%)] p-6 shadow-[var(--shadow-elevated-1)]">
+            <div className="rounded-3xl border border-white/8 bg-[linear-gradient(180deg,rgba(0,191,255,0.06)_0%,rgba(12,26,46,0.95)_28%)] p-6 shadow-[var(--shadow-elevated-1)]">
               <p className="text-xs font-medium uppercase tracking-wider text-slate-400">
                 Completed Trips
               </p>
-              <p className="mt-2 text-2xl font-semibold text-slate-900 tabular-nums">
+              <p className="mt-2 text-2xl font-semibold text-foreground tabular-nums">
                 {overview.trip_count}
               </p>
             </div>

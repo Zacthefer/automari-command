@@ -87,7 +87,7 @@ export default function NewComplianceDocumentPage() {
           </div>
         )}
 
-        <Card className="border-0 bg-white shadow-[var(--shadow-elevated-1)]">
+        <Card className="border border-white/10 bg-card shadow-[var(--shadow-elevated-1)]">
           <CardHeader>
             <CardTitle className="text-base">Document Information</CardTitle>
           </CardHeader>
@@ -98,7 +98,7 @@ export default function NewComplianceDocumentPage() {
                 id="document_type"
                 name="document_type"
                 required
-                className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2"
+                className="flex h-10 w-full rounded-md border border-white/10 bg-[#07111f]/70 px-3 text-foreground py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-cyan)] focus-visible:ring-offset-2"
               >
                 <option value="">Select type...</option>
                 {documentTypes.map((t) => (
@@ -122,7 +122,7 @@ export default function NewComplianceDocumentPage() {
                 id="holder_type"
                 name="holder_type"
                 required
-                className="flex h-10 w-full rounded-md border border-slate-200 bg-white px-3 py-2 text-sm ring-offset-white focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-slate-950 focus-visible:ring-offset-2"
+                className="flex h-10 w-full rounded-md border border-white/10 bg-[#07111f]/70 px-3 text-foreground py-2 text-sm ring-offset-background focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-[var(--brand-cyan)] focus-visible:ring-offset-2"
               >
                 <option value="">Select type...</option>
                 {holderTypes.map((t) => (
@@ -152,7 +152,7 @@ export default function NewComplianceDocumentPage() {
           </CardContent>
         </Card>
 
-        <Card className="border-0 bg-white shadow-[var(--shadow-elevated-1)]">
+        <Card className="border border-white/10 bg-card shadow-[var(--shadow-elevated-1)]">
           <CardHeader>
             <CardTitle className="text-base">Dates & Notes</CardTitle>
           </CardHeader>

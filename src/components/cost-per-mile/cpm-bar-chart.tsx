@@ -32,9 +32,9 @@ export function CpmBarChart({
   }));
 
   return (
-    <Card className="rounded-2xl border-0 bg-white shadow-[var(--shadow-elevated-1)]">
+    <Card className="rounded-2xl border border-white/10 bg-card shadow-[var(--shadow-elevated-1)]">
       <CardHeader className="pb-2">
-        <CardTitle className="text-base font-semibold text-slate-900">
+        <CardTitle className="text-base font-semibold text-foreground">
           {title}
         </CardTitle>
       </CardHeader>

@@ -63,8 +63,8 @@ export default function RecruitingPage() {
             className={cn(
               "rounded-full px-3 py-1 text-sm font-medium transition-colors",
               statusFilter === filter.value
-                ? "bg-slate-900 text-white"
-                : "bg-white text-slate-600 shadow-[var(--shadow-elevated-1)] hover:text-slate-900"
+                ? "bg-[var(--brand-cyan)] text-[#001018]"
+                : "bg-card text-muted-foreground border border-white/10 shadow-[var(--shadow-elevated-1)] hover:text-foreground"
             )}
           >
             {filter.label}

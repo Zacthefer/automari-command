@@ -12,10 +12,10 @@ interface FleetStatCardProps {
 }
 
 const accentStyles = {
-  blue: { bg: "bg-blue-50", text: "text-blue-600" },
-  green: { bg: "bg-emerald-50", text: "text-emerald-600" },
-  amber: { bg: "bg-amber-50", text: "text-amber-600" },
-  red: { bg: "bg-red-50", text: "text-red-600" },
+  blue: { bg: "bg-[var(--brand-cyan-dim)]", text: "text-[var(--brand-cyan)]" },
+  green: { bg: "bg-emerald-500/15", text: "text-emerald-300" },
+  amber: { bg: "bg-amber-500/15", text: "text-amber-300" },
+  red: { bg: "bg-red-500/15", text: "text-red-300" },
 };
 
 export function FleetStatCard({
@@ -29,12 +29,12 @@ export function FleetStatCard({
   const colors = accentStyles[accent];
 
   const card = (
-    <Card className="cursor-pointer rounded-3xl border border-white/8 bg-[linear-gradient(180deg,rgba(255,255,255,0.04)_0%,#FFFFFF_8%)] shadow-[var(--shadow-elevated-1)] transition-all duration-200 hover:-translate-y-1 hover:shadow-[var(--shadow-elevated-3)]">
+    <Card className="cursor-pointer rounded-3xl border border-white/8 bg-[linear-gradient(180deg,rgba(0,191,255,0.06)_0%,rgba(12,26,46,0.95)_28%)] shadow-[var(--shadow-elevated-1)] transition-all duration-200 hover:-translate-y-1 hover:shadow-[var(--shadow-elevated-3)]">
       <CardContent className="p-6">
         <div className="flex items-start justify-between">
           <div>
-            <p className="text-[13px] font-medium text-slate-500">{label}</p>
-            <p className="mt-2 text-[28px] font-semibold leading-none tracking-[-0.02em] text-slate-900 tabular-nums">
+            <p className="text-[13px] font-medium text-muted-foreground">{label}</p>
+            <p className="mt-2 text-[28px] font-semibold leading-none tracking-[-0.02em] text-foreground tabular-nums">
               {value}
             </p>
             {detail && (

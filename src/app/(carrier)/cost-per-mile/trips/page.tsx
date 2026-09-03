@@ -20,7 +20,7 @@ import type { Trip } from "@/types/cost-per-mile";
 
 const statusStyles: Record<string, string> = {
   completed: "bg-emerald-50 text-emerald-700 hover:bg-emerald-50",
-  in_transit: "bg-blue-50 text-blue-700 hover:bg-blue-50",
+  in_transit: "bg-[var(--brand-cyan-dim)] text-[var(--brand-cyan)] hover:bg-[var(--brand-cyan-dim)]",
   planned: "bg-slate-100 text-slate-500 hover:bg-slate-100",
 };
 
@@ -75,14 +75,14 @@ export default function TripsPage() {
       </div>
 
       {trips.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-2xl border-0 bg-white py-16 shadow-[var(--shadow-elevated-1)]">
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-white/10 bg-card py-16 shadow-[var(--shadow-elevated-1)]">
           <p className="text-sm text-slate-500">No trips found</p>
           <p className="mt-1 text-xs text-slate-400">
             Log trips to start tracking cost per mile.
           </p>
         </div>
       ) : (
-        <div className="overflow-hidden rounded-2xl border-0 bg-white shadow-[var(--shadow-elevated-1)]">
+        <div className="overflow-hidden rounded-2xl border border-white/10 bg-card shadow-[var(--shadow-elevated-1)]">
           <Table>
             <TableHeader>
               <TableRow className="hover:bg-transparent">
@@ -112,14 +112,14 @@ export default function TripsPage() {
                   key={trip.id}
                   className="group h-11 border-slate-100"
                 >
-                  <TableCell className="text-sm text-slate-900">
+                  <TableCell className="text-sm text-foreground">
                     {trip.origin_city}, {trip.origin_state} →{" "}
                     {trip.destination_city}, {trip.destination_state}
                   </TableCell>
                   <TableCell className="font-mono text-[13px] text-slate-600 tabular-nums">
                     {formatNumber(trip.miles)}
                   </TableCell>
-                  <TableCell className="font-mono text-[13px] font-medium text-slate-900 tabular-nums">
+                  <TableCell className="font-mono text-[13px] font-medium text-foreground tabular-nums">
                     {formatCurrency(trip.revenue)}
                   </TableCell>
                   <TableCell className="font-mono text-[13px] text-slate-600 tabular-nums">

@@ -53,7 +53,7 @@ function Field({
   return (
     <div>
       <p className="text-xs font-medium text-slate-500">{label}</p>
-      <p className="mt-0.5 text-sm text-slate-900">{value || "—"}</p>
+      <p className="mt-0.5 text-sm text-foreground">{value || "—"}</p>
     </div>
   );
 }
@@ -157,7 +157,7 @@ export default function ComplianceDetailPage() {
             <ArrowLeft className="h-4 w-4" />
           </Link>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-semibold tracking-tight text-slate-900">
+            <h1 className="text-2xl font-semibold tracking-tight text-foreground">
               {documentTypeLabels[doc.document_type] || doc.document_type}
             </h1>
             <ComplianceStatusChip status={doc.status} />

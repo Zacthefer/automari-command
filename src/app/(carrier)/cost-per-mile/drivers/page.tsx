@@ -55,14 +55,14 @@ export default function DriversPage() {
       </div>
 
       {drivers.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-2xl border-0 bg-white py-16 shadow-[var(--shadow-elevated-1)]">
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-white/10 bg-card py-16 shadow-[var(--shadow-elevated-1)]">
           <p className="text-sm text-slate-500">No drivers found</p>
           <p className="mt-1 text-xs text-slate-400">
             Add drivers to track per-driver cost per mile.
           </p>
         </div>
       ) : (
-        <div className="overflow-hidden rounded-2xl border-0 bg-white shadow-[var(--shadow-elevated-1)]">
+        <div className="overflow-hidden rounded-2xl border border-white/10 bg-card shadow-[var(--shadow-elevated-1)]">
           <Table>
             <TableHeader>
               <TableRow className="hover:bg-transparent">
@@ -83,7 +83,7 @@ export default function DriversPage() {
             <TableBody>
               {drivers.map((driver) => (
                 <TableRow key={driver.id} className="group h-11 border-slate-100">
-                  <TableCell className="text-sm font-medium text-slate-900">
+                  <TableCell className="text-sm font-medium text-foreground">
                     {driver.first_name} {driver.last_name}
                   </TableCell>
                   <TableCell className="text-sm text-slate-600">

@@ -11,7 +11,7 @@ const statusConfig: Record<
   },
   sent: {
     label: "Sent",
-    className: "bg-blue-50 text-blue-700 hover:bg-blue-50",
+    className: "bg-[var(--brand-cyan-dim)] text-[var(--brand-cyan)] hover:bg-[var(--brand-cyan-dim)]",
   },
   viewed: {
     label: "Viewed",

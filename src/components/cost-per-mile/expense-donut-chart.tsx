@@ -17,8 +17,8 @@ interface ExpenseDonutChartProps {
 }
 
 const COLORS = [
-  "#2563eb", // blue-600
-  "#3b82f6", // blue-500
+  "#00bfff", // brand cyan
+  "#38bdf8", // sky
   "#60a5fa", // blue-400
   "#93c5fd", // blue-300
   "#1d4ed8", // blue-700
@@ -60,9 +60,9 @@ export function ExpenseDonutChart({
   }));
 
   return (
-    <Card className="rounded-2xl border-0 bg-white shadow-[var(--shadow-elevated-1)]">
+    <Card className="rounded-2xl border border-white/10 bg-card shadow-[var(--shadow-elevated-1)]">
       <CardHeader className="pb-2">
-        <CardTitle className="text-base font-semibold text-slate-900">
+        <CardTitle className="text-base font-semibold text-foreground">
           Expense Breakdown
         </CardTitle>
       </CardHeader>
@@ -119,7 +119,7 @@ export function ExpenseDonutChart({
             <div className="pointer-events-none absolute inset-0 flex items-center justify-center" style={{ paddingBottom: 40 }}>
               <div className="text-center">
                 <p className="text-xs text-slate-400">Total</p>
-                <p className="text-lg font-semibold text-slate-900 tabular-nums">
+                <p className="text-lg font-semibold text-foreground tabular-nums">
                   {formatCurrency(totalExpenses)}
                 </p>
               </div>
