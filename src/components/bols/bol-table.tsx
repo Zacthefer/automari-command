@@ -21,8 +21,8 @@ export function BolTable({ bols }: BolTableProps) {
   if (bols.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center rounded-2xl border border-white/10 bg-card py-16 shadow-[var(--shadow-elevated-1)]">
-        <p className="text-sm text-slate-500">No BOLs found</p>
-        <p className="mt-1 text-xs text-slate-400">
+        <p className="text-sm text-[#d5e6f6]">No BOLs found</p>
+        <p className="mt-1 text-xs text-[#b7cce0]">
           BOLs will appear here once drivers submit them via text.
         </p>
       </div>
@@ -34,22 +34,22 @@ export function BolTable({ bols }: BolTableProps) {
       <Table>
         <TableHeader>
           <TableRow className="hover:bg-transparent">
-            <TableHead className="text-[11px] font-medium uppercase tracking-wider text-slate-500">
+            <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
               PRO #
             </TableHead>
-            <TableHead className="text-[11px] font-medium uppercase tracking-wider text-slate-500">
+            <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
               BOL #
             </TableHead>
-            <TableHead className="text-[11px] font-medium uppercase tracking-wider text-slate-500">
+            <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
               Shipper
             </TableHead>
-            <TableHead className="text-[11px] font-medium uppercase tracking-wider text-slate-500">
+            <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
               Consignee
             </TableHead>
-            <TableHead className="text-[11px] font-medium uppercase tracking-wider text-slate-500">
+            <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
               Status
             </TableHead>
-            <TableHead className="text-[11px] font-medium uppercase tracking-wider text-slate-500">
+            <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
               Date
             </TableHead>
           </TableRow>
@@ -65,19 +65,19 @@ export function BolTable({ bols }: BolTableProps) {
                   {bol.pro_number || "—"}
                 </Link>
               </TableCell>
-              <TableCell className="font-mono text-[13px] text-slate-600">
+              <TableCell className="font-mono text-[13px] text-[#d7e8f8]">
                 {bol.bol_number || "—"}
               </TableCell>
-              <TableCell className="text-sm text-slate-600">
+              <TableCell className="text-sm text-[#d7e8f8]">
                 {bol.shipper_name || "—"}
               </TableCell>
-              <TableCell className="text-sm text-slate-600">
+              <TableCell className="text-sm text-[#d7e8f8]">
                 {bol.consignee_name || "—"}
               </TableCell>
               <TableCell>
                 <BolStatusChip status={bol.status} />
               </TableCell>
-              <TableCell className="text-[13px] text-slate-500 tabular-nums">
+              <TableCell className="text-[13px] text-[#d7e8f8] tabular-nums">
                 {format(new Date(bol.created_at), "MMM d, yyyy")}
               </TableCell>
             </TableRow>

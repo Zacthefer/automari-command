@@ -22,7 +22,7 @@ function Field({
 }) {
   return (
     <div>
-      <p className="text-xs font-medium text-slate-500">{label}</p>
+      <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#c5d8eb]">{label}</p>
       <p className="mt-0.5 text-sm text-foreground">{value || "—"}</p>
     </div>
   );
@@ -53,7 +53,7 @@ export default function ClientDetailPage() {
   if (!client) {
     return (
       <div className="text-center py-16">
-        <p className="text-sm text-slate-500">Client not found.</p>
+        <p className="text-sm text-[#d5e6f6]">Client not found.</p>
       </div>
     );
   }
@@ -122,7 +122,7 @@ export default function ClientDetailPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <p className="text-xs font-medium text-slate-500">API Key</p>
+              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#c5d8eb]">API Key</p>
               <div className="mt-1 flex items-center gap-2">
                 <code className="rounded bg-slate-100 px-3 py-1.5 text-sm font-mono text-slate-700">
                   {client.api_key.slice(0, 12)}{"••••••••"}

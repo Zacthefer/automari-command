@@ -56,8 +56,8 @@ export default function DriversPage() {
 
       {drivers.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-2xl border border-white/10 bg-card py-16 shadow-[var(--shadow-elevated-1)]">
-          <p className="text-sm text-slate-500">No drivers found</p>
-          <p className="mt-1 text-xs text-slate-400">
+          <p className="text-sm text-[#d5e6f6]">No drivers found</p>
+          <p className="mt-1 text-xs text-[#b7cce0]">
             Add drivers to track per-driver cost per mile.
           </p>
         </div>
@@ -66,16 +66,16 @@ export default function DriversPage() {
           <Table>
             <TableHeader>
               <TableRow className="hover:bg-transparent">
-                <TableHead className="text-[11px] font-medium uppercase tracking-wider text-slate-500">
+                <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
                   Name
                 </TableHead>
-                <TableHead className="text-[11px] font-medium uppercase tracking-wider text-slate-500">
+                <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
                   Phone
                 </TableHead>
-                <TableHead className="text-[11px] font-medium uppercase tracking-wider text-slate-500">
+                <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
                   CDL
                 </TableHead>
-                <TableHead className="text-[11px] font-medium uppercase tracking-wider text-slate-500">
+                <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
                   Status
                 </TableHead>
               </TableRow>
@@ -86,10 +86,10 @@ export default function DriversPage() {
                   <TableCell className="text-sm font-medium text-foreground">
                     {driver.first_name} {driver.last_name}
                   </TableCell>
-                  <TableCell className="text-sm text-slate-600">
+                  <TableCell className="text-sm text-[#d7e8f8]">
                     {driver.phone || "—"}
                   </TableCell>
-                  <TableCell className="font-mono text-[13px] text-slate-500">
+                  <TableCell className="font-mono text-[13px] text-[#d7e8f8]">
                     {driver.cdl_number
                       ? `${driver.cdl_number} (${driver.cdl_state || "—"})`
                       : "—"}

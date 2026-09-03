@@ -11,6 +11,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { ComplianceStatusChip } from "./compliance-status-chip";
+import { HolderTypeChip } from "./holder-type-chip";
 import type { ComplianceDocument } from "@/types";
 
 interface ComplianceTableProps {
@@ -29,18 +30,12 @@ const documentTypeLabels: Record<ComplianceDocument["document_type"], string> = 
   other: "Other",
 };
 
-const holderTypeLabels: Record<ComplianceDocument["holder_type"], string> = {
-  driver: "Driver",
-  vehicle: "Vehicle",
-  company: "Company",
-};
-
 export function ComplianceTable({ documents }: ComplianceTableProps) {
   if (documents.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center rounded-2xl border border-white/10 bg-card py-16 shadow-[var(--shadow-elevated-1)]">
-        <p className="text-sm text-slate-500">No compliance documents found</p>
-        <p className="mt-1 text-xs text-slate-400">
+        <p className="text-sm text-[#d5e6f6]">No compliance documents found</p>
+        <p className="mt-1 text-xs text-[#b7cce0]">
           Add documents to track expiration dates and stay compliant.
         </p>
       </div>
@@ -51,51 +46,51 @@ export function ComplianceTable({ documents }: ComplianceTableProps) {
     <div className="overflow-hidden rounded-2xl border border-white/10 bg-card shadow-[var(--shadow-elevated-1)]">
       <Table>
         <TableHeader>
-          <TableRow className="hover:bg-transparent">
-            <TableHead className="text-xs font-medium text-slate-500">
+          <TableRow className="border-white/8 hover:bg-transparent">
+            <TableHead className="px-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
               Document
             </TableHead>
-            <TableHead className="text-xs font-medium text-slate-500">
+            <TableHead className="px-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
               Holder
             </TableHead>
-            <TableHead className="text-xs font-medium text-slate-500">
+            <TableHead className="px-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
               Type
             </TableHead>
-            <TableHead className="text-xs font-medium text-slate-500">
+            <TableHead className="px-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
               Doc #
             </TableHead>
-            <TableHead className="text-xs font-medium text-slate-500">
+            <TableHead className="px-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
               Status
             </TableHead>
-            <TableHead className="text-xs font-medium text-slate-500">
+            <TableHead className="px-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
               Expires
             </TableHead>
           </TableRow>
         </TableHeader>
         <TableBody>
           {documents.map((doc) => (
-            <TableRow key={doc.id} className="group">
-              <TableCell>
+            <TableRow key={doc.id} className="group border-white/8">
+              <TableCell className="px-4 py-3.5">
                 <Link
                   href={`/compliance/${doc.id}`}
-                  className="font-medium text-foreground group-hover:text-[var(--brand-cyan)] transition-colors"
+                  className="font-medium text-[#f3f8ff] transition-colors group-hover:text-[var(--brand-cyan)]"
                 >
                   {documentTypeLabels[doc.document_type] || doc.document_type}
                 </Link>
               </TableCell>
-              <TableCell className="text-slate-600">
+              <TableCell className="px-4 py-3.5 text-[14px] font-medium text-[#e8f2fc]">
                 {doc.holder_name}
               </TableCell>
-              <TableCell className="text-slate-500 text-sm">
-                {holderTypeLabels[doc.holder_type] || doc.holder_type}
+              <TableCell className="px-4 py-3.5">
+                <HolderTypeChip type={doc.holder_type} />
               </TableCell>
-              <TableCell className="text-slate-600">
+              <TableCell className="px-4 py-3.5 font-mono text-[13px] tracking-wide text-[#d7e8f8]">
                 {doc.document_number || "—"}
               </TableCell>
-              <TableCell>
+              <TableCell className="px-4 py-3.5">
                 <ComplianceStatusChip status={doc.status} />
               </TableCell>
-              <TableCell className="text-slate-500 text-sm">
+              <TableCell className="px-4 py-3.5 text-[13px] text-[#d7e8f8]">
                 {doc.expiration_date
                   ? format(new Date(doc.expiration_date), "MMM d, yyyy")
                   : "No expiration"}

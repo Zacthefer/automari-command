@@ -48,7 +48,7 @@ function Field({
 }) {
   return (
     <div>
-      <p className="text-xs font-medium text-slate-500">{label}</p>
+      <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#c5d8eb]">{label}</p>
       <p className="mt-0.5 text-sm text-foreground">{value || "—"}</p>
     </div>
   );
@@ -159,7 +159,7 @@ export default function InvoiceDetailPage() {
   if (!invoice) {
     return (
       <div className="text-center py-16">
-        <p className="text-sm text-slate-500">Invoice not found.</p>
+        <p className="text-sm text-[#d5e6f6]">Invoice not found.</p>
       </div>
     );
   }
@@ -331,7 +331,7 @@ export default function InvoiceDetailPage() {
                     value={formatCurrency(invoice.accessorial_charges)}
                   />
                   <div>
-                    <p className="text-xs font-medium text-slate-500">Total</p>
+                    <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#c5d8eb]">Total</p>
                     <p className="mt-0.5 text-lg font-semibold text-foreground">
                       {formatCurrency(invoice.total_amount)}
                     </p>
@@ -424,7 +424,7 @@ export default function InvoiceDetailPage() {
                 </>
               )}
               {!bol.has_image && (
-                <p className="text-sm text-slate-400 italic">
+                <p className="text-sm text-[#b7cce0] italic">
                   No image stored for this BOL.
                 </p>
               )}
