@@ -15,7 +15,7 @@ import type { BOL } from "@/types";
 function Field({ label, value }: { label: string; value: string | null | undefined }) {
   return (
     <div>
-      <p className="text-xs font-medium text-slate-500">{label}</p>
+      <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#c5d8eb]">{label}</p>
       <p className="mt-0.5 text-sm text-foreground">{value || "—"}</p>
     </div>
   );
@@ -38,7 +38,7 @@ export default function BolDetailPage() {
   if (!bol) {
     return (
       <div className="text-center py-16">
-        <p className="text-sm text-slate-500">BOL not found.</p>
+        <p className="text-sm text-[#d5e6f6]">BOL not found.</p>
       </div>
     );
   }

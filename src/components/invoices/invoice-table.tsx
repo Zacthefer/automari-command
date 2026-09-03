@@ -28,8 +28,8 @@ export function InvoiceTable({ invoices }: InvoiceTableProps) {
   if (invoices.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center rounded-2xl border border-white/10 bg-card py-16 shadow-[var(--shadow-elevated-1)]">
-        <p className="text-sm text-slate-500">No invoices found</p>
-        <p className="mt-1 text-xs text-slate-400">
+        <p className="text-sm text-[#d5e6f6]">No invoices found</p>
+        <p className="mt-1 text-xs text-[#b7cce0]">
           Invoices are auto-generated from processed BOLs.
         </p>
       </div>
@@ -41,22 +41,22 @@ export function InvoiceTable({ invoices }: InvoiceTableProps) {
       <Table>
         <TableHeader>
           <TableRow className="hover:bg-transparent">
-            <TableHead className="text-xs font-medium text-slate-500">
+            <TableHead className="text-xs font-semibold uppercase tracking-[0.12em] text-[#c5d8eb]">
               Invoice #
             </TableHead>
-            <TableHead className="text-xs font-medium text-slate-500">
+            <TableHead className="text-xs font-semibold uppercase tracking-[0.12em] text-[#c5d8eb]">
               Bill To
             </TableHead>
-            <TableHead className="text-xs font-medium text-slate-500">
+            <TableHead className="text-xs font-semibold uppercase tracking-[0.12em] text-[#c5d8eb]">
               PRO #
             </TableHead>
-            <TableHead className="text-xs font-medium text-slate-500">
+            <TableHead className="text-xs font-semibold uppercase tracking-[0.12em] text-[#c5d8eb]">
               Amount
             </TableHead>
-            <TableHead className="text-xs font-medium text-slate-500">
+            <TableHead className="text-xs font-semibold uppercase tracking-[0.12em] text-[#c5d8eb]">
               Status
             </TableHead>
-            <TableHead className="text-xs font-medium text-slate-500">
+            <TableHead className="text-xs font-semibold uppercase tracking-[0.12em] text-[#c5d8eb]">
               Due Date
             </TableHead>
           </TableRow>
@@ -72,10 +72,10 @@ export function InvoiceTable({ invoices }: InvoiceTableProps) {
                   {inv.invoice_number}
                 </Link>
               </TableCell>
-              <TableCell className="text-slate-600">
+              <TableCell className="text-[#d7e8f8]">
                 {inv.bill_to_name}
               </TableCell>
-              <TableCell className="text-slate-600">
+              <TableCell className="text-[#d7e8f8]">
                 {inv.pro_number || "—"}
               </TableCell>
               <TableCell className="font-medium text-foreground">
@@ -84,7 +84,7 @@ export function InvoiceTable({ invoices }: InvoiceTableProps) {
               <TableCell>
                 <InvoiceStatusChip status={inv.status} />
               </TableCell>
-              <TableCell className="text-slate-500 text-sm">
+              <TableCell className="text-sm text-[#d7e8f8]">
                 {inv.due_date
                   ? format(new Date(inv.due_date), "MMM d, yyyy")
                   : "—"}

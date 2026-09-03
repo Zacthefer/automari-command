@@ -41,7 +41,7 @@ export function CpmBarChart({
       <CardContent>
         {data.length === 0 ? (
           <div className="flex h-[280px] items-center justify-center">
-            <p className="text-sm text-slate-400">No data available</p>
+            <p className="text-sm text-[#b7cce0]">No data available</p>
           </div>
         ) : (
           <ResponsiveContainer width="100%" height={280}>

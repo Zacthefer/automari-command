@@ -50,8 +50,8 @@ export default function TrucksPage() {
 
       {trucks.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-2xl border border-white/10 bg-card py-16 shadow-[var(--shadow-elevated-1)]">
-          <p className="text-sm text-slate-500">No trucks found</p>
-          <p className="mt-1 text-xs text-slate-400">
+          <p className="text-sm text-[#d5e6f6]">No trucks found</p>
+          <p className="mt-1 text-xs text-[#b7cce0]">
             Add trucks to start tracking cost per mile.
           </p>
         </div>
@@ -60,16 +60,16 @@ export default function TrucksPage() {
           <Table>
             <TableHeader>
               <TableRow className="hover:bg-transparent">
-                <TableHead className="text-[11px] font-medium uppercase tracking-wider text-slate-500">
+                <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
                   Unit #
                 </TableHead>
-                <TableHead className="text-[11px] font-medium uppercase tracking-wider text-slate-500">
+                <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
                   Vehicle
                 </TableHead>
-                <TableHead className="text-[11px] font-medium uppercase tracking-wider text-slate-500">
+                <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
                   VIN
                 </TableHead>
-                <TableHead className="text-[11px] font-medium uppercase tracking-wider text-slate-500">
+                <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
                   Status
                 </TableHead>
               </TableRow>
@@ -80,12 +80,12 @@ export default function TrucksPage() {
                   <TableCell className="font-mono text-[13px] font-medium text-foreground">
                     {truck.unit_number}
                   </TableCell>
-                  <TableCell className="text-sm text-slate-600">
+                  <TableCell className="text-sm text-[#d7e8f8]">
                     {[truck.year, truck.make, truck.model]
                       .filter(Boolean)
                       .join(" ") || "—"}
                   </TableCell>
-                  <TableCell className="font-mono text-[13px] text-slate-500">
+                  <TableCell className="font-mono text-[13px] text-[#d7e8f8]">
                     {truck.vin || "—"}
                   </TableCell>
                   <TableCell>

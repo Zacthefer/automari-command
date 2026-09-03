@@ -21,8 +21,8 @@ export function ApplicantTable({ applicants }: ApplicantTableProps) {
   if (applicants.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center rounded-2xl border border-white/10 bg-card py-16 shadow-[var(--shadow-elevated-1)]">
-        <p className="text-sm text-slate-500">No applicants found</p>
-        <p className="mt-1 text-xs text-slate-400">
+        <p className="text-sm text-[#d5e6f6]">No applicants found</p>
+        <p className="mt-1 text-xs text-[#b7cce0]">
           Add driver applicants to start building your recruiting pipeline.
         </p>
       </div>
@@ -34,22 +34,22 @@ export function ApplicantTable({ applicants }: ApplicantTableProps) {
       <Table>
         <TableHeader>
           <TableRow className="hover:bg-transparent">
-            <TableHead className="text-xs font-medium text-slate-500">
+            <TableHead className="text-xs font-semibold uppercase tracking-[0.12em] text-[#c5d8eb]">
               Name
             </TableHead>
-            <TableHead className="text-xs font-medium text-slate-500">
+            <TableHead className="text-xs font-semibold uppercase tracking-[0.12em] text-[#c5d8eb]">
               Contact
             </TableHead>
-            <TableHead className="text-xs font-medium text-slate-500">
+            <TableHead className="text-xs font-semibold uppercase tracking-[0.12em] text-[#c5d8eb]">
               CDL
             </TableHead>
-            <TableHead className="text-xs font-medium text-slate-500">
+            <TableHead className="text-xs font-semibold uppercase tracking-[0.12em] text-[#c5d8eb]">
               Experience
             </TableHead>
-            <TableHead className="text-xs font-medium text-slate-500">
+            <TableHead className="text-xs font-semibold uppercase tracking-[0.12em] text-[#c5d8eb]">
               Status
             </TableHead>
-            <TableHead className="text-xs font-medium text-slate-500">
+            <TableHead className="text-xs font-semibold uppercase tracking-[0.12em] text-[#c5d8eb]">
               Applied
             </TableHead>
           </TableRow>
@@ -65,13 +65,13 @@ export function ApplicantTable({ applicants }: ApplicantTableProps) {
                   {applicant.name}
                 </Link>
               </TableCell>
-              <TableCell className="text-slate-600 text-sm">
+              <TableCell className="text-sm text-[#d7e8f8]">
                 {applicant.phone || applicant.email || "—"}
               </TableCell>
-              <TableCell className="text-slate-500 text-sm">
+              <TableCell className="text-sm text-[#d7e8f8]">
                 {applicant.cdl_class ? `Class ${applicant.cdl_class}` : "—"}
               </TableCell>
-              <TableCell className="text-slate-500 text-sm">
+              <TableCell className="text-sm text-[#d7e8f8]">
                 {applicant.years_experience != null
                   ? `${applicant.years_experience} yrs`
                   : "—"}
@@ -79,7 +79,7 @@ export function ApplicantTable({ applicants }: ApplicantTableProps) {
               <TableCell>
                 <ApplicantStatusChip status={applicant.status} />
               </TableCell>
-              <TableCell className="text-slate-500 text-sm">
+              <TableCell className="text-sm text-[#d7e8f8]">
                 {format(new Date(applicant.created_at), "MMM d, yyyy")}
               </TableCell>
             </TableRow>

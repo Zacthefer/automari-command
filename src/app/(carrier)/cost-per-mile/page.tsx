@@ -1,17 +1,17 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import {
-  TrendingUp,
-  Gauge,
-  DollarSign,
-  Truck,
-  Users,
-  Route,
-} from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
 import { PageSkeleton } from "@/components/layout/page-skeleton";
 import { FleetStatCard } from "@/components/cost-per-mile/fleet-stat-card";
+import {
+  DriversMark,
+  GaugeMark,
+  MilesMark,
+  ProfitMark,
+  RevenueMark,
+  TruckMark,
+} from "@/components/icons/brand-marks";
 import { CpmBarChart } from "@/components/cost-per-mile/cpm-bar-chart";
 import { ExpenseDonutChart } from "@/components/cost-per-mile/expense-donut-chart";
 import { getFleetOverview, getCpmSummary } from "@/lib/api-cpm";
@@ -73,39 +73,39 @@ export default function CostPerMilePage() {
             <FleetStatCard
               label="Avg Cost/Mile"
               value={`$${overview.avg_cost_per_mile.toFixed(2)}`}
-              icon={Gauge}
+              icon={GaugeMark}
               accent="blue"
             />
             <FleetStatCard
               label="Revenue/Mile"
               value={`$${overview.avg_revenue_per_mile.toFixed(2)}`}
-              icon={TrendingUp}
+              icon={RevenueMark}
               accent="green"
             />
             <FleetStatCard
               label="Profit/Mile"
               value={`$${overview.avg_profit_per_mile.toFixed(2)}`}
-              icon={DollarSign}
+              icon={ProfitMark}
               accent={overview.avg_profit_per_mile > 0 ? "green" : "red"}
             />
             <FleetStatCard
               label="Total Miles"
               value={formatNumber(overview.total_miles)}
-              icon={Route}
+              icon={MilesMark}
               detail={`${formatNumber(overview.total_empty_miles)} empty`}
               accent="blue"
             />
             <FleetStatCard
               label="Trucks"
               value={overview.truck_count}
-              icon={Truck}
+              icon={TruckMark}
               accent="blue"
               href="/cost-per-mile/trucks"
             />
             <FleetStatCard
               label="Drivers"
               value={overview.driver_count}
-              icon={Users}
+              icon={DriversMark}
               accent="blue"
               href="/cost-per-mile/drivers"
             />
@@ -129,7 +129,7 @@ export default function CostPerMilePage() {
           {/* Summary numbers */}
           <div className="grid gap-4 sm:grid-cols-3">
             <div className="rounded-3xl border border-white/8 bg-[linear-gradient(180deg,rgba(0,191,255,0.06)_0%,rgba(12,26,46,0.95)_28%)] p-6 shadow-[var(--shadow-elevated-1)]">
-              <p className="text-xs font-medium uppercase tracking-wider text-slate-400">
+              <p className="text-xs font-medium uppercase tracking-[0.14em] text-[#c5d8eb]">
                 Total Revenue
               </p>
               <p className="mt-2 text-2xl font-semibold text-foreground tabular-nums">
@@ -137,7 +137,7 @@ export default function CostPerMilePage() {
               </p>
             </div>
             <div className="rounded-3xl border border-white/8 bg-[linear-gradient(180deg,rgba(0,191,255,0.06)_0%,rgba(12,26,46,0.95)_28%)] p-6 shadow-[var(--shadow-elevated-1)]">
-              <p className="text-xs font-medium uppercase tracking-wider text-slate-400">
+              <p className="text-xs font-medium uppercase tracking-[0.14em] text-[#c5d8eb]">
                 Total Expenses
               </p>
               <p className="mt-2 text-2xl font-semibold text-foreground tabular-nums">
@@ -145,7 +145,7 @@ export default function CostPerMilePage() {
               </p>
             </div>
             <div className="rounded-3xl border border-white/8 bg-[linear-gradient(180deg,rgba(0,191,255,0.06)_0%,rgba(12,26,46,0.95)_28%)] p-6 shadow-[var(--shadow-elevated-1)]">
-              <p className="text-xs font-medium uppercase tracking-wider text-slate-400">
+              <p className="text-xs font-medium uppercase tracking-[0.14em] text-[#c5d8eb]">
                 Completed Trips
               </p>
               <p className="mt-2 text-2xl font-semibold text-foreground tabular-nums">

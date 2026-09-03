@@ -12,21 +12,23 @@ interface StatCardProps {
 
 export function StatCard({ label, value, icon: Icon, detail, href }: StatCardProps) {
   const card = (
-    <Card className="cursor-pointer rounded-3xl border border-white/10 bg-[linear-gradient(180deg,rgba(0,191,255,0.06)_0%,rgba(12,26,46,0.95)_28%)] shadow-[var(--shadow-elevated-1)] ring-0 transition-all duration-200 hover:-translate-y-1 hover:border-[var(--brand-cyan)]/25 hover:shadow-[var(--shadow-elevated-3)] active:translate-y-0">
-      <CardContent className="p-7">
-        <div className="flex items-start justify-between">
-          <div>
-            <p className="text-[13px] font-medium text-muted-foreground">{label}</p>
-            <p className="mt-3 text-[36px] font-semibold leading-none tracking-[-0.03em] text-foreground tabular-nums">
-              {value}
-            </p>
-            {detail && (
-              <p className="mt-2 text-xs text-muted-foreground tabular-nums">{detail}</p>
-            )}
-          </div>
-          <div className="flex h-10 w-10 items-center justify-center rounded-xl bg-[var(--brand-cyan-dim)]">
-            <Icon className="h-5 w-5 text-[var(--brand-cyan)]" />
-          </div>
+    <Card className="h-full rounded-2xl border border-white/10 bg-[#0b182b] shadow-[var(--shadow-elevated-1)] ring-0 transition-all duration-200 hover:-translate-y-0.5 hover:border-[var(--brand-cyan)]/25 hover:shadow-[var(--shadow-elevated-2)]">
+      <CardContent className="flex h-full flex-col gap-4 p-5">
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
+            {label}
+          </p>
+          <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[rgba(0,191,255,0.10)] text-[var(--brand-cyan)] ring-1 ring-[rgba(0,191,255,0.22)]">
+            <Icon className="h-[18px] w-[18px]" />
+          </span>
+        </div>
+        <div className="min-w-0">
+          <p className="truncate text-[28px] font-semibold leading-none tracking-[-0.03em] text-[#f3f8ff] tabular-nums">
+            {value}
+          </p>
+          {detail ? (
+            <p className="mt-2 text-[12px] font-medium text-[#b7cce0] tabular-nums">{detail}</p>
+          ) : null}
         </div>
       </CardContent>
     </Card>
@@ -34,7 +36,7 @@ export function StatCard({ label, value, icon: Icon, detail, href }: StatCardPro
 
   if (href) {
     return (
-      <Link href={href} className="block no-underline">
+      <Link href={href} className="block h-full no-underline">
         {card}
       </Link>
     );

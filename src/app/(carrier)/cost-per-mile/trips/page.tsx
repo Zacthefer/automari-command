@@ -76,8 +76,8 @@ export default function TripsPage() {
 
       {trips.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-2xl border border-white/10 bg-card py-16 shadow-[var(--shadow-elevated-1)]">
-          <p className="text-sm text-slate-500">No trips found</p>
-          <p className="mt-1 text-xs text-slate-400">
+          <p className="text-sm text-[#d5e6f6]">No trips found</p>
+          <p className="mt-1 text-xs text-[#b7cce0]">
             Log trips to start tracking cost per mile.
           </p>
         </div>
@@ -86,22 +86,22 @@ export default function TripsPage() {
           <Table>
             <TableHeader>
               <TableRow className="hover:bg-transparent">
-                <TableHead className="text-[11px] font-medium uppercase tracking-wider text-slate-500">
+                <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
                   Lane
                 </TableHead>
-                <TableHead className="text-[11px] font-medium uppercase tracking-wider text-slate-500">
+                <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
                   Miles
                 </TableHead>
-                <TableHead className="text-[11px] font-medium uppercase tracking-wider text-slate-500">
+                <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
                   Revenue
                 </TableHead>
-                <TableHead className="text-[11px] font-medium uppercase tracking-wider text-slate-500">
+                <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
                   $/Mile
                 </TableHead>
-                <TableHead className="text-[11px] font-medium uppercase tracking-wider text-slate-500">
+                <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
                   Date
                 </TableHead>
-                <TableHead className="text-[11px] font-medium uppercase tracking-wider text-slate-500">
+                <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
                   Status
                 </TableHead>
               </TableRow>
@@ -116,16 +116,16 @@ export default function TripsPage() {
                     {trip.origin_city}, {trip.origin_state} →{" "}
                     {trip.destination_city}, {trip.destination_state}
                   </TableCell>
-                  <TableCell className="font-mono text-[13px] text-slate-600 tabular-nums">
+                  <TableCell className="font-mono text-[13px] text-[#d7e8f8] tabular-nums">
                     {formatNumber(trip.miles)}
                   </TableCell>
                   <TableCell className="font-mono text-[13px] font-medium text-foreground tabular-nums">
                     {formatCurrency(trip.revenue)}
                   </TableCell>
-                  <TableCell className="font-mono text-[13px] text-slate-600 tabular-nums">
+                  <TableCell className="font-mono text-[13px] text-[#d7e8f8] tabular-nums">
                     ${(trip.revenue / trip.miles).toFixed(2)}
                   </TableCell>
-                  <TableCell className="text-[13px] text-slate-500 tabular-nums">
+                  <TableCell className="text-[13px] text-[#d7e8f8] tabular-nums">
                     {format(new Date(trip.start_date), "MMM d, yyyy")}
                   </TableCell>
                   <TableCell>

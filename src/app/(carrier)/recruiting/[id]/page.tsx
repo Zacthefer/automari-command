@@ -36,7 +36,7 @@ function Field({
 }) {
   return (
     <div>
-      <p className="text-xs font-medium text-slate-500">{label}</p>
+      <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#c5d8eb]">{label}</p>
       <p className="mt-0.5 text-sm text-foreground">{value || "—"}</p>
     </div>
   );
@@ -108,7 +108,7 @@ export default function ApplicantDetailPage() {
   if (!applicant) {
     return (
       <div className="py-16 text-center">
-        <p className="text-sm text-slate-500">Applicant not found.</p>
+        <p className="text-sm text-[#d5e6f6]">Applicant not found.</p>
       </div>
     );
   }

@@ -21,8 +21,8 @@ export function ClientTable({ clients }: ClientTableProps) {
   if (clients.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center rounded-2xl border border-white/10 bg-card py-16 shadow-[var(--shadow-elevated-1)]">
-        <p className="text-sm text-slate-500">No clients yet</p>
-        <p className="mt-1 text-xs text-slate-400">
+        <p className="text-sm text-[#d5e6f6]">No clients yet</p>
+        <p className="mt-1 text-xs text-[#b7cce0]">
           Add your first client to get started.
         </p>
       </div>
@@ -34,19 +34,19 @@ export function ClientTable({ clients }: ClientTableProps) {
       <Table>
         <TableHeader>
           <TableRow className="hover:bg-transparent">
-            <TableHead className="text-xs font-medium text-slate-500">
+            <TableHead className="text-xs font-semibold uppercase tracking-[0.12em] text-[#c5d8eb]">
               Company
             </TableHead>
-            <TableHead className="text-xs font-medium text-slate-500">
+            <TableHead className="text-xs font-semibold uppercase tracking-[0.12em] text-[#c5d8eb]">
               Contact
             </TableHead>
-            <TableHead className="text-xs font-medium text-slate-500">
+            <TableHead className="text-xs font-semibold uppercase tracking-[0.12em] text-[#c5d8eb]">
               Email
             </TableHead>
-            <TableHead className="text-xs font-medium text-slate-500">
+            <TableHead className="text-xs font-semibold uppercase tracking-[0.12em] text-[#c5d8eb]">
               Status
             </TableHead>
-            <TableHead className="text-xs font-medium text-slate-500">
+            <TableHead className="text-xs font-semibold uppercase tracking-[0.12em] text-[#c5d8eb]">
               Created
             </TableHead>
           </TableRow>
@@ -62,10 +62,10 @@ export function ClientTable({ clients }: ClientTableProps) {
                   {client.company_name}
                 </Link>
               </TableCell>
-              <TableCell className="text-slate-600">
+              <TableCell className="text-[#d7e8f8]">
                 {client.contact_name}
               </TableCell>
-              <TableCell className="text-slate-600">
+              <TableCell className="text-[#d7e8f8]">
                 {client.contact_email}
               </TableCell>
               <TableCell>
@@ -80,7 +80,7 @@ export function ClientTable({ clients }: ClientTableProps) {
                   {client.is_active ? "Active" : "Inactive"}
                 </Badge>
               </TableCell>
-              <TableCell className="text-slate-500 text-sm">
+              <TableCell className="text-sm text-[#d7e8f8]">
                 {format(new Date(client.created_at), "MMM d, yyyy")}
               </TableCell>
             </TableRow>

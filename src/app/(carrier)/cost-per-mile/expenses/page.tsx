@@ -79,8 +79,8 @@ export default function ExpensesPage() {
 
       {expenses.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-2xl border border-white/10 bg-card py-16 shadow-[var(--shadow-elevated-1)]">
-          <p className="text-sm text-slate-500">No expenses found</p>
-          <p className="mt-1 text-xs text-slate-400">
+          <p className="text-sm text-[#d5e6f6]">No expenses found</p>
+          <p className="mt-1 text-xs text-[#b7cce0]">
             Log expenses to start tracking cost per mile.
           </p>
         </div>
@@ -89,22 +89,22 @@ export default function ExpensesPage() {
           <Table>
             <TableHeader>
               <TableRow className="hover:bg-transparent">
-                <TableHead className="text-[11px] font-medium uppercase tracking-wider text-slate-500">
+                <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
                   Date
                 </TableHead>
-                <TableHead className="text-[11px] font-medium uppercase tracking-wider text-slate-500">
+                <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
                   Category
                 </TableHead>
-                <TableHead className="text-[11px] font-medium uppercase tracking-wider text-slate-500">
+                <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
                   Amount
                 </TableHead>
-                <TableHead className="text-[11px] font-medium uppercase tracking-wider text-slate-500">
+                <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
                   Vendor
                 </TableHead>
-                <TableHead className="text-[11px] font-medium uppercase tracking-wider text-slate-500">
+                <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
                   Description
                 </TableHead>
-                <TableHead className="text-[11px] font-medium uppercase tracking-wider text-slate-500">
+                <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
                   Source
                 </TableHead>
               </TableRow>
@@ -115,7 +115,7 @@ export default function ExpensesPage() {
                   key={expense.id}
                   className="group h-11 border-slate-100"
                 >
-                  <TableCell className="text-[13px] text-slate-600 tabular-nums">
+                  <TableCell className="text-[13px] text-[#d7e8f8] tabular-nums">
                     {format(new Date(expense.expense_date), "MMM d, yyyy")}
                   </TableCell>
                   <TableCell>
@@ -129,13 +129,13 @@ export default function ExpensesPage() {
                   <TableCell className="font-mono text-[13px] font-medium text-foreground tabular-nums">
                     {formatCurrency(expense.amount)}
                   </TableCell>
-                  <TableCell className="text-sm text-slate-600">
+                  <TableCell className="text-sm text-[#d7e8f8]">
                     {expense.vendor || "—"}
                   </TableCell>
-                  <TableCell className="max-w-[200px] truncate text-sm text-slate-500">
+                  <TableCell className="max-w-[200px] truncate text-sm text-[#d5e6f6]">
                     {expense.description || "—"}
                   </TableCell>
-                  <TableCell className="text-xs text-slate-400">
+                  <TableCell className="text-xs text-[#b7cce0]">
                     {expense.source === "manual"
                       ? "Manual"
                       : expense.source === "fuel_card_import"

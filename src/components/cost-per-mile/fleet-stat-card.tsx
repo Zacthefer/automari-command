@@ -1,21 +1,38 @@
-import Link from "next/link";
 import { Card, CardContent } from "@/components/ui/card";
-import type { LucideIcon } from "lucide-react";
+import { cn } from "@/lib/utils";
+import Link from "next/link";
+import type { ComponentType, SVGProps } from "react";
 
 interface FleetStatCardProps {
   label: string;
   value: string | number;
-  icon: LucideIcon;
+  icon: ComponentType<SVGProps<SVGSVGElement>>;
   detail?: string;
   accent?: "blue" | "green" | "amber" | "red";
   href?: string;
 }
 
 const accentStyles = {
-  blue: { bg: "bg-[var(--brand-cyan-dim)]", text: "text-[var(--brand-cyan)]" },
-  green: { bg: "bg-emerald-500/15", text: "text-emerald-300" },
-  amber: { bg: "bg-amber-500/15", text: "text-amber-300" },
-  red: { bg: "bg-red-500/15", text: "text-red-300" },
+  blue: {
+    ink: "text-[var(--brand-cyan)]",
+    wash: "bg-[rgba(0,191,255,0.10)]",
+    ring: "ring-[rgba(0,191,255,0.22)]",
+  },
+  green: {
+    ink: "text-emerald-300",
+    wash: "bg-emerald-400/10",
+    ring: "ring-emerald-300/25",
+  },
+  amber: {
+    ink: "text-amber-200",
+    wash: "bg-amber-400/10",
+    ring: "ring-amber-300/25",
+  },
+  red: {
+    ink: "text-rose-300",
+    wash: "bg-rose-400/10",
+    ring: "ring-rose-300/25",
+  },
 };
 
 export function FleetStatCard({
@@ -29,25 +46,32 @@ export function FleetStatCard({
   const colors = accentStyles[accent];
 
   const card = (
-    <Card className="cursor-pointer rounded-3xl border border-white/8 bg-[linear-gradient(180deg,rgba(0,191,255,0.06)_0%,rgba(12,26,46,0.95)_28%)] shadow-[var(--shadow-elevated-1)] transition-all duration-200 hover:-translate-y-1 hover:shadow-[var(--shadow-elevated-3)]">
-      <CardContent className="p-6">
-        <div className="flex items-start justify-between">
-          <div>
-            <p className="text-[13px] font-medium text-muted-foreground">{label}</p>
-            <p className="mt-2 text-[28px] font-semibold leading-none tracking-[-0.02em] text-foreground tabular-nums">
-              {value}
-            </p>
-            {detail && (
-              <p className="mt-1.5 text-xs text-slate-400 tabular-nums">
-                {detail}
-              </p>
+    <Card className="h-full rounded-2xl border border-white/10 bg-[#0b182b] shadow-[var(--shadow-elevated-1)] transition-all duration-200 hover:-translate-y-0.5 hover:border-white/16 hover:shadow-[var(--shadow-elevated-2)]">
+      <CardContent className="flex h-full flex-col gap-4 p-5">
+        <div className="flex items-center justify-between gap-3">
+          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
+            {label}
+          </p>
+          <span
+            className={cn(
+              "inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl ring-1",
+              colors.wash,
+              colors.ring,
+              colors.ink
             )}
-          </div>
-          <div
-            className={`flex h-10 w-10 items-center justify-center rounded-xl ${colors.bg}`}
           >
-            <Icon className={`h-5 w-5 ${colors.text}`} />
-          </div>
+            <Icon className="h-[18px] w-[18px]" />
+          </span>
+        </div>
+        <div className="min-w-0">
+          <p className="truncate text-[26px] font-semibold leading-none tracking-[-0.03em] text-[#f3f8ff] tabular-nums">
+            {value}
+          </p>
+          {detail ? (
+            <p className="mt-2 text-[12px] font-medium text-[#b7cce0] tabular-nums">
+              {detail}
+            </p>
+          ) : null}
         </div>
       </CardContent>
     </Card>
@@ -55,7 +79,7 @@ export function FleetStatCard({
 
   if (href) {
     return (
-      <Link href={href} className="block no-underline">
+      <Link href={href} className="block h-full no-underline">
         {card}
       </Link>
     );
