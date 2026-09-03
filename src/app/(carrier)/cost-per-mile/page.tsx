@@ -5,13 +5,13 @@ import { PageHeader } from "@/components/layout/page-header";
 import { PageSkeleton } from "@/components/layout/page-skeleton";
 import { FleetStatCard } from "@/components/cost-per-mile/fleet-stat-card";
 import {
-  DriversMark,
-  GaugeMark,
-  MilesMark,
-  ProfitMark,
-  RevenueMark,
-  TruckMark,
-} from "@/components/icons/brand-marks";
+  CostGaugeIcon,
+  DriversMotionIcon,
+  MilesRouteIcon,
+  ProfitPulseIcon,
+  RevenueTrendIcon,
+  TruckMotionIcon,
+} from "@/components/icons/metric-state-icons";
 import { CpmBarChart } from "@/components/cost-per-mile/cpm-bar-chart";
 import { ExpenseDonutChart } from "@/components/cost-per-mile/expense-donut-chart";
 import { getFleetOverview, getCpmSummary } from "@/lib/api-cpm";
@@ -73,41 +73,47 @@ export default function CostPerMilePage() {
             <FleetStatCard
               label="Avg Cost/Mile"
               value={`$${overview.avg_cost_per_mile.toFixed(2)}`}
-              icon={GaugeMark}
+              icon={CostGaugeIcon}
               accent="blue"
+              index={0}
             />
             <FleetStatCard
               label="Revenue/Mile"
               value={`$${overview.avg_revenue_per_mile.toFixed(2)}`}
-              icon={RevenueMark}
+              icon={RevenueTrendIcon}
               accent="green"
+              index={1}
             />
             <FleetStatCard
               label="Profit/Mile"
               value={`$${overview.avg_profit_per_mile.toFixed(2)}`}
-              icon={ProfitMark}
+              icon={ProfitPulseIcon}
               accent={overview.avg_profit_per_mile > 0 ? "green" : "red"}
+              index={2}
             />
             <FleetStatCard
               label="Total Miles"
               value={formatNumber(overview.total_miles)}
-              icon={MilesMark}
+              icon={MilesRouteIcon}
               detail={`${formatNumber(overview.total_empty_miles)} empty`}
               accent="blue"
+              index={3}
             />
             <FleetStatCard
               label="Trucks"
               value={overview.truck_count}
-              icon={TruckMark}
+              icon={TruckMotionIcon}
               accent="blue"
               href="/cost-per-mile/trucks"
+              index={4}
             />
             <FleetStatCard
               label="Drivers"
               value={overview.driver_count}
-              icon={DriversMark}
+              icon={DriversMotionIcon}
               accent="blue"
               href="/cost-per-mile/drivers"
+              index={5}
             />
           </div>
 
