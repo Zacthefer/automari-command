@@ -8,7 +8,13 @@ import {
   useCallback,
   type ReactNode,
 } from "react";
-import { getMe, logout as apiLogout, getToken } from "@/lib/api";
+import {
+  getMe,
+  logout as apiLogout,
+  getToken,
+  getCachedUser,
+  cacheUser,
+} from "@/lib/api";
 import type { User } from "@/types";
 
 interface AuthState {
@@ -25,6 +31,8 @@ interface AuthContextValue extends AuthState {
 const AuthContext = createContext<AuthContextValue | null>(null);
 
 export function AuthProvider({ children }: { children: ReactNode }) {
+  // Keep SSR + first client render identical to avoid hydration mismatches
+  // that can break form event handlers on the login flow.
   const [state, setState] = useState<AuthState>({
     user: null,
     loading: true,
@@ -38,8 +46,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
       return;
     }
 
+    const cached = getCachedUser();
+    if (cached) {
+      setState({ user: cached, loading: false, error: null });
+    }
+
     try {
       const user = await getMe();
+      cacheUser(user);
       setState({ user, loading: false, error: null });
     } catch {
       setState({ user: null, loading: false, error: "Session expired" });
@@ -47,7 +61,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, []);
 
   useEffect(() => {
-    refresh();
+    void refresh();
   }, [refresh]);
 
   const logout = useCallback(() => {

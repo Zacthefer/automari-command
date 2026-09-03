@@ -20,6 +20,41 @@ function setToken(token: string): void {
 
 function clearToken(): void {
   localStorage.removeItem("automari_token");
+  if (typeof window !== "undefined") {
+    sessionStorage.removeItem("automari_user");
+  }
+}
+
+export function cacheUser(user: import("@/types").User): void {
+  sessionStorage.setItem("automari_user", JSON.stringify(user));
+}
+
+export function getCachedUser(): import("@/types").User | null {
+  if (typeof window === "undefined") return null;
+  const raw = sessionStorage.getItem("automari_user");
+  if (!raw) return null;
+  try {
+    return JSON.parse(raw) as import("@/types").User;
+  } catch {
+    return null;
+  }
+}
+
+/** Wake the Render API (cold starts can take 30–60s). Fire-and-forget safe. */
+export async function wakeApi(): Promise<boolean> {
+  try {
+    const controller = new AbortController();
+    const timer = setTimeout(() => controller.abort(), 45000);
+    const res = await fetch(`${API_BASE}/health`, {
+      method: "GET",
+      cache: "no-store",
+      signal: controller.signal,
+    });
+    clearTimeout(timer);
+    return res.ok;
+  } catch {
+    return false;
+  }
 }
 
 async function request<T>(
@@ -64,15 +99,35 @@ async function request<T>(
 // ── Auth ──────────────────────────────────────────────
 
 export async function login(email: string, password: string) {
-  const data = await request<{ access_token: string; token_type: string }>(
-    "/api/auth/login",
-    {
+  const controller = new AbortController();
+  const timer = setTimeout(() => controller.abort(), 60000);
+
+  try {
+    const data = await request<{
+      access_token: string;
+      token_type: string;
+      user?: import("@/types").User;
+    }>("/api/auth/login", {
       method: "POST",
       body: JSON.stringify({ email, password }),
+      signal: controller.signal,
+    });
+    setToken(data.access_token);
+    if (data.user) {
+      cacheUser(data.user);
     }
-  );
-  setToken(data.access_token);
-  return data;
+    return data;
+  } catch (err) {
+    if (err instanceof DOMException && err.name === "AbortError") {
+      throw new ApiError(
+        "Sign-in is taking too long — the server may be waking up. Please try again.",
+        408
+      );
+    }
+    throw err;
+  } finally {
+    clearTimeout(timer);
+  }
 }
 
 export async function getMe() {

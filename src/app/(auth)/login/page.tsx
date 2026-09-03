@@ -1,22 +1,50 @@
 "use client";
 
-import { useState, type FormEvent } from "react";
-import Image from "next/image";
+import { useEffect, useState, type FormEvent } from "react";
 import { useRouter } from "next/navigation";
 import { BrandMark } from "@/components/layout/brand-mark";
+import { SignInOverlay } from "@/components/auth/signin-overlay";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
-import { login } from "@/lib/api";
+import { login, wakeApi } from "@/lib/api";
+
+type Phase = "idle" | "waking" | "signing" | "routing";
 
 export default function LoginPage() {
   const router = useRouter();
   const [loading, setLoading] = useState(false);
+  const [phase, setPhase] = useState<Phase>("idle");
   const [error, setError] = useState<string | null>(null);
+  const [apiReady, setApiReady] = useState(false);
+
+  useEffect(() => {
+    let cancelled = false;
+    router.prefetch("/dashboard");
+
+    (async () => {
+      const ok = await wakeApi();
+      if (!cancelled) setApiReady(ok);
+    })();
+
+    // Keep Render warm while the login page is open
+    const keepAlive = window.setInterval(() => {
+      void wakeApi();
+    }, 4 * 60 * 1000);
+
+    return () => {
+      cancelled = true;
+      window.clearInterval(keepAlive);
+    };
+  }, [router]);
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
+    e.stopPropagation();
+    if (loading) return;
+
     setLoading(true);
+    setPhase("signing");
     setError(null);
 
     const form = new FormData(e.currentTarget);
@@ -24,20 +52,52 @@ export default function LoginPage() {
     const password = form.get("password") as string;
 
     try {
+      // Warm API in parallel with a short race so UI never feels frozen
+      if (!apiReady) {
+        setPhase("waking");
+        const warmed = await Promise.race([
+          wakeApi().then((ok) => ok),
+          new Promise<boolean>((resolve) => setTimeout(() => resolve(false), 8000)),
+        ]);
+        if (warmed) setApiReady(true);
+      }
+
+      setPhase("signing");
       await login(email, password);
-      router.push("/dashboard");
+
+      setPhase("routing");
+      window.location.assign("/dashboard");
     } catch (err) {
+      setPhase("idle");
+      setLoading(false);
       setError(
         err instanceof Error ? err.message : "Invalid email or password"
       );
-    } finally {
-      setLoading(false);
     }
   }
 
+  const overlayCopy =
+    phase === "waking"
+      ? {
+          status: "Waking command systems…",
+          detail: "Backend may be cold-starting — usually under a minute.",
+        }
+      : phase === "routing"
+        ? {
+            status: "Launching dashboard…",
+            detail: "Credentials verified. Loading your workspace.",
+          }
+        : {
+            status: "Signing you in…",
+            detail: "Securing your Automari.Ai session.",
+          };
+
   return (
     <div className="flex min-h-screen bg-background">
-      {/* Left — brand stage */}
+      {loading ? (
+        <SignInOverlay status={overlayCopy.status} detail={overlayCopy.detail} />
+      ) : null}
+
       <div className="brand-surface relative hidden overflow-hidden lg:flex lg:w-[52%] flex-col justify-between p-12 text-white">
         <div className="brand-grid pointer-events-none absolute inset-0" />
         <div
@@ -73,7 +133,6 @@ export default function LoginPage() {
         </p>
       </div>
 
-      {/* Right — sign in */}
       <div className="relative flex flex-1 items-center justify-center px-6 py-12">
         <div
           className="pointer-events-none absolute inset-0 opacity-60"
@@ -103,7 +162,7 @@ export default function LoginPage() {
               </div>
             )}
 
-            <form onSubmit={handleSubmit} className="space-y-5">
+            <form onSubmit={handleSubmit} method="post" action="#" className="space-y-5">
               <div className="space-y-2">
                 <Label htmlFor="email" className="text-[#c5d8eb]">
                   Email
@@ -114,6 +173,7 @@ export default function LoginPage() {
                   type="email"
                   required
                   autoComplete="email"
+                  disabled={loading}
                   placeholder="you@company.com"
                   className="h-11 border-white/10 bg-[#07111f]/70 text-white placeholder:text-[#5f7a96]"
                 />
@@ -128,16 +188,26 @@ export default function LoginPage() {
                   type="password"
                   required
                   autoComplete="current-password"
+                  disabled={loading}
                   placeholder="Enter your password"
                   className="h-11 border-white/10 bg-[#07111f]/70 text-white placeholder:text-[#5f7a96]"
                 />
               </div>
               <Button
                 type="submit"
-                className="mt-2 h-11 w-full bg-[var(--brand-cyan)] font-semibold text-[#001018] hover:bg-[var(--brand-cyan-soft)]"
+                className="relative mt-2 h-11 w-full overflow-hidden bg-[var(--brand-cyan)] font-semibold text-[#001018] hover:bg-[var(--brand-cyan-soft)]"
                 disabled={loading}
               >
-                {loading ? "Signing in..." : "Sign in"}
+                {loading ? (
+                  <span className="inline-flex items-center gap-2">
+                    <span className="signin-dot h-1.5 w-1.5 rounded-full bg-[#001018]" />
+                    <span className="signin-dot h-1.5 w-1.5 rounded-full bg-[#001018]" style={{ animationDelay: "0.12s" }} />
+                    <span className="signin-dot h-1.5 w-1.5 rounded-full bg-[#001018]" style={{ animationDelay: "0.24s" }} />
+                    <span>Signing in…</span>
+                  </span>
+                ) : (
+                  "Sign in"
+                )}
               </Button>
             </form>
           </div>
