@@ -1,0 +1,15 @@
+[config]
+model = "anthropic/claude-haiku-4-5"
+
+[pr_reviewer]
+num_code_suggestions = 4
+extra_instructions = "Focus on security vulnerabilities, logic errors, and breaking changes. Flag anything that could fail in production. Check for hardcoded secrets, unsanitized inputs, and missing auth checks."
+require_security_review = true
+require_tests_review = true
+
+[pr_code_suggestions]
+num_code_suggestions = 4
+enable_large_pr_chunking = true
+
+[ignore]
+glob = ["*.lock", "node_modules/**", "dist/**", "*.min.js", "*.min.css", "package-lock.json", "yarn.lock"]
