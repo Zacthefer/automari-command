@@ -115,7 +115,7 @@ function mark(steps: Step[], index: number, state: StepState, detail?: string): 
   );
 }
 
-function asList<T>(value: T[] | unknown): T[] {
+function asList<T>(value: T[] | null | undefined): T[] {
   return Array.isArray(value) ? value : [];
 }
 
