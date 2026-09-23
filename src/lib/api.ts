@@ -9,6 +9,25 @@ class ApiError extends Error {
   }
 }
 
+function readApiDetail(detail: unknown, status: number): string {
+  if (typeof detail === "string" && detail.trim()) return detail.slice(0, 400);
+  if (Array.isArray(detail)) {
+    const parts = detail
+      .map((item) => {
+        if (typeof item === "string") return item;
+        if (item && typeof item === "object" && "msg" in item) {
+          const loc = "loc" in item ? String((item as { loc: unknown }).loc) : "";
+          return `${loc} ${String((item as { msg: unknown }).msg)}`.trim();
+        }
+        return "";
+      })
+      .filter(Boolean);
+    if (parts.length) return parts.join(". ");
+  }
+  if (detail && typeof detail === "object") return JSON.stringify(detail).slice(0, 400);
+  return `Request failed with status ${status}`;
+}
+
 function getToken(): string | null {
   if (typeof window === "undefined") return null;
   return localStorage.getItem("automari_token");
@@ -87,7 +106,7 @@ async function request<T>(
   if (!response.ok) {
     const body = await response.json().catch(() => ({}));
     throw new ApiError(
-      body.detail || `Request failed with status ${response.status}`,
+      readApiDetail(body.detail, response.status),
       response.status
     );
   }
@@ -185,11 +204,19 @@ export async function uploadBol(file: File): Promise<import("@/types").BOL> {
   }
 
   if (!response.ok) {
-    const body = await response.json().catch(() => ({}));
-    throw new ApiError(
-      body.detail || `Upload failed with status ${response.status}`,
-      response.status
-    );
+    const raw = await response.text();
+    let detail: unknown;
+    try {
+      detail = JSON.parse(raw).detail;
+    } catch {
+      detail = raw;
+    }
+    const message = readApiDetail(detail, response.status);
+    const extra =
+      message.startsWith("Request failed") && raw.trim()
+        ? `: ${raw.trim().slice(0, 280)}`
+        : "";
+    throw new ApiError(`${message}${extra}`, response.status);
   }
 
   return response.json();

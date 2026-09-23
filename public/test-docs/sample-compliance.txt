@@ -1,0 +1,9 @@
+Sample compliance document for testing.
+
+Document: CDL
+Holder: Test Driver
+Holder type: Driver
+Number: TEST-CDL
+Authority: Florida DHSMV
+Status to expect: valid
+Notes: This file is only a sample. The Test button creates a real record from it.

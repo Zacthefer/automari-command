@@ -1,8 +1,9 @@
 "use client";
 
 import { useEffect } from "react";
-import { useRouter } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import { AuthProvider, useAuth } from "@/lib/auth";
+import { isTestSectionEnabled } from "@/lib/test-section";
 import { Sidebar } from "@/components/layout/sidebar";
 import { Header } from "@/components/layout/header";
 import { PageSkeleton } from "@/components/layout/page-skeleton";
@@ -10,15 +11,18 @@ import { PageSkeleton } from "@/components/layout/page-skeleton";
 function AdminGate({ children }: { children: React.ReactNode }) {
   const { user, loading } = useAuth();
   const router = useRouter();
+  const pathname = usePathname();
+  const devTest =
+    isTestSectionEnabled() && pathname.startsWith("/admin/test");
 
   useEffect(() => {
     if (!loading && !user) {
       router.replace("/login");
     }
-    if (!loading && user && user.role !== "admin") {
+    if (!loading && user && user.role !== "admin" && !devTest) {
       router.replace("/dashboard");
     }
-  }, [loading, user, router]);
+  }, [loading, user, router, devTest]);
 
   if (loading) {
     return (
@@ -28,7 +32,7 @@ function AdminGate({ children }: { children: React.ReactNode }) {
     );
   }
 
-  if (!user || user.role !== "admin") return null;
+  if (!user || (user.role !== "admin" && !devTest)) return null;
 
   return (
     <div className="min-h-screen bg-background">

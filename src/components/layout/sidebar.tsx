@@ -11,8 +11,10 @@ import {
   LogOut,
   TrendingUp,
   UserPlus,
+  FlaskConical,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
+import { isTestSectionEnabled } from "@/lib/test-section";
 import { cn } from "@/lib/utils";
 import { BrandMark } from "@/components/layout/brand-mark";
 
@@ -25,9 +27,14 @@ const carrierNav = [
   { label: "Cost Per Mile", href: "/cost-per-mile", icon: TrendingUp },
 ];
 
+const testNav = isTestSectionEnabled()
+  ? [{ label: "Test Section", href: "/admin/test", icon: FlaskConical }]
+  : [];
+
 const adminNav = [
   { label: "Overview", href: "/dashboard", icon: LayoutDashboard },
   { label: "Clients", href: "/admin/clients", icon: Building2 },
+  ...testNav,
   { label: "BOLs", href: "/bols", icon: FileText },
   { label: "Invoices", href: "/invoices", icon: Receipt },
   { label: "Compliance", href: "/compliance", icon: ShieldCheck },
@@ -39,7 +46,8 @@ export function Sidebar() {
   const pathname = usePathname();
   const { user, logout } = useAuth();
 
-  const navItems = user?.role === "admin" ? adminNav : carrierNav;
+  const navItems =
+    user?.role === "admin" ? adminNav : [...carrierNav, ...testNav];
 
   return (
     <aside className="fixed inset-y-0 left-0 z-30 flex w-64 flex-col border-r border-[var(--sidebar-border)] bg-[var(--brand-navy)] text-[var(--sidebar-foreground)]">
