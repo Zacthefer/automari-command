@@ -158,3 +158,129 @@ export interface RecruitingSummary {
   rejected: number;
   hired: number;
 }
+
+// ── Loads / Rate Cons ────────────────────────────────
+
+export type LoadStatus = "needs_review" | "booked" | "delivered" | "invoiced" | "paid";
+export type RateConStatus = "approved" | "review" | "superseded" | "rejected" | "failed";
+export type PaymentStatus = "not_ready" | "ready_to_submit" | "submitted" | "processing" | "paid" | "action_required";
+export type PaymentPath = "direct" | "quickpay" | "factoring";
+
+export interface AccessorialItem {
+  type: string | null;
+  description: string | null;
+  amount: number | null;
+}
+
+export interface RateConfirmation {
+  id: string;
+  load_id: string | null;
+  version: number | null;
+  status: RateConStatus;
+  filename: string | null;
+  content_type: string | null;
+  confidence: number | null;
+  field_confidence: Record<string, number> | null;
+  review_reasons: string[] | null;
+  changes: Record<string, unknown> | null;
+  revision_reason: string | null;
+  load_number: string | null;
+  broker_name: string | null;
+  broker_email: string | null;
+  carrier_name: string | null;
+  origin: string | null;
+  destination: string | null;
+  pickup_at: string | null;
+  delivery_at: string | null;
+  equipment_type: string | null;
+  commodity: string | null;
+  weight: number | null;
+  payment_terms: string | null;
+  special_instructions: string | null;
+  stops: unknown[] | null;
+  linehaul: number | null;
+  fuel_surcharge: number | null;
+  accessorial_items: AccessorialItem[];
+  accessorial_total: number | null;
+  total_rate: number | null;
+  approved_at: string | null;
+  created_at: string;
+}
+
+export interface LoadDocument {
+  id: string;
+  kind: string;
+  bol_id: string | null;
+  filename: string | null;
+  created_at: string;
+}
+
+export interface LoadEvent {
+  id: string;
+  event_type: string;
+  detail: Record<string, unknown> | null;
+  created_at: string;
+}
+
+export interface PipelineStep {
+  key: string;
+  state: "done" | "pending" | "ready" | "attention";
+  detail: string | null;
+}
+
+export interface PacketDocument {
+  kind: string;
+  id: string;
+  label: string;
+  status: string;
+  url: string;
+}
+
+export interface BillingPacket {
+  load_id: string;
+  complete: boolean;
+  missing: string[];
+  documents: PacketDocument[];
+  total_amount: number | null;
+}
+
+export interface LoadSummary {
+  id: string;
+  load_number: string | null;
+  status: LoadStatus;
+  broker_name: string | null;
+  origin: string | null;
+  destination: string | null;
+  pickup_at: string | null;
+  delivery_at: string | null;
+  invoice_id: string | null;
+  payment_path: string | null;
+  payment_status: PaymentStatus;
+  submitted_at: string | null;
+  paid_at: string | null;
+  current_total: number | null;
+  original_total: number | null;
+  missing: string[];
+  created_at: string;
+}
+
+export interface LoadDetail extends LoadSummary {
+  broker_email: string | null;
+  carrier_name: string | null;
+  equipment_type: string | null;
+  commodity: string | null;
+  weight: number | null;
+  payment_terms: string | null;
+  special_instructions: string | null;
+  stops: unknown[] | null;
+  payment_provider: string | null;
+  payment_external_ref: string | null;
+  payment_note: string | null;
+  payment_status_at: string | null;
+  aging_days: number | null;
+  pipeline: PipelineStep[];
+  packet: BillingPacket;
+  rate_confirmations: RateConfirmation[];
+  documents: LoadDocument[];
+  events: LoadEvent[];
+}

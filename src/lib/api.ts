@@ -444,6 +444,150 @@ export async function getRecruitingSummary() {
   );
 }
 
+// ── Loads ─────────────────────────────────────────────
+
+export async function getLoads(params?: {
+  status?: string;
+  payment_status?: string;
+  skip?: number;
+  limit?: number;
+}) {
+  const query = new URLSearchParams();
+  if (params?.status) query.set("status", params.status);
+  if (params?.payment_status) query.set("payment_status", params.payment_status);
+  if (params?.skip) query.set("skip", String(params.skip));
+  if (params?.limit) query.set("limit", String(params.limit));
+  const qs = query.toString();
+  return request<import("@/types").LoadSummary[]>(
+    `/api/loads/${qs ? `?${qs}` : ""}`
+  );
+}
+
+export async function getLoad(id: string) {
+  return request<import("@/types").LoadDetail>(`/api/loads/${id}`);
+}
+
+export async function uploadRateCon(file: File): Promise<{
+  rate_con: import("@/types").RateConfirmation;
+  duplicate: boolean;
+}> {
+  const token = getToken();
+  const formData = new FormData();
+  formData.append("file", file);
+
+  const response = await fetch(`${API_BASE}/api/loads/rate-cons/upload`, {
+    method: "POST",
+    headers: token ? { Authorization: `Bearer ${token}` } : {},
+    body: formData,
+  });
+
+  if (response.status === 401) {
+    clearToken();
+    if (typeof window !== "undefined") {
+      window.location.href = "/login";
+    }
+    throw new ApiError("Unauthorized", 401);
+  }
+
+  if (!response.ok) {
+    const raw = await response.text();
+    let detail: unknown;
+    try {
+      detail = JSON.parse(raw).detail;
+    } catch {
+      detail = raw;
+    }
+    throw new ApiError(readApiDetail(detail, response.status), response.status);
+  }
+
+  return response.json();
+}
+
+export async function getRateCon(id: string) {
+  return request<import("@/types").RateConfirmation>(
+    `/api/loads/rate-cons/${id}`
+  );
+}
+
+export function getRateConFileUrl(rateConId: string): string {
+  const token = getToken();
+  const base = `${API_BASE}/api/loads/rate-cons/${rateConId}/file`;
+  return token ? `${base}?token=${token}` : base;
+}
+
+export async function reviewRateCon(
+  id: string,
+  data: {
+    approve?: boolean;
+    load_number?: string;
+    broker_name?: string;
+    broker_email?: string;
+    carrier_name?: string;
+    origin?: string;
+    destination?: string;
+    pickup_at?: string;
+    delivery_at?: string;
+    payment_terms?: string;
+    linehaul?: number;
+    fuel_surcharge?: number;
+    total_rate?: number;
+    accessorials?: import("@/types").AccessorialItem[];
+  }
+) {
+  return request<import("@/types").RateConfirmation>(
+    `/api/loads/rate-cons/${id}`,
+    { method: "PATCH", body: JSON.stringify(data) }
+  );
+}
+
+export async function rejectRateCon(id: string, reason?: string) {
+  return request<import("@/types").RateConfirmation>(
+    `/api/loads/rate-cons/${id}/reject`,
+    { method: "POST", body: JSON.stringify({ reason }) }
+  );
+}
+
+export async function attachDocument(
+  loadId: string,
+  data: { bol_id: string; kind?: string }
+) {
+  return request<import("@/types").LoadDetail>(
+    `/api/loads/${loadId}/documents`,
+    { method: "POST", body: JSON.stringify(data) }
+  );
+}
+
+export async function submitForPayment(
+  loadId: string,
+  data: { path: string; external_reference?: string }
+) {
+  return request<import("@/types").LoadDetail>(
+    `/api/loads/${loadId}/submit`,
+    { method: "POST", body: JSON.stringify(data) }
+  );
+}
+
+export async function updatePaymentStatus(
+  loadId: string,
+  data: {
+    status: string;
+    external_reference?: string;
+    note?: string;
+    paid_at?: string;
+  }
+) {
+  return request<import("@/types").LoadDetail>(
+    `/api/loads/${loadId}/payment-status`,
+    { method: "POST", body: JSON.stringify(data) }
+  );
+}
+
+export async function getPacket(loadId: string) {
+  return request<import("@/types").BillingPacket>(
+    `/api/loads/${loadId}/packet`
+  );
+}
+
 // ── Tenants (Admin) ───────────────────────────────────
 
 export async function getTenants(params?: {
