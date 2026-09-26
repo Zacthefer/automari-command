@@ -12,6 +12,7 @@ import {
   TrendingUp,
   UserPlus,
   FlaskConical,
+  Truck,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { isTestSectionEnabled } from "@/lib/test-section";
@@ -20,6 +21,7 @@ import { BrandMark } from "@/components/layout/brand-mark";
 
 const carrierNav = [
   { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
+  { label: "Loads", href: "/loads", icon: Truck },
   { label: "BOLs", href: "/bols", icon: FileText },
   { label: "Invoices", href: "/invoices", icon: Receipt },
   { label: "Compliance", href: "/compliance", icon: ShieldCheck },
@@ -35,6 +37,7 @@ const adminNav = [
   { label: "Overview", href: "/dashboard", icon: LayoutDashboard },
   { label: "Clients", href: "/admin/clients", icon: Building2 },
   ...testNav,
+  { label: "Loads", href: "/loads", icon: Truck },
   { label: "BOLs", href: "/bols", icon: FileText },
   { label: "Invoices", href: "/invoices", icon: Receipt },
   { label: "Compliance", href: "/compliance", icon: ShieldCheck },
