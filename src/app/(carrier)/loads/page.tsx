@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useCallback } from "react";
 import { PageHeader } from "@/components/layout/page-header";
 import { PageSkeleton } from "@/components/layout/page-skeleton";
 import { LoadsTable } from "@/components/loads/loads-table";
@@ -25,14 +25,28 @@ export default function LoadsPage() {
   const [statusFilter, setStatusFilter] = useState("");
   const fileInputRef = useRef<HTMLInputElement>(null);
 
-  function fetchLoads(status?: string) {
-    getLoads({ status: status || undefined, limit: 50 })
-      .then(setLoads)
-      .catch((err) => setError(err instanceof Error ? err.message : "Failed to load"))
-      .finally(() => setLoading(false));
-  }
+  const fetchLoads = useCallback(
+    (status?: string, signal?: AbortSignal) => {
+      getLoads({ status: status || undefined, limit: 50 })
+        .then((data) => {
+          if (!signal?.aborted) setLoads(data);
+        })
+        .catch((err) => {
+          if (!signal?.aborted)
+            setError(err instanceof Error ? err.message : "Failed to load");
+        })
+        .finally(() => {
+          if (!signal?.aborted) setLoading(false);
+        });
+    },
+    []
+  );
 
-  useEffect(() => { fetchLoads(statusFilter); }, [statusFilter]);
+  useEffect(() => {
+    const controller = new AbortController();
+    fetchLoads(statusFilter, controller.signal);
+    return () => controller.abort();
+  }, [statusFilter, fetchLoads]);
 
   async function handleFileChange(e: React.ChangeEvent<HTMLInputElement>) {
     const file = e.target.files?.[0];

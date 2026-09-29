@@ -8,7 +8,6 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PageSkeleton } from "@/components/layout/page-skeleton";
 import { BolStatusChip } from "@/components/bols/bol-status-chip";
@@ -48,7 +47,13 @@ export default function BolDetailPage() {
     setShowAttach(true);
     setAttachError(null);
     setAttachSuccess(null);
-    getLoads({ limit: 100 }).then(setLoads).catch(() => {});
+    getLoads({ limit: 100 })
+      .then(setLoads)
+      .catch((err) =>
+        setAttachError(
+          err instanceof Error ? err.message : "Failed to fetch loads"
+        )
+      );
   }
 
   async function handleAttach() {

@@ -31,7 +31,7 @@ import {
   rejectRateCon,
   submitForPayment,
   updatePaymentStatus,
-  getRateConFileUrl,
+  downloadRateConFile,
 } from "@/lib/api";
 import type {
   LoadDetail,
@@ -46,6 +46,33 @@ function formatCurrency(amount: number | null): string {
     style: "currency",
     currency: "USD",
   }).format(amount);
+}
+
+function safeFormatDate(
+  value: string | null | undefined,
+  fmt: string = "MMM d, yyyy"
+): string {
+  if (!value) return "—";
+  const date = new Date(value);
+  if (isNaN(date.getTime())) return "—";
+  return format(date, fmt);
+}
+
+function renderEventDetail(detail: Record<string, unknown>): React.ReactNode {
+  const entries = Object.entries(detail);
+  if (entries.length === 0) return null;
+  return (
+    <div className="mt-0.5 space-y-0.5">
+      {entries.map(([key, val]) => (
+        <p key={key} className="text-xs text-[#8aa3bd]">
+          <span className="text-[#6f8aaa]">{key.replace(/_/g, " ")}:</span>{" "}
+          {typeof val === "object" && val !== null
+            ? JSON.stringify(val)
+            : String(val ?? "—")}
+        </p>
+      ))}
+    </div>
+  );
 }
 
 function Field({
@@ -216,15 +243,22 @@ function RateConCard({
           )}
 
           {rc.filename && (
-            <a
-              href={getRateConFileUrl(rc.id)}
-              target="_blank"
-              rel="noopener noreferrer"
+            <button
+              onClick={async () => {
+                try {
+                  const blob = await downloadRateConFile(rc.id);
+                  const url = URL.createObjectURL(blob);
+                  window.open(url, "_blank");
+                  setTimeout(() => URL.revokeObjectURL(url), 60000);
+                } catch {
+                  /* download error handled silently — file is non-critical view */
+                }
+              }}
               className="inline-flex items-center gap-1.5 text-xs text-[var(--brand-cyan)] hover:underline"
             >
               <FileText className="h-3 w-3" />
               {rc.filename}
-            </a>
+            </button>
           )}
 
           {rc.status === "review" && (
@@ -557,19 +591,11 @@ export default function LoadDetailPage() {
               <Field label="Destination" value={load.destination} />
               <Field
                 label="Pickup"
-                value={
-                  load.pickup_at
-                    ? format(new Date(load.pickup_at), "MMM d, yyyy")
-                    : null
-                }
+                value={safeFormatDate(load.pickup_at)}
               />
               <Field
                 label="Delivery"
-                value={
-                  load.delivery_at
-                    ? format(new Date(load.delivery_at), "MMM d, yyyy")
-                    : null
-                }
+                value={safeFormatDate(load.delivery_at)}
               />
               <Field label="Equipment" value={load.equipment_type} />
               <Field label="Commodity" value={load.commodity} />
@@ -636,19 +662,11 @@ export default function LoadDetailPage() {
             <div className="grid gap-4 sm:grid-cols-2">
               <Field
                 label="Submitted"
-                value={
-                  load.submitted_at
-                    ? format(new Date(load.submitted_at), "MMM d, yyyy h:mm a")
-                    : null
-                }
+                value={safeFormatDate(load.submitted_at, "MMM d, yyyy h:mm a")}
               />
               <Field
                 label="Paid"
-                value={
-                  load.paid_at
-                    ? format(new Date(load.paid_at), "MMM d, yyyy h:mm a")
-                    : null
-                }
+                value={safeFormatDate(load.paid_at, "MMM d, yyyy h:mm a")}
               />
             </div>
 
@@ -685,7 +703,18 @@ export default function LoadDetailPage() {
                           className="flex items-center gap-2 text-xs text-[#d7e8f8]"
                         >
                           <FileText className="h-3 w-3 text-[#6f8aaa]" />
-                          <span>{doc.label}</span>
+                          {doc.url ? (
+                            <a
+                              href={doc.url}
+                              target="_blank"
+                              rel="noopener noreferrer"
+                              className="hover:text-[var(--brand-cyan)] hover:underline"
+                            >
+                              {doc.label}
+                            </a>
+                          ) : (
+                            <span>{doc.label}</span>
+                          )}
                           <Badge
                             variant="secondary"
                             className="text-[10px] bg-slate-100 text-slate-700 hover:bg-slate-100"
@@ -750,7 +779,7 @@ export default function LoadDetailPage() {
                         </p>
                         <p className="text-xs text-[#8aa3bd]">
                           {doc.kind.toUpperCase()} ·{" "}
-                          {format(new Date(doc.created_at), "MMM d, yyyy")}
+                          {safeFormatDate(doc.created_at)}
                         </p>
                       </div>
                     </div>
@@ -776,16 +805,9 @@ export default function LoadDetailPage() {
                       <p className="text-sm text-foreground">
                         {event.event_type.replace(/_/g, " ")}
                       </p>
-                      {event.detail && (
-                        <p className="text-xs text-[#8aa3bd]">
-                          {JSON.stringify(event.detail)}
-                        </p>
-                      )}
+                      {event.detail && renderEventDetail(event.detail)}
                       <p className="text-[11px] text-[#6f8aaa]">
-                        {format(
-                          new Date(event.created_at),
-                          "MMM d, yyyy h:mm a"
-                        )}
+                        {safeFormatDate(event.created_at, "MMM d, yyyy h:mm a")}
                       </p>
                     </div>
                   </div>

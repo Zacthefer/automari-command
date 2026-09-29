@@ -509,10 +509,28 @@ export async function getRateCon(id: string) {
   );
 }
 
-export function getRateConFileUrl(rateConId: string): string {
+export async function downloadRateConFile(rateConId: string): Promise<Blob> {
   const token = getToken();
-  const base = `${API_BASE}/api/loads/rate-cons/${rateConId}/file`;
-  return token ? `${base}?token=${token}` : base;
+  const response = await fetch(
+    `${API_BASE}/api/loads/rate-cons/${rateConId}/file`,
+    {
+      headers: token ? { Authorization: `Bearer ${token}` } : {},
+    }
+  );
+
+  if (response.status === 401) {
+    clearToken();
+    if (typeof window !== "undefined") {
+      window.location.href = "/login";
+    }
+    throw new ApiError("Unauthorized", 401);
+  }
+
+  if (!response.ok) {
+    throw new ApiError("Failed to download file", response.status);
+  }
+
+  return response.blob();
 }
 
 export async function reviewRateCon(
