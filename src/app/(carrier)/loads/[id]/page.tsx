@@ -149,6 +149,7 @@ function RateConCard({
   loading: boolean;
 }) {
   const [expanded, setExpanded] = useState(isCurrent);
+  const [downloadError, setDownloadError] = useState<string | null>(null);
 
   const statusColor: Record<string, string> = {
     approved: "bg-emerald-50 text-emerald-700 hover:bg-emerald-50",
@@ -243,22 +244,42 @@ function RateConCard({
           )}
 
           {rc.filename && (
-            <button
-              onClick={async () => {
-                try {
-                  const blob = await downloadRateConFile(rc.id);
-                  const url = URL.createObjectURL(blob);
-                  window.open(url, "_blank");
-                  setTimeout(() => URL.revokeObjectURL(url), 60000);
-                } catch {
-                  /* download error handled silently — file is non-critical view */
-                }
-              }}
-              className="inline-flex items-center gap-1.5 text-xs text-[var(--brand-cyan)] hover:underline"
-            >
-              <FileText className="h-3 w-3" />
-              {rc.filename}
-            </button>
+            <>
+              <button
+                onClick={async () => {
+                  setDownloadError(null);
+                  const tab = window.open("about:blank", "_blank");
+                  try {
+                    const blob = await downloadRateConFile(rc.id);
+                    const url = URL.createObjectURL(blob);
+                    if (tab && !tab.closed) {
+                      tab.location.href = url;
+                    } else {
+                      // Popup was blocked — fall back to download
+                      const a = document.createElement("a");
+                      a.href = url;
+                      a.download = rc.filename || "rate-con";
+                      document.body.appendChild(a);
+                      a.click();
+                      document.body.removeChild(a);
+                    }
+                    setTimeout(() => URL.revokeObjectURL(url), 60000);
+                  } catch (err) {
+                    if (tab && !tab.closed) tab.close();
+                    setDownloadError(
+                      err instanceof Error ? err.message : "Failed to download file"
+                    );
+                  }
+                }}
+                className="inline-flex items-center gap-1.5 text-xs text-[var(--brand-cyan)] hover:underline"
+              >
+                <FileText className="h-3 w-3" />
+                {rc.filename}
+              </button>
+              {downloadError && (
+                <p className="text-xs text-red-600 mt-1">{downloadError}</p>
+              )}
+            </>
           )}
 
           {rc.status === "review" && (
