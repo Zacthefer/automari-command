@@ -249,6 +249,12 @@ function RateConCard({
                 onClick={async () => {
                   setDownloadError(null);
                   const tab = window.open("about:blank", "_blank");
+                  if (tab) {
+                    tab.document.title = "Loading file…";
+                    tab.document.body.style.cssText =
+                      "margin:0;display:flex;align-items:center;justify-content:center;height:100vh;font-family:system-ui;color:#64748b;background:#f8fafc";
+                    tab.document.body.textContent = "Loading file…";
+                  }
                   try {
                     const blob = await downloadRateConFile(rc.id);
                     const url = URL.createObjectURL(blob);
