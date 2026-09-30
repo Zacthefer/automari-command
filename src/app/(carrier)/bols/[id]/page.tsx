@@ -34,6 +34,7 @@ export default function BolDetailPage() {
   const [attachLoading, setAttachLoading] = useState(false);
   const [attachError, setAttachError] = useState<string | null>(null);
   const [attachSuccess, setAttachSuccess] = useState<string | null>(null);
+  const [loadSearch, setLoadSearch] = useState("");
 
   useEffect(() => {
     if (params.id) {
@@ -129,22 +130,55 @@ export default function BolDetailPage() {
                   No loads found. Upload a rate confirmation first.
                 </p>
               ) : (
-                <select
-                  value={selectedLoadId}
-                  onChange={(e) => setSelectedLoadId(e.target.value)}
-                  className="mt-1 w-full rounded-lg border border-slate-200 bg-background px-3 py-2 text-sm text-foreground"
-                >
-                  <option value="">Choose a load…</option>
-                  {loads.map((load) => (
-                    <option key={load.id} value={load.id}>
-                      {load.load_number || load.id.slice(0, 8)} —{" "}
-                      {load.broker_name || "No broker"} —{" "}
-                      {load.origin && load.destination
-                        ? `${load.origin} → ${load.destination}`
-                        : "No route"}
-                    </option>
-                  ))}
-                </select>
+                <>
+                  <input
+                    type="text"
+                    placeholder="Search by load #, broker, or route…"
+                    value={loadSearch}
+                    onChange={(e) => setLoadSearch(e.target.value)}
+                    className="mt-1 mb-2 w-full rounded-lg border border-slate-200 bg-background px-3 py-2 text-sm text-foreground placeholder:text-[#8aa3bd]"
+                  />
+                  <select
+                    value={selectedLoadId}
+                    onChange={(e) => setSelectedLoadId(e.target.value)}
+                    className="w-full rounded-lg border border-slate-200 bg-background px-3 py-2 text-sm text-foreground"
+                    size={Math.min(
+                      8,
+                      loads.filter((l) => {
+                        if (!loadSearch) return true;
+                        const q = loadSearch.toLowerCase();
+                        return (
+                          (l.load_number || "").toLowerCase().includes(q) ||
+                          (l.broker_name || "").toLowerCase().includes(q) ||
+                          (l.origin || "").toLowerCase().includes(q) ||
+                          (l.destination || "").toLowerCase().includes(q)
+                        );
+                      }).length + 1
+                    )}
+                  >
+                    <option value="">Choose a load…</option>
+                    {loads
+                      .filter((l) => {
+                        if (!loadSearch) return true;
+                        const q = loadSearch.toLowerCase();
+                        return (
+                          (l.load_number || "").toLowerCase().includes(q) ||
+                          (l.broker_name || "").toLowerCase().includes(q) ||
+                          (l.origin || "").toLowerCase().includes(q) ||
+                          (l.destination || "").toLowerCase().includes(q)
+                        );
+                      })
+                      .map((load) => (
+                        <option key={load.id} value={load.id}>
+                          {load.load_number || load.id.slice(0, 8)} —{" "}
+                          {load.broker_name || "No broker"} —{" "}
+                          {load.origin && load.destination
+                            ? `${load.origin} → ${load.destination}`
+                            : "No route"}
+                        </option>
+                      ))}
+                  </select>
+                </>
               )}
             </div>
             <div>
