@@ -53,16 +53,16 @@ export function ComplianceTable({ documents }: ComplianceTableProps) {
             <TableHead className="px-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
               Holder
             </TableHead>
-            <TableHead className="px-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
+            <TableHead className="hidden sm:table-cell px-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
               Type
             </TableHead>
-            <TableHead className="px-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
+            <TableHead className="hidden md:table-cell px-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
               Doc #
             </TableHead>
             <TableHead className="px-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
               Status
             </TableHead>
-            <TableHead className="px-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
+            <TableHead className="hidden lg:table-cell px-4 text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
               Expires
             </TableHead>
           </TableRow>
@@ -81,16 +81,16 @@ export function ComplianceTable({ documents }: ComplianceTableProps) {
               <TableCell className="px-4 py-3.5 text-[14px] font-medium text-[#e8f2fc]">
                 {doc.holder_name}
               </TableCell>
-              <TableCell className="px-4 py-3.5">
+              <TableCell className="hidden sm:table-cell px-4 py-3.5">
                 <HolderTypeChip type={doc.holder_type} />
               </TableCell>
-              <TableCell className="px-4 py-3.5 font-mono text-[13px] tracking-wide text-[#d7e8f8]">
+              <TableCell className="hidden md:table-cell px-4 py-3.5 font-mono text-[13px] tracking-wide text-[#d7e8f8]">
                 {doc.document_number || "—"}
               </TableCell>
               <TableCell className="px-4 py-3.5">
                 <ComplianceStatusChip status={doc.status} />
               </TableCell>
-              <TableCell className="px-4 py-3.5 text-[13px] text-[#d7e8f8]">
+              <TableCell className="hidden lg:table-cell px-4 py-3.5 text-[13px] text-[#d7e8f8]">
                 {doc.expiration_date
                   ? format(new Date(doc.expiration_date), "MMM d, yyyy")
                   : "No expiration"}

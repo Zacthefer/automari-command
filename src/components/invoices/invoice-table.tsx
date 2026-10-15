@@ -47,7 +47,7 @@ export function InvoiceTable({ invoices }: InvoiceTableProps) {
             <TableHead className="text-xs font-semibold uppercase tracking-[0.12em] text-[#c5d8eb]">
               Bill To
             </TableHead>
-            <TableHead className="text-xs font-semibold uppercase tracking-[0.12em] text-[#c5d8eb]">
+            <TableHead className="hidden sm:table-cell text-xs font-semibold uppercase tracking-[0.12em] text-[#c5d8eb]">
               PRO #
             </TableHead>
             <TableHead className="text-xs font-semibold uppercase tracking-[0.12em] text-[#c5d8eb]">
@@ -56,7 +56,7 @@ export function InvoiceTable({ invoices }: InvoiceTableProps) {
             <TableHead className="text-xs font-semibold uppercase tracking-[0.12em] text-[#c5d8eb]">
               Status
             </TableHead>
-            <TableHead className="text-xs font-semibold uppercase tracking-[0.12em] text-[#c5d8eb]">
+            <TableHead className="hidden md:table-cell text-xs font-semibold uppercase tracking-[0.12em] text-[#c5d8eb]">
               Due Date
             </TableHead>
           </TableRow>
@@ -75,7 +75,7 @@ export function InvoiceTable({ invoices }: InvoiceTableProps) {
               <TableCell className="text-[#d7e8f8]">
                 {inv.bill_to_name}
               </TableCell>
-              <TableCell className="text-[#d7e8f8]">
+              <TableCell className="hidden sm:table-cell text-[#d7e8f8]">
                 {inv.pro_number || "—"}
               </TableCell>
               <TableCell className="font-medium text-foreground">
@@ -84,7 +84,7 @@ export function InvoiceTable({ invoices }: InvoiceTableProps) {
               <TableCell>
                 <InvoiceStatusChip status={inv.status} />
               </TableCell>
-              <TableCell className="text-sm text-[#d7e8f8]">
+              <TableCell className="hidden md:table-cell text-sm text-[#d7e8f8]">
                 {inv.due_date
                   ? format(new Date(inv.due_date), "MMM d, yyyy")
                   : "—"}

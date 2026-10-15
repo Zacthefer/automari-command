@@ -1,8 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { FileText } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
 import { PageSkeleton } from "@/components/layout/page-skeleton";
+import { EmptyState } from "@/components/layout/empty-state";
+import { ErrorBanner } from "@/components/layout/error-banner";
 import { BolTable } from "@/components/bols/bol-table";
 import { Button } from "@/components/ui/button";
 import { getBols, uploadBol } from "@/lib/api";
@@ -71,11 +74,19 @@ export default function BolsPage() {
         }
       />
       {error && (
-        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-          {error}
-        </div>
+        <ErrorBanner message={error} onRetry={() => { setError(null); loadBols(); }} />
       )}
-      <BolTable bols={bols} />
+      {bols.length === 0 && !error ? (
+        <EmptyState
+          icon={FileText}
+          title="No BOLs yet"
+          description="Upload a bill of lading to start processing. Drivers can also text photos directly to your Automari number."
+          actionLabel="Upload BOL"
+          onAction={() => fileInputRef.current?.click()}
+        />
+      ) : (
+        <BolTable bols={bols} />
+      )}
     </div>
   );
 }

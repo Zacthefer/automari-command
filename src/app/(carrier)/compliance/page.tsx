@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Plus } from "lucide-react";
+import { Plus, ShieldCheck } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
 import { PageSkeleton } from "@/components/layout/page-skeleton";
+import { EmptyState } from "@/components/layout/empty-state";
 import { ComplianceTable } from "@/components/compliance/compliance-table";
 import { Button } from "@/components/ui/button";
 import { getComplianceDocuments } from "@/lib/api";
@@ -36,7 +37,17 @@ export default function CompliancePage() {
           </Link>
         }
       />
-      <ComplianceTable documents={documents} />
+      {documents.length === 0 ? (
+        <EmptyState
+          icon={ShieldCheck}
+          title="No compliance documents"
+          description="Add your first document to stay on top of expirations. Track CDLs, insurance, medical cards, and more."
+          actionLabel="Add Document"
+          actionHref="/compliance/new"
+        />
+      ) : (
+        <ComplianceTable documents={documents} />
+      )}
     </div>
   );
 }

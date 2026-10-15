@@ -1,8 +1,11 @@
 "use client";
 
 import { useEffect, useRef, useState, useCallback } from "react";
+import { Truck } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
 import { PageSkeleton } from "@/components/layout/page-skeleton";
+import { EmptyState } from "@/components/layout/empty-state";
+import { ErrorBanner } from "@/components/layout/error-banner";
 import { LoadsTable } from "@/components/loads/loads-table";
 import { Button } from "@/components/ui/button";
 import { getLoads, uploadRateCon } from "@/lib/api";
@@ -114,12 +117,20 @@ export default function LoadsPage() {
       </div>
 
       {error && (
-        <div className="rounded-lg border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-700">
-          {error}
-        </div>
+        <ErrorBanner message={error} onRetry={() => { setError(null); fetchLoads(statusFilter); }} />
       )}
 
-      <LoadsTable loads={loads} />
+      {loads.length === 0 && !error ? (
+        <EmptyState
+          icon={Truck}
+          title="No loads yet"
+          description="Upload your first rate confirmation to get started. We'll extract the details and create a load automatically."
+          actionLabel="Upload Rate Con"
+          onAction={() => fileInputRef.current?.click()}
+        />
+      ) : (
+        <LoadsTable loads={loads} />
+      )}
     </div>
   );
 }

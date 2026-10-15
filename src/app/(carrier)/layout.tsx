@@ -30,9 +30,9 @@ function AuthGate({ children }: { children: React.ReactNode }) {
   return (
     <div className="relative min-h-screen bg-background">
       <Sidebar />
-      <div className="relative z-10 pl-64">
+      <div className="relative z-10 md:pl-64">
         <Header />
-        <main className="px-10 py-10">{children}</main>
+        <main className="px-4 py-6 md:px-10 md:py-10">{children}</main>
       </div>
     </div>
   );

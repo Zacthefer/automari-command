@@ -37,19 +37,19 @@ export function BolTable({ bols }: BolTableProps) {
             <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
               PRO #
             </TableHead>
-            <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
+            <TableHead className="hidden sm:table-cell text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
               BOL #
             </TableHead>
             <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
               Shipper
             </TableHead>
-            <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
+            <TableHead className="hidden md:table-cell text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
               Consignee
             </TableHead>
             <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
               Status
             </TableHead>
-            <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
+            <TableHead className="hidden lg:table-cell text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
               Date
             </TableHead>
           </TableRow>
@@ -65,19 +65,19 @@ export function BolTable({ bols }: BolTableProps) {
                   {bol.pro_number || "—"}
                 </Link>
               </TableCell>
-              <TableCell className="font-mono text-[13px] text-[#d7e8f8]">
+              <TableCell className="hidden sm:table-cell font-mono text-[13px] text-[#d7e8f8]">
                 {bol.bol_number || "—"}
               </TableCell>
               <TableCell className="text-sm text-[#d7e8f8]">
                 {bol.shipper_name || "—"}
               </TableCell>
-              <TableCell className="text-sm text-[#d7e8f8]">
+              <TableCell className="hidden md:table-cell text-sm text-[#d7e8f8]">
                 {bol.consignee_name || "—"}
               </TableCell>
               <TableCell>
                 <BolStatusChip status={bol.status} />
               </TableCell>
-              <TableCell className="text-[13px] text-[#d7e8f8] tabular-nums">
+              <TableCell className="hidden lg:table-cell text-[13px] text-[#d7e8f8] tabular-nums">
                 {format(new Date(bol.created_at), "MMM d, yyyy")}
               </TableCell>
             </TableRow>

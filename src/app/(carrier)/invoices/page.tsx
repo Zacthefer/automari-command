@@ -1,8 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { Receipt } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
 import { PageSkeleton } from "@/components/layout/page-skeleton";
+import { EmptyState } from "@/components/layout/empty-state";
 import { InvoiceTable } from "@/components/invoices/invoice-table";
 import { getInvoices } from "@/lib/api";
 import type { Invoice } from "@/types";
@@ -25,7 +27,17 @@ export default function InvoicesPage() {
         title="Invoices"
         description="All invoices generated from processed BOLs."
       />
-      <InvoiceTable invoices={invoices} />
+      {invoices.length === 0 ? (
+        <EmptyState
+          icon={Receipt}
+          title="No invoices yet"
+          description="Invoices are generated automatically when you upload a rate confirmation and attach a BOL. Start by uploading a rate con."
+          actionLabel="Go to Loads"
+          actionHref="/loads"
+        />
+      ) : (
+        <InvoiceTable invoices={invoices} />
+      )}
     </div>
   );
 }

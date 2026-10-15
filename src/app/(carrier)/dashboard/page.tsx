@@ -9,6 +9,7 @@ import {
   ShieldCheck,
   Gauge,
   Route,
+  Truck,
 } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
 import { PageSkeleton } from "@/components/layout/page-skeleton";
@@ -19,8 +20,10 @@ import {
   getDashboardStats,
   getAdminStats,
   getBols,
+  getTenant,
+  createMyPortalSession,
 } from "@/lib/api";
-import type { DashboardStats, AdminStats, BOL } from "@/types";
+import type { DashboardStats, AdminStats, BOL, Tenant } from "@/types";
 
 function formatCurrency(amount: number): string {
   return new Intl.NumberFormat("en-US", {
@@ -36,6 +39,7 @@ export default function DashboardPage() {
   const [carrierStats, setCarrierStats] = useState<DashboardStats | null>(null);
   const [adminStats, setAdminStats] = useState<AdminStats | null>(null);
   const [recentBols, setRecentBols] = useState<BOL[]>([]);
+  const [tenant, setTenant] = useState<Tenant | null>(null);
   const [loading, setLoading] = useState(true);
 
   const isAdmin = user?.role === "admin";
@@ -50,6 +54,10 @@ export default function DashboardPage() {
             : getDashboardStats().then(setCarrierStats),
         ]);
         setRecentBols(bols);
+        // Load tenant for billing banner (carrier only)
+        if (!isAdmin && user?.tenant_id) {
+          getTenant(user.tenant_id).then(setTenant).catch(() => {});
+        }
       } catch {
         // errors handled by api client
       } finally {
@@ -57,7 +65,7 @@ export default function DashboardPage() {
       }
     }
     load();
-  }, [isAdmin]);
+  }, [isAdmin, user?.tenant_id]);
 
   if (loading) return <PageSkeleton />;
 
@@ -71,6 +79,32 @@ export default function DashboardPage() {
             : `Welcome back, ${user?.name?.split(" ")[0]}.`
         }
       />
+
+      {/* Billing banner for past_due */}
+      {!isAdmin && tenant?.subscription_status === "past_due" && (
+        <div className="rounded-lg border border-amber-200 bg-amber-50 px-4 py-3 flex items-center justify-between gap-4">
+          <div className="flex items-center gap-2 text-sm text-amber-800">
+            <AlertTriangle className="h-4 w-4 flex-shrink-0" />
+            <span>
+              Your payment didn&apos;t go through. Update your payment method to
+              avoid interruption.
+            </span>
+          </div>
+          <button
+            onClick={async () => {
+              try {
+                const result = await createMyPortalSession();
+                window.open(result.portal_url, "_blank");
+              } catch {
+                // silently fail
+              }
+            }}
+            className="flex-shrink-0 rounded-md bg-amber-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-amber-700 transition-colors"
+          >
+            Update Payment
+          </button>
+        </div>
+      )}
 
       {/* Stats grid */}
       {isAdmin && adminStats ? (
@@ -148,6 +182,17 @@ export default function DashboardPage() {
             href="/cost-per-mile"
           />
           <StatCard
+            label="Loads Submitted"
+            value={carrierStats.loads_submitted}
+            icon={Truck}
+            detail={
+              carrierStats.loads_action_required > 0
+                ? `${carrierStats.loads_action_required} action required`
+                : undefined
+            }
+            href="/payments"
+          />
+          <StatCard
             label="Fleet Expenses"
             value={formatCurrency(carrierStats.fleet_total_expenses)}
             icon={Route}
@@ -156,10 +201,57 @@ export default function DashboardPage() {
         </div>
       ) : null}
 
+      {/* Day 1 getting started */}
+      {!isAdmin &&
+        carrierStats &&
+        carrierStats.bols_total === 0 &&
+        carrierStats.invoices_total === 0 && (
+          <div className="rounded-lg border border-[var(--brand-cyan)]/20 bg-[var(--brand-cyan-dim)] p-6">
+            <h3 className="text-sm font-semibold text-foreground">
+              Get started in 3 steps
+            </h3>
+            <ol className="mt-3 space-y-2 text-sm text-muted-foreground">
+              <li className="flex items-start gap-2">
+                <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-[var(--brand-cyan)]/20 text-xs font-bold text-[var(--brand-cyan)]">
+                  1
+                </span>
+                <span>
+                  <strong className="text-foreground">Upload a rate confirmation</strong>{" "}
+                  — we extract broker, amounts, and load details automatically.
+                </span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-[var(--brand-cyan)]/20 text-xs font-bold text-[var(--brand-cyan)]">
+                  2
+                </span>
+                <span>
+                  <strong className="text-foreground">Attach your BOL / POD</strong>{" "}
+                  — upload or have your driver text a photo. The invoice generates automatically.
+                </span>
+              </li>
+              <li className="flex items-start gap-2">
+                <span className="flex h-5 w-5 flex-shrink-0 items-center justify-center rounded-full bg-[var(--brand-cyan)]/20 text-xs font-bold text-[var(--brand-cyan)]">
+                  3
+                </span>
+                <span>
+                  <strong className="text-foreground">Submit billing packet</strong>{" "}
+                  — send the full packet to your broker and track payment status.
+                </span>
+              </li>
+            </ol>
+          </div>
+        )}
+
       {/* Recent BOLs */}
       <div className="space-y-4">
         <h2 className="text-[17px] font-semibold tracking-[-0.01em] text-foreground">Recent BOLs</h2>
-        <BolTable bols={recentBols} />
+        {recentBols.length === 0 ? (
+          <div className="rounded-lg border border-dashed border-border bg-muted/30 p-8 text-center text-sm text-muted-foreground">
+            No BOLs yet. Upload a rate confirmation to get started.
+          </div>
+        ) : (
+          <BolTable bols={recentBols} />
+        )}
       </div>
     </div>
   );

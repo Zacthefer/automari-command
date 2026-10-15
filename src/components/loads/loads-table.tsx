@@ -51,7 +51,7 @@ export function LoadsTable({ loads }: LoadsTableProps) {
             <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
               Broker
             </TableHead>
-            <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
+            <TableHead className="hidden md:table-cell text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
               Route
             </TableHead>
             <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
@@ -60,10 +60,10 @@ export function LoadsTable({ loads }: LoadsTableProps) {
             <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
               Status
             </TableHead>
-            <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
+            <TableHead className="hidden sm:table-cell text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
               Payment
             </TableHead>
-            <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
+            <TableHead className="hidden lg:table-cell text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
               Date
             </TableHead>
           </TableRow>
@@ -82,7 +82,7 @@ export function LoadsTable({ loads }: LoadsTableProps) {
               <TableCell className="text-sm text-[#d7e8f8]">
                 {load.broker_name || "—"}
               </TableCell>
-              <TableCell className="text-sm text-[#d7e8f8]">
+              <TableCell className="hidden md:table-cell text-sm text-[#d7e8f8]">
                 {formatRoute(load.origin, load.destination)}
               </TableCell>
               <TableCell className="font-mono text-[13px] text-[#d7e8f8] tabular-nums">
@@ -91,10 +91,10 @@ export function LoadsTable({ loads }: LoadsTableProps) {
               <TableCell>
                 <LoadStatusChip status={load.status} />
               </TableCell>
-              <TableCell>
+              <TableCell className="hidden sm:table-cell">
                 <PaymentStatusChip status={load.payment_status} />
               </TableCell>
-              <TableCell className="text-[13px] text-[#d7e8f8] tabular-nums">
+              <TableCell className="hidden lg:table-cell text-[13px] text-[#d7e8f8] tabular-nums">
                 {format(new Date(load.created_at), "MMM d, yyyy")}
               </TableCell>
             </TableRow>
