@@ -121,13 +121,23 @@ export default function LoadsPage() {
       )}
 
       {loads.length === 0 && !error ? (
-        <EmptyState
-          icon={Truck}
-          title="No loads yet"
-          description="Upload your first rate confirmation to get started. We'll extract the details and create a load automatically."
-          actionLabel="Upload Rate Con"
-          onAction={() => fileInputRef.current?.click()}
-        />
+        statusFilter ? (
+          <EmptyState
+            icon={Truck}
+            title="No loads match this filter"
+            description={`No loads with status "${statusFilter}" found.`}
+            actionLabel="Clear Filter"
+            onAction={() => setStatusFilter("")}
+          />
+        ) : (
+          <EmptyState
+            icon={Truck}
+            title="No loads yet"
+            description="Upload your first rate confirmation to get started. We'll extract the details and create a load automatically."
+            actionLabel="Upload Rate Con"
+            onAction={() => fileInputRef.current?.click()}
+          />
+        )
       ) : (
         <LoadsTable loads={loads} />
       )}

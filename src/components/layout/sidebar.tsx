@@ -60,11 +60,12 @@ function SidebarContent({ onNavigate }: { onNavigate?: () => void }) {
     user?.role === "admin" ? adminNav : [...carrierNav, ...testNav];
 
   async function openBillingPortal() {
+    const tab = window.open("", "_blank");
     try {
       const result = await createMyPortalSession();
-      window.open(result.portal_url, "_blank");
+      if (tab) tab.location.href = result.portal_url;
     } catch {
-      // silently fail — carrier may not have billing set up
+      if (tab) tab.close();
     }
   }
 
@@ -164,6 +165,10 @@ export function MobileNav() {
 
       {/* Drawer */}
       <div
+        role={open ? "dialog" : undefined}
+        aria-modal={open ? true : undefined}
+        aria-hidden={!open}
+        inert={!open ? true : undefined}
         className={cn(
           "fixed inset-y-0 left-0 z-50 flex w-64 flex-col bg-[var(--brand-navy)] text-[var(--sidebar-foreground)] transition-transform duration-300 md:hidden",
           open ? "translate-x-0" : "-translate-x-full"

@@ -11,6 +11,7 @@ import {
 import { PageHeader } from "@/components/layout/page-header";
 import { PageSkeleton } from "@/components/layout/page-skeleton";
 import { StatCard } from "@/components/dashboard/stat-card";
+import { ErrorBanner } from "@/components/layout/error-banner";
 import { getPaymentSummary, getLoads } from "@/lib/api";
 import type {
   PaymentSummaryResponse,
@@ -55,28 +56,38 @@ export default function PaymentsPage() {
   const [loads, setLoads] = useState<LoadSummary[]>([]);
   const [filter, setFilter] = useState<FilterTab>("all");
   const [loading, setLoading] = useState(true);
+  const [error, setError] = useState<string | null>(null);
 
-  useEffect(() => {
+  function loadData() {
+    setLoading(true);
+    setError(null);
     Promise.all([
       getPaymentSummary(),
-      getLoads({ limit: 200 }),
+      getLoads({ payment_status: "submitted,processing,action_required", limit: 200 }),
     ])
       .then(([s, l]) => {
         setSummary(s);
-        // Only show loads that have been submitted for payment
-        setLoads(
-          l.filter((load) =>
-            ["submitted", "processing", "action_required"].includes(
-              load.payment_status
-            )
-          )
-        );
+        setLoads(l);
+      })
+      .catch(() => {
+        setError("Failed to load payment data. Please try again.");
       })
       .finally(() => setLoading(false));
-  }, []);
+  }
+
+  useEffect(() => {
+    loadData();
+  }, []); // eslint-disable-line react-hooks/exhaustive-deps
 
   if (loading) return <PageSkeleton />;
-  if (!summary) return null;
+  if (error || !summary) {
+    return (
+      <div className="space-y-8">
+        <PageHeader title="Payments" description="Track submitted loads and outstanding receivables." />
+        <ErrorBanner message={error || "Failed to load payment data."} onRetry={loadData} />
+      </div>
+    );
+  }
 
   const filteredLoads =
     filter === "all"

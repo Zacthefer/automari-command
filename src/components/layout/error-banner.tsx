@@ -1,7 +1,7 @@
 "use client";
 
 import { AlertTriangle, X } from "lucide-react";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 
 interface ErrorBannerProps {
   message: string;
@@ -10,6 +10,10 @@ interface ErrorBannerProps {
 
 export function ErrorBanner({ message, onRetry }: ErrorBannerProps) {
   const [dismissed, setDismissed] = useState(false);
+
+  useEffect(() => {
+    setDismissed(false);
+  }, [message]);
 
   if (dismissed) return null;
 

@@ -92,11 +92,12 @@ export default function DashboardPage() {
           </div>
           <button
             onClick={async () => {
+              const tab = window.open("", "_blank");
               try {
                 const result = await createMyPortalSession();
-                window.open(result.portal_url, "_blank");
+                if (tab) tab.location.href = result.portal_url;
               } catch {
-                // silently fail
+                if (tab) tab.close();
               }
             }}
             className="flex-shrink-0 rounded-md bg-amber-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-amber-700 transition-colors"
