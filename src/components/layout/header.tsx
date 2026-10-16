@@ -10,6 +10,7 @@ import {
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu";
 import { LogOut, User } from "lucide-react";
+import { MobileNav } from "@/components/layout/sidebar";
 
 export function Header() {
   const { user, logout } = useAuth();
@@ -24,9 +25,12 @@ export function Header() {
     : "?";
 
   return (
-    <header className="sticky top-0 z-20 flex h-[4.25rem] items-center justify-between border-b border-border/80 bg-[rgba(7,17,31,0.82)] px-10 backdrop-blur-xl">
-      <div className="text-xs font-medium uppercase tracking-[0.18em] text-[#9eb6ce]">
-        Command
+    <header className="sticky top-0 z-20 flex h-[4.25rem] items-center justify-between border-b border-border/80 bg-[rgba(7,17,31,0.82)] px-4 md:px-10 backdrop-blur-xl">
+      <div className="flex items-center gap-3">
+        <MobileNav />
+        <div className="text-xs font-medium uppercase tracking-[0.18em] text-[#9eb6ce]">
+          Command
+        </div>
       </div>
       <DropdownMenu>
         <DropdownMenuTrigger

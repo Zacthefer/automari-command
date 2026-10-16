@@ -606,6 +606,39 @@ export async function getPacket(loadId: string) {
   );
 }
 
+export async function downloadPacketZip(loadId: string): Promise<Blob> {
+  const token = getToken();
+  const headers: Record<string, string> = {};
+  if (token) {
+    headers["Authorization"] = `Bearer ${token}`;
+  }
+
+  const response = await fetch(
+    `${API_BASE}/api/loads/${loadId}/packet/download`,
+    { headers }
+  );
+
+  if (response.status === 401) {
+    clearToken();
+    if (typeof window !== "undefined") {
+      window.location.href = "/login";
+    }
+    throw new ApiError("Unauthorized", 401);
+  }
+
+  if (!response.ok) {
+    throw new ApiError("Failed to download packet", response.status);
+  }
+
+  return response.blob();
+}
+
+export async function getPaymentSummary() {
+  return request<import("@/types").PaymentSummaryResponse>(
+    "/api/loads/payments/summary"
+  );
+}
+
 // ── Tenants (Admin) ───────────────────────────────────
 
 export async function getTenants(params?: {
@@ -638,6 +671,39 @@ export async function createTenant(data: {
   return request<import("@/types").Tenant>("/api/tenants/", {
     method: "POST",
     body: JSON.stringify(data),
+  });
+}
+
+// ── Billing ──────────────────────────────────────────
+
+export async function createCheckoutSession(data: {
+  tenant_id: string;
+  tier: "core" | "pro" | "elite";
+  founding?: boolean;
+  include_setup_fee?: boolean;
+}) {
+  return request<{ checkout_url: string; session_id: string }>(
+    "/api/billing/checkout",
+    { method: "POST", body: JSON.stringify(data) }
+  );
+}
+
+export async function createPortalSession(tenantId: string) {
+  return request<{ portal_url: string }>(
+    `/api/billing/portal?tenant_id=${tenantId}`,
+    { method: "POST" }
+  );
+}
+
+export async function getBillingStatus(tenantId: string) {
+  return request<import("@/types").BillingStatus>(
+    `/api/billing/status/${tenantId}`
+  );
+}
+
+export async function createMyPortalSession() {
+  return request<{ portal_url: string }>("/api/billing/my-portal", {
+    method: "POST",
   });
 }
 

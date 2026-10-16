@@ -2,9 +2,10 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import { Plus } from "lucide-react";
+import { Plus, UserPlus } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
 import { PageSkeleton } from "@/components/layout/page-skeleton";
+import { EmptyState } from "@/components/layout/empty-state";
 import { ApplicantTable } from "@/components/recruiting/applicant-table";
 import { Button } from "@/components/ui/button";
 import { getApplicants } from "@/lib/api";
@@ -72,7 +73,17 @@ export default function RecruitingPage() {
         ))}
       </div>
 
-      <ApplicantTable applicants={applicants} />
+      {applicants.length === 0 ? (
+        <EmptyState
+          icon={UserPlus}
+          title="No applicants yet"
+          description="Add a driver applicant to start tracking them through your hiring pipeline."
+          actionLabel="Add Applicant"
+          actionHref="/recruiting/new"
+        />
+      ) : (
+        <ApplicantTable applicants={applicants} />
+      )}
     </div>
   );
 }
