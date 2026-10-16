@@ -6,9 +6,10 @@ import { useEffect, useState } from "react";
 interface ErrorBannerProps {
   message: string;
   onRetry?: () => void;
+  retryLabel?: string;
 }
 
-export function ErrorBanner({ message, onRetry }: ErrorBannerProps) {
+export function ErrorBanner({ message, onRetry, retryLabel = "Retry" }: ErrorBannerProps) {
   const [dismissed, setDismissed] = useState(false);
 
   useEffect(() => {
@@ -29,7 +30,7 @@ export function ErrorBanner({ message, onRetry }: ErrorBannerProps) {
             onClick={onRetry}
             className="rounded-md bg-red-600 px-3 py-1.5 text-xs font-medium text-white hover:bg-red-700 transition-colors"
           >
-            Retry
+            {retryLabel}
           </button>
         )}
         <button

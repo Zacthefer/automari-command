@@ -74,7 +74,7 @@ export default function BolsPage() {
         }
       />
       {error && (
-        <ErrorBanner message={error} onRetry={() => { setError(null); loadBols(); }} />
+        <ErrorBanner message={error} onRetry={() => { setError(null); loadBols(); }} retryLabel="Refresh" />
       )}
       {bols.length === 0 && !error ? (
         <EmptyState
