@@ -70,7 +70,7 @@ export function BrandMark({
         )}
       >
         Automari
-        <span className="text-[#5d87ff]">.Ai</span>
+        <span className="text-[var(--primary)]">.Ai</span>
       </span>
     </div>
   );
