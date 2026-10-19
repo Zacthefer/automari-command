@@ -59,18 +59,18 @@ export function BrandMark({
         alt="Automari.Ai"
         width={logoSize}
         height={logoSize}
-        className={cn("rounded-[22%] shadow-[0_0_0_1px_rgba(0,191,255,0.12)]", logoClassName)}
+        className={cn("rounded-[22%] shadow-[0_0_0_1px_rgba(93,135,255,0.15)]", logoClassName)}
         priority
       />
       <span
         className={cn(
-          "font-semibold tracking-[-0.03em] text-[var(--brand-navy-fg)]",
+          "font-semibold tracking-[-0.03em] text-[var(--foreground)]",
           textSize,
           textClassName
         )}
       >
         Automari
-        <span className="automari-ai-accent">.Ai</span>
+        <span className="text-[#5d87ff]">.Ai</span>
       </span>
     </div>
   );
