@@ -47,9 +47,9 @@ export default function ClientDetailPage() {
   useEffect(() => {
     if (params.id) {
       const id = params.id as string;
-      Promise.all([
+      Promise.allSettled([
         getTenant(id).then(setClient),
-        getBillingStatus(id).then(setBilling).catch(() => {}),
+        getBillingStatus(id).then(setBilling),
       ]).finally(() => setLoading(false));
     }
   }, [params.id]);
@@ -70,9 +70,13 @@ export default function ClientDetailPage() {
         tier: selectedTier,
         founding,
       });
-      await navigator.clipboard.writeText(result.checkout_url);
-      setCheckoutCopied(true);
-      setTimeout(() => setCheckoutCopied(false), 3000);
+      try {
+        await navigator.clipboard.writeText(result.checkout_url);
+        setCheckoutCopied(true);
+        setTimeout(() => setCheckoutCopied(false), 3000);
+      } catch {
+        alert("Checkout link created but clipboard copy failed. URL: " + result.checkout_url);
+      }
     } catch (err) {
       alert(err instanceof Error ? err.message : "Failed to create checkout session");
     } finally {
