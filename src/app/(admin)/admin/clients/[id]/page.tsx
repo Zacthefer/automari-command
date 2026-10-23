@@ -37,6 +37,7 @@ export default function ClientDetailPage() {
   const params = useParams();
   const [client, setClient] = useState<Tenant | null>(null);
   const [billing, setBilling] = useState<BillingStatus | null>(null);
+  const [billingError, setBillingError] = useState(false);
   const [loading, setLoading] = useState(true);
   const [copied, setCopied] = useState(false);
   const [checkoutCopied, setCheckoutCopied] = useState(false);
@@ -49,10 +50,20 @@ export default function ClientDetailPage() {
       const id = params.id as string;
       Promise.allSettled([
         getTenant(id).then(setClient),
-        getBillingStatus(id).then(setBilling),
+        loadBilling(id),
       ]).finally(() => setLoading(false));
     }
   }, [params.id]);
+
+  async function loadBilling(id: string) {
+    setBillingError(false);
+    try {
+      setBilling(await getBillingStatus(id));
+    } catch {
+      setBilling(null);
+      setBillingError(true);
+    }
+  }
 
   function copyApiKey() {
     if (!client) return;
@@ -86,11 +97,19 @@ export default function ClientDetailPage() {
 
   async function handleOpenPortal() {
     if (!client) return;
+    // Open the tab during the click so popup blockers allow it, then navigate once the URL is back
+    const portalTab = window.open("", "_blank");
+    if (portalTab) portalTab.opener = null;
     setBillingLoading(true);
     try {
       const result = await createPortalSession(client.id);
-      window.open(result.portal_url, "_blank");
+      if (portalTab) {
+        portalTab.location.href = result.portal_url;
+      } else {
+        window.location.assign(result.portal_url);
+      }
     } catch (err) {
+      portalTab?.close();
       alert(err instanceof Error ? err.message : "Failed to open billing portal");
     } finally {
       setBillingLoading(false);
@@ -176,7 +195,9 @@ export default function ClientDetailPage() {
               <div>
                 <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#c5d8eb]">Tier</p>
                 <div className="mt-1">
-                  {billing?.subscription_tier ? (
+                  {billingError ? (
+                    <span className="text-sm text-slate-400">Unknown</span>
+                  ) : billing?.subscription_tier ? (
                     <Badge className="bg-blue-50 text-blue-700 capitalize">
                       {billing.subscription_tier}
                     </Badge>
@@ -227,7 +248,14 @@ export default function ClientDetailPage() {
 
             <Separator />
 
-            {!billing?.subscription_status || billing.subscription_status === "canceled" ? (
+            {billingError ? (
+              <div className="flex flex-wrap items-center gap-3">
+                <p className="text-sm text-red-600">Couldn&apos;t load billing status.</p>
+                <Button variant="outline" size="sm" onClick={() => loadBilling(client.id)}>
+                  Retry
+                </Button>
+              </div>
+            ) : !billing?.subscription_status || billing.subscription_status === "canceled" ? (
               <div className="space-y-3">
                 <p className="text-sm font-medium text-foreground">Generate Payment Link</p>
                 <div className="flex flex-wrap items-end gap-3">
