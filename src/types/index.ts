@@ -27,6 +27,14 @@ export interface Tenant {
   updated_at: string;
 }
 
+export interface BillingStatus {
+  subscription_tier: string | null;
+  subscription_status: string | null;
+  trial_end: string | null;
+  current_period_end: string | null;
+  stripe_customer_id: string | null;
+}
+
 export interface BOL {
   id: string;
   tenant_id: string;

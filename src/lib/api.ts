@@ -641,4 +641,30 @@ export async function createTenant(data: {
   });
 }
 
+// ── Billing ──────────────────────────────────────────
+
+export async function getBillingStatus(tenantId: string) {
+  return request<import("@/types").BillingStatus>(
+    `/api/tenants/${tenantId}/billing`
+  );
+}
+
+export async function createCheckoutSession(data: {
+  tenant_id: string;
+  tier: "core" | "pro" | "elite";
+  founding?: boolean;
+}) {
+  return request<{ checkout_url: string }>("/api/billing/checkout", {
+    method: "POST",
+    body: JSON.stringify(data),
+  });
+}
+
+export async function createPortalSession(tenantId: string) {
+  return request<{ portal_url: string }>(
+    `/api/billing/portal/${tenantId}`,
+    { method: "POST" }
+  );
+}
+
 export { ApiError, getToken, clearToken };
