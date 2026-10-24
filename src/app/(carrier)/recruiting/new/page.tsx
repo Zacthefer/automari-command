@@ -80,7 +80,7 @@ export default function NewApplicantPage() {
         >
           <ArrowLeft className="h-4 w-4" />
         </Link>
-        <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+        <h1 className="text-2xl font-medium tracking-tight text-foreground">
           Add Applicant
         </h1>
       </div>
@@ -92,7 +92,7 @@ export default function NewApplicantPage() {
           </div>
         )}
 
-        <Card className="border border-white/10 bg-card shadow-[var(--shadow-elevated-1)]">
+        <Card className="border border-border bg-card shadow-[var(--shadow-elevated-1)]">
           <CardHeader>
             <CardTitle className="text-base">Contact Information</CardTitle>
           </CardHeader>
@@ -117,7 +117,7 @@ export default function NewApplicantPage() {
           </CardContent>
         </Card>
 
-        <Card className="border border-white/10 bg-card shadow-[var(--shadow-elevated-1)]">
+        <Card className="border border-border bg-card shadow-[var(--shadow-elevated-1)]">
           <CardHeader>
             <CardTitle className="text-base">Qualifications</CardTitle>
           </CardHeader>
@@ -127,7 +127,7 @@ export default function NewApplicantPage() {
               <select
                 id="cdl_class"
                 name="cdl_class"
-                className="flex h-10 w-full rounded-md border border-white/10 bg-[#07111f]/70 px-3 text-foreground py-2 text-sm"
+                className="flex h-10 w-full rounded-md border border-border bg-[var(--field)] px-3 text-foreground py-2 text-sm"
               >
                 <option value="">Select class...</option>
                 {cdlClasses.map((c) => (

@@ -64,7 +64,7 @@ export function BrandMark({
       />
       <span
         className={cn(
-          "font-semibold tracking-[-0.03em] text-[var(--brand-navy-fg)]",
+          "font-medium tracking-[-0.03em] text-[var(--brand-navy-fg)]",
           textSize,
           textClassName
         )}

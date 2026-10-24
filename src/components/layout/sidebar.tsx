@@ -13,96 +13,142 @@ import {
   UserPlus,
   FlaskConical,
   Truck,
+  type LucideIcon,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { isTestSectionEnabled } from "@/lib/test-section";
-import { cn } from "@/lib/utils";
 import { BrandMark } from "@/components/layout/brand-mark";
+import {
+  Sidebar as SidebarRoot,
+  SidebarContent,
+  SidebarFooter,
+  SidebarGroup,
+  SidebarGroupContent,
+  SidebarGroupLabel,
+  SidebarHeader,
+  SidebarMenu,
+  SidebarMenuButton,
+  SidebarMenuItem,
+  SidebarRail,
+  useSidebar,
+} from "@/components/ui/sidebar";
 
-const carrierNav = [
-  { label: "Dashboard", href: "/dashboard", icon: LayoutDashboard },
-  { label: "Loads", href: "/loads", icon: Truck },
-  { label: "BOLs", href: "/bols", icon: FileText },
-  { label: "Invoices", href: "/invoices", icon: Receipt },
-  { label: "Compliance", href: "/compliance", icon: ShieldCheck },
-  { label: "Recruiting", href: "/recruiting", icon: UserPlus },
-  { label: "Cost Per Mile", href: "/cost-per-mile", icon: TrendingUp },
-];
+type NavItem = { label: string; href: string; icon: LucideIcon };
+type NavGroup = { label: string; items: NavItem[] };
 
-const testNav = isTestSectionEnabled()
+const operations: NavGroup = {
+  label: "Operations",
+  items: [
+    { label: "Loads", href: "/loads", icon: Truck },
+    { label: "BOLs", href: "/bols", icon: FileText },
+    { label: "Compliance", href: "/compliance", icon: ShieldCheck },
+    { label: "Recruiting", href: "/recruiting", icon: UserPlus },
+  ],
+};
+
+const finance: NavGroup = {
+  label: "Finance",
+  items: [
+    { label: "Invoices", href: "/invoices", icon: Receipt },
+    { label: "Cost Per Mile", href: "/cost-per-mile", icon: TrendingUp },
+  ],
+};
+
+const testItems: NavItem[] = isTestSectionEnabled()
   ? [{ label: "Test Section", href: "/admin/test", icon: FlaskConical }]
   : [];
 
-const adminNav = [
-  { label: "Overview", href: "/dashboard", icon: LayoutDashboard },
-  { label: "Clients", href: "/admin/clients", icon: Building2 },
-  ...testNav,
-  { label: "Loads", href: "/loads", icon: Truck },
-  { label: "BOLs", href: "/bols", icon: FileText },
-  { label: "Invoices", href: "/invoices", icon: Receipt },
-  { label: "Compliance", href: "/compliance", icon: ShieldCheck },
-  { label: "Recruiting", href: "/recruiting", icon: UserPlus },
-  { label: "Cost Per Mile", href: "/cost-per-mile", icon: TrendingUp },
+const carrierNav: NavGroup[] = [
+  { label: "Overview", items: [{ label: "Dashboard", href: "/dashboard", icon: LayoutDashboard }] },
+  operations,
+  finance,
+  ...(testItems.length ? [{ label: "Dev", items: testItems }] : []),
+];
+
+const adminNav: NavGroup[] = [
+  {
+    label: "Admin",
+    items: [
+      { label: "Overview", href: "/dashboard", icon: LayoutDashboard },
+      { label: "Clients", href: "/admin/clients", icon: Building2 },
+      ...testItems,
+    ],
+  },
+  operations,
+  finance,
 ];
 
 export function Sidebar() {
   const pathname = usePathname();
   const { user, logout } = useAuth();
+  const { isMobile, setOpenMobile } = useSidebar();
 
-  const navItems =
-    user?.role === "admin" ? adminNav : [...carrierNav, ...testNav];
+  const groups = user?.role === "admin" ? adminNav : carrierNav;
+
+  // The mobile drawer stays open after a link is tapped unless we close it
+  const closeMobile = () => {
+    if (isMobile) setOpenMobile(false);
+  };
 
   return (
-    <aside className="fixed inset-y-0 left-0 z-30 flex w-64 flex-col border-r border-[var(--sidebar-border)] bg-[var(--brand-navy)] text-[var(--sidebar-foreground)]">
-      <div className="flex h-[4.25rem] items-center px-5 border-b border-[var(--sidebar-border)]">
-        <BrandMark size="sm" textClassName="text-white" />
-      </div>
+    <SidebarRoot collapsible="icon">
+      <SidebarHeader className="h-[4.25rem] justify-center border-b border-sidebar-border px-3 group-data-[collapsible=icon]:px-2">
+        <Link href="/dashboard" onClick={closeMobile} className="flex items-center">
+          <BrandMark size="sm" textClassName="text-white group-data-[collapsible=icon]:hidden" />
+        </Link>
+      </SidebarHeader>
 
-      <nav className="flex-1 space-y-0.5 py-4 pr-3">
-        {navItems.map((item) => {
-          const isActive =
-            pathname === item.href ||
-            (item.href !== "/dashboard" && pathname.startsWith(item.href));
-          return (
-            <Link
-              key={item.href}
-              href={item.href}
-              className={cn(
-                "group relative flex items-center gap-3 border-l-2 py-2.5 pl-[22px] pr-3 text-sm font-medium transition-all duration-200",
-                isActive
-                  ? "border-[var(--brand-cyan)] bg-[var(--brand-cyan-dim)] text-white"
-                  : "border-transparent text-[#8aa3bd] hover:bg-white/[0.03] hover:text-white"
-              )}
-            >
-              <item.icon
-                className={cn(
-                  "h-[18px] w-[18px] transition-colors",
-                  isActive ? "text-[var(--brand-cyan)]" : "text-[#6f8aaa] group-hover:text-[#a8c4de]"
-                )}
-              />
-              {item.label}
-            </Link>
-          );
-        })}
-      </nav>
+      <SidebarContent className="py-2">
+        {groups.map((group) => (
+          <SidebarGroup key={group.label}>
+            <SidebarGroupLabel className="uppercase tracking-[0.12em] text-[var(--sidebar-muted)]">
+              {group.label}
+            </SidebarGroupLabel>
+            <SidebarGroupContent>
+              <SidebarMenu>
+                {group.items.map((item) => {
+                  const isActive =
+                    pathname === item.href ||
+                    (item.href !== "/dashboard" && pathname.startsWith(item.href));
+                  return (
+                    <SidebarMenuItem key={item.href}>
+                      <SidebarMenuButton
+                        isActive={isActive}
+                        tooltip={item.label}
+                        render={<Link href={item.href} onClick={closeMobile} />}
+                        className="h-9 text-[var(--sidebar-subtle)] hover:text-white data-active:sidebar-item-active data-active:bg-transparent data-active:text-white [&[data-active]>svg]:text-[var(--brand-cyan)]"
+                      >
+                        <item.icon />
+                        <span>{item.label}</span>
+                      </SidebarMenuButton>
+                    </SidebarMenuItem>
+                  );
+                })}
+              </SidebarMenu>
+            </SidebarGroupContent>
+          </SidebarGroup>
+        ))}
+      </SidebarContent>
 
-      <div className="border-t border-[var(--sidebar-border)] p-4">
-        <div className="flex items-center justify-between gap-2">
-          <div className="min-w-0">
-            <p className="truncate text-sm font-medium text-white">
-              {user?.name}
-            </p>
-            <p className="truncate text-xs text-[#6f8aaa]">{user?.email}</p>
-          </div>
-          <button
-            onClick={logout}
-            className="ml-1 rounded-lg p-2 text-[#6f8aaa] transition-colors hover:bg-white/5 hover:text-[var(--brand-cyan)]"
-            aria-label="Sign out"
-          >
-            <LogOut className="h-4 w-4" />
-          </button>
+      <SidebarFooter className="border-t border-sidebar-border">
+        <div className="min-w-0 px-2 pt-1 group-data-[collapsible=icon]:hidden">
+          <p className="truncate text-sm font-medium text-white">{user?.name}</p>
+          <p className="truncate text-xs text-[var(--sidebar-muted)]">{user?.email}</p>
         </div>
-      </div>
-    </aside>
+        <SidebarMenu>
+          <SidebarMenuItem>
+            <SidebarMenuButton
+              tooltip="Sign out"
+              onClick={logout}
+              className="text-[var(--sidebar-subtle)] hover:text-[var(--brand-cyan)]"
+            >
+              <LogOut />
+              <span>Sign out</span>
+            </SidebarMenuButton>
+          </SidebarMenuItem>
+        </SidebarMenu>
+      </SidebarFooter>
+      <SidebarRail />
+    </SidebarRoot>
   );
 }

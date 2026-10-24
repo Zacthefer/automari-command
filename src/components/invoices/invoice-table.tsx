@@ -27,9 +27,9 @@ function formatCurrency(amount: number): string {
 export function InvoiceTable({ invoices }: InvoiceTableProps) {
   if (invoices.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-2xl border border-white/10 bg-card py-16 shadow-[var(--shadow-elevated-1)]">
-        <p className="text-sm text-[#d5e6f6]">No invoices found</p>
-        <p className="mt-1 text-xs text-[#b7cce0]">
+      <div className="flex flex-col items-center justify-center rounded-2xl border border-border bg-card py-16 shadow-[var(--shadow-elevated-1)]">
+        <p className="text-sm text-subtle-foreground">No invoices found</p>
+        <p className="mt-1 text-xs text-subtle-foreground">
           Invoices are auto-generated from processed BOLs.
         </p>
       </div>
@@ -37,26 +37,26 @@ export function InvoiceTable({ invoices }: InvoiceTableProps) {
   }
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-white/10 bg-card shadow-[var(--shadow-elevated-1)]">
+    <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-[var(--shadow-elevated-1)]">
       <Table>
         <TableHeader>
           <TableRow className="hover:bg-transparent">
-            <TableHead className="text-xs font-semibold uppercase tracking-[0.12em] text-[#c5d8eb]">
+            <TableHead className="text-xs font-medium uppercase tracking-[0.12em] text-subtle-foreground">
               Invoice #
             </TableHead>
-            <TableHead className="text-xs font-semibold uppercase tracking-[0.12em] text-[#c5d8eb]">
+            <TableHead className="text-xs font-medium uppercase tracking-[0.12em] text-subtle-foreground">
               Bill To
             </TableHead>
-            <TableHead className="text-xs font-semibold uppercase tracking-[0.12em] text-[#c5d8eb]">
+            <TableHead className="text-xs font-medium uppercase tracking-[0.12em] text-subtle-foreground">
               PRO #
             </TableHead>
-            <TableHead className="text-xs font-semibold uppercase tracking-[0.12em] text-[#c5d8eb]">
+            <TableHead className="text-xs font-medium uppercase tracking-[0.12em] text-subtle-foreground">
               Amount
             </TableHead>
-            <TableHead className="text-xs font-semibold uppercase tracking-[0.12em] text-[#c5d8eb]">
+            <TableHead className="text-xs font-medium uppercase tracking-[0.12em] text-subtle-foreground">
               Status
             </TableHead>
-            <TableHead className="text-xs font-semibold uppercase tracking-[0.12em] text-[#c5d8eb]">
+            <TableHead className="text-xs font-medium uppercase tracking-[0.12em] text-subtle-foreground">
               Due Date
             </TableHead>
           </TableRow>
@@ -67,15 +67,15 @@ export function InvoiceTable({ invoices }: InvoiceTableProps) {
               <TableCell>
                 <Link
                   href={`/invoices/${inv.id}`}
-                  className="font-medium text-foreground group-hover:text-[var(--brand-cyan)] transition-colors"
+                  className="font-medium text-foreground group-hover:text-[var(--brand-link)] transition-colors"
                 >
                   {inv.invoice_number}
                 </Link>
               </TableCell>
-              <TableCell className="text-[#d7e8f8]">
+              <TableCell className="text-foreground">
                 {inv.bill_to_name}
               </TableCell>
-              <TableCell className="text-[#d7e8f8]">
+              <TableCell className="text-foreground">
                 {inv.pro_number || "—"}
               </TableCell>
               <TableCell className="font-medium text-foreground">
@@ -84,7 +84,7 @@ export function InvoiceTable({ invoices }: InvoiceTableProps) {
               <TableCell>
                 <InvoiceStatusChip status={inv.status} />
               </TableCell>
-              <TableCell className="text-sm text-[#d7e8f8]">
+              <TableCell className="text-sm text-foreground">
                 {inv.due_date
                   ? format(new Date(inv.due_date), "MMM d, yyyy")
                   : "—"}

@@ -116,7 +116,7 @@ export default function LoginPage() {
         <div className="relative z-10 max-w-xl space-y-8">
           <BrandMark size="lg" textClassName="text-white" className="scale-125 origin-left" />
           <div>
-            <h2 className="text-[2.75rem] font-semibold leading-[1.1] tracking-[-0.04em] text-white">
+            <h2 className="text-[2.75rem] font-medium leading-[1.1] tracking-[-0.04em] text-white">
               Freight operations,
               <br />
               <span className="text-[var(--brand-cyan)]">automated.</span>
@@ -128,7 +128,7 @@ export default function LoginPage() {
           </div>
         </div>
 
-        <p className="relative z-10 text-xs tracking-wide text-[#5f7a96]">
+        <p className="relative z-10 text-xs tracking-wide text-[#8aa3bd]">
           &copy; {new Date().getFullYear()} Automari.Ai · All rights reserved.
         </p>
       </div>
@@ -143,28 +143,28 @@ export default function LoginPage() {
         />
         <div className="relative z-10 w-full max-w-[400px] space-y-8">
           <div className="flex justify-center lg:hidden">
-            <BrandMark size="md" textClassName="text-white" />
+            <BrandMark size="md" textClassName="text-foreground" />
           </div>
 
-          <div className="rounded-2xl border border-white/10 bg-[rgba(12,26,46,0.85)] p-8 shadow-[var(--shadow-elevated-3)] backdrop-blur-md">
+          <div className="rounded-2xl border border-border bg-card p-8 shadow-[var(--shadow-elevated-3)]">
             <div className="mb-8 space-y-2">
-              <h1 className="text-2xl font-semibold tracking-[-0.03em] text-white">
+              <h1 className="text-2xl font-medium tracking-[-0.03em] text-foreground">
                 Sign in
               </h1>
-              <p className="text-sm leading-relaxed text-[#8aa3bd]">
+              <p className="text-sm leading-relaxed text-muted-foreground">
                 Access your Automari.Ai command center.
               </p>
             </div>
 
             {error && (
-              <div className="mb-6 rounded-xl border border-red-400/20 bg-red-500/10 px-4 py-3 text-sm text-red-200">
+              <div className="mb-6 rounded-xl border border-red-200 bg-red-50 px-4 py-3 text-sm text-red-800">
                 {error}
               </div>
             )}
 
             <form onSubmit={handleSubmit} method="post" action="#" className="space-y-5">
               <div className="space-y-2">
-                <Label htmlFor="email" className="text-[#c5d8eb]">
+                <Label htmlFor="email" className="text-subtle-foreground">
                   Email
                 </Label>
                 <Input
@@ -175,11 +175,11 @@ export default function LoginPage() {
                   autoComplete="email"
                   disabled={loading}
                   placeholder="you@company.com"
-                  className="h-11 border-white/10 bg-[#07111f]/70 text-white placeholder:text-[#5f7a96]"
+                  className="h-11 border-input bg-[var(--field)] text-foreground placeholder:text-muted-foreground"
                 />
               </div>
               <div className="space-y-2">
-                <Label htmlFor="password" className="text-[#c5d8eb]">
+                <Label htmlFor="password" className="text-subtle-foreground">
                   Password
                 </Label>
                 <Input
@@ -190,12 +190,12 @@ export default function LoginPage() {
                   autoComplete="current-password"
                   disabled={loading}
                   placeholder="Enter your password"
-                  className="h-11 border-white/10 bg-[#07111f]/70 text-white placeholder:text-[#5f7a96]"
+                  className="h-11 border-input bg-[var(--field)] text-foreground placeholder:text-muted-foreground"
                 />
               </div>
               <Button
                 type="submit"
-                className="relative mt-2 h-11 w-full overflow-hidden bg-[var(--brand-cyan)] font-semibold text-[#001018] hover:bg-[var(--brand-cyan-soft)]"
+                className="relative mt-2 h-11 w-full overflow-hidden bg-[var(--brand-cyan)] font-medium text-[#001018] hover:bg-[var(--brand-cyan-soft)]"
                 disabled={loading}
               >
                 {loading ? (

@@ -12,22 +12,20 @@ interface StatCardProps {
 
 export function StatCard({ label, value, icon: Icon, detail, href }: StatCardProps) {
   const card = (
-    <Card className="h-full rounded-2xl border border-white/10 bg-[#0b182b] shadow-[var(--shadow-elevated-1)] ring-0 transition-all duration-200 hover:-translate-y-0.5 hover:border-[var(--brand-cyan)]/25 hover:shadow-[var(--shadow-elevated-2)]">
-      <CardContent className="flex h-full flex-col gap-4 p-5">
-        <div className="flex items-center justify-between gap-3">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
-            {label}
-          </p>
-          <span className="inline-flex h-9 w-9 shrink-0 items-center justify-center rounded-xl bg-[rgba(0,191,255,0.10)] text-[var(--brand-cyan)] ring-1 ring-[rgba(0,191,255,0.22)]">
-            <Icon className="h-[18px] w-[18px]" />
+    <Card className="h-full rounded-2xl border border-border bg-card shadow-[var(--shadow-elevated-1)] ring-0 transition-all duration-200 hover:-translate-y-0.5 hover:border-[var(--brand-cyan)]/25 hover:shadow-[var(--shadow-elevated-2)]">
+      <CardContent className="flex h-full flex-col gap-3 p-5">
+        <div className="flex items-center gap-3">
+          <span className="inline-flex size-9 shrink-0 items-center justify-center rounded-lg bg-[var(--brand-cyan-dim)] text-[var(--brand-link)]">
+            <Icon className="size-[18px]" />
           </span>
-        </div>
-        <div className="min-w-0">
-          <p className="truncate text-[28px] font-semibold leading-none tracking-[-0.03em] text-[#f3f8ff] tabular-nums">
+          <p className="truncate text-[28px] font-medium leading-none tracking-[-0.03em] text-foreground tabular-nums">
             {value}
           </p>
+        </div>
+        <div className="min-w-0">
+          <p className="text-sm font-medium text-foreground">{label}</p>
           {detail ? (
-            <p className="mt-2 text-[12px] font-medium text-[#b7cce0] tabular-nums">{detail}</p>
+            <p className="mt-1 text-[12px] font-medium text-subtle-foreground tabular-nums">{detail}</p>
           ) : null}
         </div>
       </CardContent>

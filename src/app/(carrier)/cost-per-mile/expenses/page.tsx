@@ -31,7 +31,7 @@ const categoryLabels: Record<string, string> = {
 };
 
 const categoryStyles: Record<string, string> = {
-  fuel: "bg-[var(--brand-cyan-dim)] text-[var(--brand-cyan)] hover:bg-[var(--brand-cyan-dim)]",
+  fuel: "bg-[var(--brand-cyan-dim)] text-[var(--brand-link)] hover:bg-[var(--brand-cyan-dim)]",
   maintenance: "bg-amber-50 text-amber-700 hover:bg-amber-50",
   insurance: "bg-violet-50 text-violet-700 hover:bg-violet-50",
   truck_payment: "bg-slate-100 text-slate-600 hover:bg-slate-100",
@@ -78,33 +78,33 @@ export default function ExpensesPage() {
       </div>
 
       {expenses.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-white/10 bg-card py-16 shadow-[var(--shadow-elevated-1)]">
-          <p className="text-sm text-[#d5e6f6]">No expenses found</p>
-          <p className="mt-1 text-xs text-[#b7cce0]">
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-border bg-card py-16 shadow-[var(--shadow-elevated-1)]">
+          <p className="text-sm text-subtle-foreground">No expenses found</p>
+          <p className="mt-1 text-xs text-subtle-foreground">
             Log expenses to start tracking cost per mile.
           </p>
         </div>
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-white/10 bg-card shadow-[var(--shadow-elevated-1)]">
+        <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-[var(--shadow-elevated-1)]">
           <Table>
             <TableHeader>
               <TableRow className="hover:bg-transparent">
-                <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
+                <TableHead className="text-[11px] font-medium uppercase tracking-[0.14em] text-subtle-foreground">
                   Date
                 </TableHead>
-                <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
+                <TableHead className="text-[11px] font-medium uppercase tracking-[0.14em] text-subtle-foreground">
                   Category
                 </TableHead>
-                <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
+                <TableHead className="text-[11px] font-medium uppercase tracking-[0.14em] text-subtle-foreground">
                   Amount
                 </TableHead>
-                <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
+                <TableHead className="text-[11px] font-medium uppercase tracking-[0.14em] text-subtle-foreground">
                   Vendor
                 </TableHead>
-                <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
+                <TableHead className="text-[11px] font-medium uppercase tracking-[0.14em] text-subtle-foreground">
                   Description
                 </TableHead>
-                <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
+                <TableHead className="text-[11px] font-medium uppercase tracking-[0.14em] text-subtle-foreground">
                   Source
                 </TableHead>
               </TableRow>
@@ -115,7 +115,7 @@ export default function ExpensesPage() {
                   key={expense.id}
                   className="group h-11 border-slate-100"
                 >
-                  <TableCell className="text-[13px] text-[#d7e8f8] tabular-nums">
+                  <TableCell className="text-[13px] text-foreground tabular-nums">
                     {format(new Date(expense.expense_date), "MMM d, yyyy")}
                   </TableCell>
                   <TableCell>
@@ -129,13 +129,13 @@ export default function ExpensesPage() {
                   <TableCell className="font-mono text-[13px] font-medium text-foreground tabular-nums">
                     {formatCurrency(expense.amount)}
                   </TableCell>
-                  <TableCell className="text-sm text-[#d7e8f8]">
+                  <TableCell className="text-sm text-foreground">
                     {expense.vendor || "—"}
                   </TableCell>
-                  <TableCell className="max-w-[200px] truncate text-sm text-[#d5e6f6]">
+                  <TableCell className="max-w-[200px] truncate text-sm text-subtle-foreground">
                     {expense.description || "—"}
                   </TableCell>
-                  <TableCell className="text-xs text-[#b7cce0]">
+                  <TableCell className="text-xs text-subtle-foreground">
                     {expense.source === "manual"
                       ? "Manual"
                       : expense.source === "fuel_card_import"

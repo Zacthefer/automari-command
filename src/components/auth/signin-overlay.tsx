@@ -29,7 +29,7 @@ export function SignInOverlay({ status, detail }: SignInOverlayProps) {
         </div>
 
         <div className="space-y-2 text-center">
-          <p className="text-base font-semibold tracking-[-0.02em] text-white">
+          <p className="text-base font-medium tracking-[-0.02em] text-white">
             {status}
           </p>
           {detail ? (

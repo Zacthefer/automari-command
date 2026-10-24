@@ -31,9 +31,9 @@ function formatRoute(origin: string | null, destination: string | null): string 
 export function LoadsTable({ loads }: LoadsTableProps) {
   if (loads.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-2xl border border-white/10 bg-card py-16 shadow-[var(--shadow-elevated-1)]">
-        <p className="text-sm text-[#d5e6f6]">No loads found</p>
-        <p className="mt-1 text-xs text-[#b7cce0]">
+      <div className="flex flex-col items-center justify-center rounded-2xl border border-border bg-card py-16 shadow-[var(--shadow-elevated-1)]">
+        <p className="text-sm text-subtle-foreground">No loads found</p>
+        <p className="mt-1 text-xs text-subtle-foreground">
           Upload a rate confirmation to create your first load.
         </p>
       </div>
@@ -41,29 +41,29 @@ export function LoadsTable({ loads }: LoadsTableProps) {
   }
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-white/10 bg-card shadow-[var(--shadow-elevated-1)]">
+    <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-[var(--shadow-elevated-1)]">
       <Table>
         <TableHeader>
           <TableRow className="hover:bg-transparent">
-            <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
+            <TableHead className="text-[11px] font-medium uppercase tracking-[0.14em] text-subtle-foreground">
               Load #
             </TableHead>
-            <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
+            <TableHead className="text-[11px] font-medium uppercase tracking-[0.14em] text-subtle-foreground">
               Broker
             </TableHead>
-            <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
+            <TableHead className="text-[11px] font-medium uppercase tracking-[0.14em] text-subtle-foreground">
               Route
             </TableHead>
-            <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
+            <TableHead className="text-[11px] font-medium uppercase tracking-[0.14em] text-subtle-foreground">
               Rate
             </TableHead>
-            <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
+            <TableHead className="text-[11px] font-medium uppercase tracking-[0.14em] text-subtle-foreground">
               Status
             </TableHead>
-            <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
+            <TableHead className="text-[11px] font-medium uppercase tracking-[0.14em] text-subtle-foreground">
               Payment
             </TableHead>
-            <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
+            <TableHead className="text-[11px] font-medium uppercase tracking-[0.14em] text-subtle-foreground">
               Date
             </TableHead>
           </TableRow>
@@ -74,18 +74,18 @@ export function LoadsTable({ loads }: LoadsTableProps) {
               <TableCell>
                 <Link
                   href={`/loads/${load.id}`}
-                  className="font-mono text-[13px] font-medium text-foreground transition-colors group-hover:text-[var(--brand-cyan)]"
+                  className="font-mono text-[13px] font-medium text-foreground transition-colors group-hover:text-[var(--brand-link)]"
                 >
                   {load.load_number || load.id.slice(0, 8)}
                 </Link>
               </TableCell>
-              <TableCell className="text-sm text-[#d7e8f8]">
+              <TableCell className="text-sm text-foreground">
                 {load.broker_name || "—"}
               </TableCell>
-              <TableCell className="text-sm text-[#d7e8f8]">
+              <TableCell className="text-sm text-foreground">
                 {formatRoute(load.origin, load.destination)}
               </TableCell>
-              <TableCell className="font-mono text-[13px] text-[#d7e8f8] tabular-nums">
+              <TableCell className="font-mono text-[13px] text-foreground tabular-nums">
                 {formatCurrency(load.current_total)}
               </TableCell>
               <TableCell>
@@ -94,7 +94,7 @@ export function LoadsTable({ loads }: LoadsTableProps) {
               <TableCell>
                 <PaymentStatusChip status={load.payment_status} />
               </TableCell>
-              <TableCell className="text-[13px] text-[#d7e8f8] tabular-nums">
+              <TableCell className="text-[13px] text-foreground tabular-nums">
                 {format(new Date(load.created_at), "MMM d, yyyy")}
               </TableCell>
             </TableRow>

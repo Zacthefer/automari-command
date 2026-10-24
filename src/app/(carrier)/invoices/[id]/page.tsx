@@ -48,7 +48,7 @@ function Field({
 }) {
   return (
     <div>
-      <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#c5d8eb]">{label}</p>
+      <p className="text-xs font-medium uppercase tracking-[0.12em] text-subtle-foreground">{label}</p>
       <p className="mt-0.5 text-sm text-foreground">{value || "—"}</p>
     </div>
   );
@@ -159,7 +159,7 @@ export default function InvoiceDetailPage() {
   if (!invoice) {
     return (
       <div className="text-center py-16">
-        <p className="text-sm text-[#d5e6f6]">Invoice not found.</p>
+        <p className="text-sm text-subtle-foreground">Invoice not found.</p>
       </div>
     );
   }
@@ -180,7 +180,7 @@ export default function InvoiceDetailPage() {
             <ArrowLeft className="h-4 w-4" />
           </Link>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+            <h1 className="text-2xl font-medium tracking-tight text-foreground">
               {invoice.invoice_number}
             </h1>
             <InvoiceStatusChip status={invoice.status} />
@@ -293,7 +293,7 @@ export default function InvoiceDetailPage() {
                   </div>
                   <div>
                     <Label>Estimated Total</Label>
-                    <p className="mt-2 text-lg font-semibold text-foreground">
+                    <p className="mt-2 text-lg font-medium text-foreground">
                       {formatCurrency(
                         (parseFloat(editRate) || 0) +
                           (parseFloat(editAccessorials) || 0)
@@ -331,8 +331,8 @@ export default function InvoiceDetailPage() {
                     value={formatCurrency(invoice.accessorial_charges)}
                   />
                   <div>
-                    <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#c5d8eb]">Total</p>
-                    <p className="mt-0.5 text-lg font-semibold text-foreground">
+                    <p className="text-xs font-medium uppercase tracking-[0.12em] text-subtle-foreground">Total</p>
+                    <p className="mt-0.5 text-lg font-medium text-foreground">
                       {formatCurrency(invoice.total_amount)}
                     </p>
                   </div>
@@ -424,7 +424,7 @@ export default function InvoiceDetailPage() {
                 </>
               )}
               {!bol.has_image && (
-                <p className="text-sm text-[#b7cce0] italic">
+                <p className="text-sm text-subtle-foreground italic">
                   No image stored for this BOL.
                 </p>
               )}

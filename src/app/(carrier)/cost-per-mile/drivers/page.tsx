@@ -55,27 +55,27 @@ export default function DriversPage() {
       </div>
 
       {drivers.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-white/10 bg-card py-16 shadow-[var(--shadow-elevated-1)]">
-          <p className="text-sm text-[#d5e6f6]">No drivers found</p>
-          <p className="mt-1 text-xs text-[#b7cce0]">
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-border bg-card py-16 shadow-[var(--shadow-elevated-1)]">
+          <p className="text-sm text-subtle-foreground">No drivers found</p>
+          <p className="mt-1 text-xs text-subtle-foreground">
             Add drivers to track per-driver cost per mile.
           </p>
         </div>
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-white/10 bg-card shadow-[var(--shadow-elevated-1)]">
+        <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-[var(--shadow-elevated-1)]">
           <Table>
             <TableHeader>
               <TableRow className="hover:bg-transparent">
-                <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
+                <TableHead className="text-[11px] font-medium uppercase tracking-[0.14em] text-subtle-foreground">
                   Name
                 </TableHead>
-                <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
+                <TableHead className="text-[11px] font-medium uppercase tracking-[0.14em] text-subtle-foreground">
                   Phone
                 </TableHead>
-                <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
+                <TableHead className="text-[11px] font-medium uppercase tracking-[0.14em] text-subtle-foreground">
                   CDL
                 </TableHead>
-                <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
+                <TableHead className="text-[11px] font-medium uppercase tracking-[0.14em] text-subtle-foreground">
                   Status
                 </TableHead>
               </TableRow>
@@ -86,10 +86,10 @@ export default function DriversPage() {
                   <TableCell className="text-sm font-medium text-foreground">
                     {driver.first_name} {driver.last_name}
                   </TableCell>
-                  <TableCell className="text-sm text-[#d7e8f8]">
+                  <TableCell className="text-sm text-foreground">
                     {driver.phone || "—"}
                   </TableCell>
-                  <TableCell className="font-mono text-[13px] text-[#d7e8f8]">
+                  <TableCell className="font-mono text-[13px] text-foreground">
                     {driver.cdl_number
                       ? `${driver.cdl_number} (${driver.cdl_state || "—"})`
                       : "—"}

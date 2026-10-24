@@ -104,8 +104,8 @@ export default function LoadsPage() {
             onClick={() => setStatusFilter(tab.value)}
             className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
               statusFilter === tab.value
-                ? "bg-[var(--brand-cyan-dim)] text-[var(--brand-cyan)]"
-                : "text-[#8aa3bd] hover:bg-white/[0.03] hover:text-white"
+                ? "bg-[var(--brand-cyan-dim)] text-[var(--brand-link)]"
+                : "text-muted-foreground hover:bg-muted hover:text-foreground"
             }`}
           >
             {tab.label}

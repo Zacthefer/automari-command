@@ -3,8 +3,7 @@
 import { useEffect } from "react";
 import { useRouter } from "next/navigation";
 import { AuthProvider, useAuth } from "@/lib/auth";
-import { Sidebar } from "@/components/layout/sidebar";
-import { Header } from "@/components/layout/header";
+import { AppShell } from "@/components/layout/app-shell";
 import { PageSkeleton } from "@/components/layout/page-skeleton";
 
 function AuthGate({ children }: { children: React.ReactNode }) {
@@ -27,15 +26,7 @@ function AuthGate({ children }: { children: React.ReactNode }) {
 
   if (!user) return null;
 
-  return (
-    <div className="relative min-h-screen bg-background">
-      <Sidebar />
-      <div className="relative z-10 pl-64">
-        <Header />
-        <main className="px-10 py-10">{children}</main>
-      </div>
-    </div>
-  );
+  return <AppShell>{children}</AppShell>;
 }
 
 export default function CarrierLayout({

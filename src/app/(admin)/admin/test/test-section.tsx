@@ -335,7 +335,7 @@ export function TestSection() {
                   ? "rounded-full bg-emerald-500/15 px-2.5 py-1 text-xs font-medium text-emerald-300"
                   : status === "failed"
                     ? "rounded-full bg-red-500/15 px-2.5 py-1 text-xs font-medium text-red-300"
-                    : "rounded-full bg-white/5 px-2.5 py-1 text-xs font-medium text-[#8aa3bd]"
+                    : "rounded-full bg-muted px-2.5 py-1 text-xs font-medium text-muted-foreground"
               }
             >
               {badge}
@@ -354,11 +354,11 @@ export function TestSection() {
                   className={
                     laneId === item.id
                       ? "rounded-lg border border-[var(--brand-cyan)] bg-[var(--brand-cyan-dim)] px-3 py-3 text-left"
-                      : "rounded-lg border border-white/10 px-3 py-3 text-left hover:bg-white/5"
+                      : "rounded-lg border border-border px-3 py-3 text-left hover:bg-muted"
                   }
                 >
                   <p className="text-sm font-medium">{item.label}</p>
-                  <p className="mt-1 text-xs text-[#8aa3bd]">{item.summary}</p>
+                  <p className="mt-1 text-xs text-muted-foreground">{item.summary}</p>
                 </button>
               ))}
             </div>
@@ -366,7 +366,7 @@ export function TestSection() {
               href={lane.image}
               target="_blank"
               rel="noreferrer"
-              className="inline-block text-sm text-[var(--brand-cyan)] underline"
+              className="inline-block text-sm text-[var(--brand-link)] underline"
             >
               Open this Bill of Lading
             </a>
@@ -427,7 +427,7 @@ export function TestSection() {
                 value={accessorial}
                 onChange={(e) => setAccessorial(e.target.value)}
               />
-              <p className="text-xs text-[#8aa3bd]">
+              <p className="text-xs text-muted-foreground">
                 Total will be {money(rate + extra)}.
               </p>
             </div>
@@ -438,7 +438,7 @@ export function TestSection() {
           </Button>
 
           {steps.length > 0 ? (
-            <ul className="space-y-2 border-t border-white/10 pt-4">
+            <ul className="space-y-2 border-t border-border pt-4">
               {steps.map((step) => (
                 <li key={step.label} className="text-sm">
                   <div className="flex items-start gap-2">
@@ -454,16 +454,16 @@ export function TestSection() {
           ) : null}
 
           {sideNotes.length > 0 ? (
-            <div className="space-y-2 border-t border-white/10 pt-4 text-sm text-[#8aa3bd]">
+            <div className="space-y-2 border-t border-border pt-4 text-sm text-muted-foreground">
               <p className="font-medium text-foreground">If they ask what else you watch</p>
               {sideNotes.map((note) => (
                 <p key={note}>{note}</p>
               ))}
               <div className="flex flex-wrap gap-3 pt-1">
-                <Link href="/compliance" className="text-[var(--brand-cyan)] underline">
+                <Link href="/compliance" className="text-[var(--brand-link)] underline">
                   Open Compliance
                 </Link>
-                <Link href="/cost-per-mile" className="text-[var(--brand-cyan)] underline">
+                <Link href="/cost-per-mile" className="text-[var(--brand-link)] underline">
                   Open Cost per Mile
                 </Link>
               </div>
@@ -482,7 +482,7 @@ function StepMark({ state }: { state: StepState }) {
   if (state === "fail") {
     return <X className="mt-0.5 h-4 w-4 shrink-0 text-red-300" />;
   }
-  return <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-[#8aa3bd]" />;
+  return <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-muted-foreground" />;
 }
 
 function StepDetail({ detail }: { detail?: string }) {
@@ -495,7 +495,7 @@ function StepDetail({ detail }: { detail?: string }) {
       <a
         href={url}
         download={filename}
-        className="mt-1 inline-block text-[var(--brand-cyan)] underline"
+        className="mt-1 inline-block text-[var(--brand-link)] underline"
       >
         Download {filename}
       </a>
@@ -507,17 +507,17 @@ function StepDetail({ detail }: { detail?: string }) {
     return (
       <p className="mt-1 flex flex-wrap gap-3">
         {bill ? (
-          <Link href={bill} className="text-[var(--brand-cyan)] underline">
+          <Link href={bill} className="text-[var(--brand-link)] underline">
             Open this Bill of Lading
           </Link>
         ) : null}
         {invoice ? (
-          <Link href={invoice} className="text-[var(--brand-cyan)] underline">
+          <Link href={invoice} className="text-[var(--brand-link)] underline">
             Open this invoice
           </Link>
         ) : null}
       </p>
     );
   }
-  return <p className="mt-0.5 text-[#8aa3bd]">{detail}</p>;
+  return <p className="mt-0.5 text-muted-foreground">{detail}</p>;
 }

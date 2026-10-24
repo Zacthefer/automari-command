@@ -7,7 +7,7 @@ const statusConfig: Record<
 > = {
   new: {
     label: "New",
-    className: "bg-[var(--brand-cyan-dim)] text-[var(--brand-cyan)] hover:bg-[var(--brand-cyan-dim)]",
+    className: "bg-[var(--brand-cyan-dim)] text-[var(--brand-link)] hover:bg-[var(--brand-cyan-dim)]",
   },
   screening: {
     label: "Screening",

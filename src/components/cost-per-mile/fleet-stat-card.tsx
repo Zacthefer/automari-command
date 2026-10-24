@@ -14,7 +14,7 @@ interface FleetStatCardProps {
 
 const accentStyles = {
   blue: {
-    ink: "text-[var(--brand-cyan)]",
+    ink: "text-[var(--brand-link)]",
     wash: "bg-[rgba(0,191,255,0.10)]",
     ring: "ring-[rgba(0,191,255,0.22)]",
   },
@@ -46,10 +46,10 @@ export function FleetStatCard({
   const colors = accentStyles[accent];
 
   const card = (
-    <Card className="h-full rounded-2xl border border-white/10 bg-[#0b182b] shadow-[var(--shadow-elevated-1)] transition-all duration-200 hover:-translate-y-0.5 hover:border-white/16 hover:shadow-[var(--shadow-elevated-2)]">
+    <Card className="h-full rounded-2xl border border-border bg-card shadow-[var(--shadow-elevated-1)] transition-all duration-200 hover:-translate-y-0.5 hover:border-foreground/20 hover:shadow-[var(--shadow-elevated-2)]">
       <CardContent className="flex h-full flex-col gap-4 p-5">
         <div className="flex items-center justify-between gap-3">
-          <p className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
+          <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-subtle-foreground">
             {label}
           </p>
           <span
@@ -64,11 +64,11 @@ export function FleetStatCard({
           </span>
         </div>
         <div className="min-w-0">
-          <p className="truncate text-[26px] font-semibold leading-none tracking-[-0.03em] text-[#f3f8ff] tabular-nums">
+          <p className="truncate text-[26px] font-medium leading-none tracking-[-0.03em] text-foreground tabular-nums">
             {value}
           </p>
           {detail ? (
-            <p className="mt-2 text-[12px] font-medium text-[#b7cce0] tabular-nums">
+            <p className="mt-2 text-[12px] font-medium text-subtle-foreground tabular-nums">
               {detail}
             </p>
           ) : null}

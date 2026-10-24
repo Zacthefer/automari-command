@@ -8,7 +8,7 @@ const statusConfig: Record<PaymentStatus, { label: string; className: string }> 
   },
   ready_to_submit: {
     label: "Ready",
-    className: "bg-[var(--brand-cyan-dim)] text-[var(--brand-cyan)] hover:bg-[var(--brand-cyan-dim)]",
+    className: "bg-[var(--brand-cyan-dim)] text-[var(--brand-link)] hover:bg-[var(--brand-cyan-dim)]",
   },
   submitted: {
     label: "Submitted",
