@@ -75,24 +75,13 @@ export function MilesMark(props: MarkProps) {
   );
 }
 
-export function TruckMark(props: MarkProps) {
+// Box truck from Phosphor Icons (MIT). Uses its own 256-unit viewBox.
+export function TruckMark({ title = "Trucks", ...props }: MarkProps) {
   return (
-    <Mark title="Trucks" {...props}>
-      <path
-        d="M5.8 12.2h11.6v8.2H5.8z"
-        stroke="currentColor"
-        strokeWidth="1.7"
-        strokeLinejoin="round"
-      />
-      <path
-        d="M17.4 15.1h5.1l3.2 3.4v1.9h-8.3"
-        stroke="currentColor"
-        strokeWidth="1.7"
-        strokeLinejoin="round"
-      />
-      <circle cx="10.2" cy="21.6" r="1.85" stroke="currentColor" strokeWidth="1.5" />
-      <circle cx="21.6" cy="21.6" r="1.85" stroke="currentColor" strokeWidth="1.5" />
-    </Mark>
+    <svg viewBox="0 0 256 256" fill="currentColor" aria-hidden={title ? undefined : true} {...props}>
+      {title ? <title>{title}</title> : null}
+      <path d="m255.42 117l-14-35a15.93 15.93 0 0 0-14.84-10H192v-8a8 8 0 0 0-8-8H32a16 16 0 0 0-16 16v112a16 16 0 0 0 16 16h17a32 32 0 0 0 62 0h50a32 32 0 0 0 62 0h17a16 16 0 0 0 16-16v-64a7.9 7.9 0 0 0-.58-3M192 88h34.58l9.6 24H192ZM32 72h144v64H32Zm48 136a16 16 0 1 1 16-16a16 16 0 0 1-16 16m81-24h-50a32 32 0 0 0-62 0H32v-32h144v12.31A32.1 32.1 0 0 0 161 184m31 24a16 16 0 1 1 16-16a16 16 0 0 1-16 16m48-24h-17a32.06 32.06 0 0 0-31-24v-32h48Z" />
+    </svg>
   );
 }
 

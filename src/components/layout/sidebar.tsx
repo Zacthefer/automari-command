@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useState, type ComponentType, type SVGProps } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -13,7 +13,6 @@ import {
   TrendingUp,
   UserPlus,
   FlaskConical,
-  Truck,
   Wallet,
   CreditCard,
   type LucideIcon,
@@ -22,6 +21,7 @@ import { useAuth } from "@/lib/auth";
 import { openCarrierBillingPortal } from "@/lib/billing";
 import { isTestSectionEnabled } from "@/lib/test-section";
 import { BrandMark } from "@/components/layout/brand-mark";
+import { TruckMark } from "@/components/icons/brand-marks";
 import {
   Sidebar as SidebarRoot,
   SidebarContent,
@@ -37,13 +37,18 @@ import {
   useSidebar,
 } from "@/components/ui/sidebar";
 
-type NavItem = { label: string; href: string; icon: LucideIcon };
+type NavItem = { label: string; href: string; icon: LucideIcon | ComponentType<SVGProps<SVGSVGElement>> };
 type NavGroup = { label: string; items: NavItem[] };
+
+// Decorative in the nav: the link text already says "Loads"
+function LoadsIcon(props: SVGProps<SVGSVGElement>) {
+  return <TruckMark title="" {...props} />;
+}
 
 const operations: NavGroup = {
   label: "Operations",
   items: [
-    { label: "Loads", href: "/loads", icon: Truck },
+    { label: "Loads", href: "/loads", icon: LoadsIcon },
     { label: "BOLs", href: "/bols", icon: FileText },
     { label: "Compliance", href: "/compliance", icon: ShieldCheck },
     { label: "Recruiting", href: "/recruiting", icon: UserPlus },

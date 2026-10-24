@@ -13,6 +13,7 @@ import {
 import { LoadStatusChip } from "./load-status-chip";
 import { PaymentStatusChip } from "./payment-status-chip";
 import type { LoadSummary } from "@/types";
+import { TruckMark } from "@/components/icons/brand-marks";
 
 interface LoadsTableProps {
   loads: LoadSummary[];
@@ -34,6 +35,7 @@ export function LoadsTable({ loads, filtered = false }: LoadsTableProps) {
   if (loads.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center rounded-2xl border border-border bg-card py-16 shadow-[var(--shadow-elevated-1)]">
+        <TruckMark title="" className="mb-4 size-12 text-[var(--brand-link)]/40" />
         <p className="text-sm text-subtle-foreground">
           {filtered ? "No loads in this status" : "No loads found"}
         </p>
