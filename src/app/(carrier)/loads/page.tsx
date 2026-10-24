@@ -119,7 +119,7 @@ export default function LoadsPage() {
         </div>
       )}
 
-      <LoadsTable loads={loads} />
+      <LoadsTable loads={loads} filtered={statusFilter !== ""} />
     </div>
   );
 }

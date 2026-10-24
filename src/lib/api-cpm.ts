@@ -39,7 +39,7 @@ async function request<T>(
 
   if (!response.ok) {
     const body = await response.json().catch(() => ({}));
-    const detail = body.detail;
+    const detail = body.detail ?? body.error;
     const message =
       typeof detail === "string" && detail.trim()
         ? detail
