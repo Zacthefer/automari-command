@@ -17,7 +17,7 @@ import type { BOL, LoadSummary } from "@/types";
 function Field({ label, value }: { label: string; value: string | null | undefined }) {
   return (
     <div>
-      <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#c5d8eb]">{label}</p>
+      <p className="text-xs font-medium uppercase tracking-[0.12em] text-subtle-foreground">{label}</p>
       <p className="mt-0.5 text-sm text-foreground">{value || "—"}</p>
     </div>
   );
@@ -83,7 +83,7 @@ export default function BolDetailPage() {
   if (!bol) {
     return (
       <div className="text-center py-16">
-        <p className="text-sm text-[#d5e6f6]">BOL not found.</p>
+        <p className="text-sm text-subtle-foreground">BOL not found.</p>
       </div>
     );
   }
@@ -99,7 +99,7 @@ export default function BolDetailPage() {
             <ArrowLeft className="h-4 w-4" />
           </Link>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+            <h1 className="text-2xl font-medium tracking-tight text-foreground">
               {bol.pro_number || bol.bol_number || "BOL"}
             </h1>
             <BolStatusChip status={bol.status} />
@@ -126,7 +126,7 @@ export default function BolDetailPage() {
             <div>
               <Label>Select Load</Label>
               {loads.length === 0 ? (
-                <p className="mt-1 text-sm text-[#8aa3bd]">
+                <p className="mt-1 text-sm text-muted-foreground">
                   No loads found. Upload a rate confirmation first.
                 </p>
               ) : (
@@ -136,7 +136,7 @@ export default function BolDetailPage() {
                     placeholder="Search by load #, broker, or route…"
                     value={loadSearch}
                     onChange={(e) => setLoadSearch(e.target.value)}
-                    className="mt-1 mb-2 w-full rounded-lg border border-slate-200 bg-background px-3 py-2 text-sm text-foreground placeholder:text-[#8aa3bd]"
+                    className="mt-1 mb-2 w-full rounded-lg border border-slate-200 bg-background px-3 py-2 text-sm text-foreground placeholder:text-muted-foreground"
                   />
                   <select
                     value={selectedLoadId}
@@ -190,7 +190,7 @@ export default function BolDetailPage() {
                     onClick={() => setAttachKind(kind)}
                     className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
                       attachKind === kind
-                        ? "bg-[var(--brand-cyan-dim)] text-[var(--brand-cyan)]"
+                        ? "bg-[var(--brand-cyan-dim)] text-[var(--brand-link)]"
                         : "bg-slate-100 text-slate-700 hover:bg-slate-200"
                     }`}
                   >

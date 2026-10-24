@@ -64,7 +64,7 @@ export default function RecruitingPage() {
               "rounded-full px-3 py-1 text-sm font-medium transition-colors",
               statusFilter === filter.value
                 ? "bg-[var(--brand-cyan)] text-[#001018]"
-                : "bg-card text-muted-foreground border border-white/10 shadow-[var(--shadow-elevated-1)] hover:text-foreground"
+                : "bg-card text-muted-foreground border border-border shadow-[var(--shadow-elevated-1)] hover:text-foreground"
             )}
           >
             {filter.label}

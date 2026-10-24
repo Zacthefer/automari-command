@@ -1,18 +1,19 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import Link from "next/link";
 import {
   FileText,
-  Receipt,
   DollarSign,
   AlertTriangle,
-  ShieldCheck,
   Gauge,
   Route,
 } from "lucide-react";
 import { PageHeader } from "@/components/layout/page-header";
 import { PageSkeleton } from "@/components/layout/page-skeleton";
 import { StatCard } from "@/components/dashboard/stat-card";
+import { ReceivablesCard } from "@/components/dashboard/receivables-card";
+import { ComplianceCard } from "@/components/dashboard/compliance-card";
 import { BolTable } from "@/components/bols/bol-table";
 import { useAuth } from "@/lib/auth";
 import {
@@ -62,7 +63,7 @@ export default function DashboardPage() {
   if (loading) return <PageSkeleton />;
 
   return (
-    <div className="space-y-10">
+    <div className="space-y-8">
       <PageHeader
         title={isAdmin ? "Admin Overview" : "Dashboard"}
         description={
@@ -99,66 +100,66 @@ export default function DashboardPage() {
           />
         </div>
       ) : carrierStats ? (
-        <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
-          <StatCard
-            label="Total BOLs"
-            value={carrierStats.bols_total}
-            icon={FileText}
-            detail={`${carrierStats.bols_this_week} this week`}
-            href="/bols"
-          />
-          <StatCard
-            label="Pending Review"
-            value={carrierStats.bols_pending_review}
-            icon={AlertTriangle}
-            href="/bols"
-          />
-          <StatCard
-            label="Invoices Sent"
-            value={carrierStats.invoices_sent}
-            icon={Receipt}
-            detail={`${carrierStats.invoices_overdue} overdue`}
-            href="/invoices"
-          />
-          <StatCard
-            label="Outstanding"
-            value={formatCurrency(carrierStats.total_outstanding)}
-            icon={DollarSign}
-            detail={`${formatCurrency(carrierStats.total_collected)} collected`}
-            href="/invoices"
-          />
-          <StatCard
-            label="Compliance"
-            value={carrierStats.compliance_total}
-            icon={ShieldCheck}
-            detail={
-              carrierStats.compliance_expired > 0
-                ? `${carrierStats.compliance_expired} expired, ${carrierStats.compliance_expiring_soon} expiring`
-                : carrierStats.compliance_expiring_soon > 0
-                  ? `${carrierStats.compliance_expiring_soon} expiring soon`
-                  : "All current"
-            }
-            href="/compliance"
-          />
-          <StatCard
-            label="Fleet CPM"
-            value={`$${carrierStats.fleet_avg_cpm.toFixed(2)}`}
-            icon={Gauge}
-            detail={`${new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(carrierStats.fleet_total_miles)} miles`}
-            href="/cost-per-mile"
-          />
-          <StatCard
-            label="Fleet Expenses"
-            value={formatCurrency(carrierStats.fleet_total_expenses)}
-            icon={Route}
-            href="/cost-per-mile/expenses"
-          />
-        </div>
+        <>
+          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
+            <StatCard
+              label="Total BOLs"
+              value={carrierStats.bols_total}
+              icon={FileText}
+              detail={`${carrierStats.bols_this_week} this week`}
+              href="/bols"
+            />
+            <StatCard
+              label="Pending Review"
+              value={carrierStats.bols_pending_review}
+              icon={AlertTriangle}
+              detail="BOLs waiting on you"
+              href="/bols"
+            />
+            <StatCard
+              label="Fleet CPM"
+              value={`$${carrierStats.fleet_avg_cpm.toFixed(2)}`}
+              icon={Gauge}
+              detail={`${new Intl.NumberFormat("en-US", { maximumFractionDigits: 0 }).format(carrierStats.fleet_total_miles)} miles`}
+              href="/cost-per-mile"
+            />
+            <StatCard
+              label="Fleet Expenses"
+              value={formatCurrency(carrierStats.fleet_total_expenses)}
+              icon={Route}
+              href="/cost-per-mile/expenses"
+            />
+          </div>
+
+          <div className="grid gap-4 lg:grid-cols-5">
+            <div className="lg:col-span-3">
+              <ReceivablesCard
+                outstanding={carrierStats.total_outstanding}
+                collected={carrierStats.total_collected}
+                invoicesSent={carrierStats.invoices_sent}
+                invoicesPaid={carrierStats.invoices_paid}
+                invoicesOverdue={carrierStats.invoices_overdue}
+              />
+            </div>
+            <div className="lg:col-span-2">
+              <ComplianceCard
+                total={carrierStats.compliance_total}
+                expiringSoon={carrierStats.compliance_expiring_soon}
+                expired={carrierStats.compliance_expired}
+              />
+            </div>
+          </div>
+        </>
       ) : null}
 
       {/* Recent BOLs */}
       <div className="space-y-4">
-        <h2 className="text-[17px] font-semibold tracking-[-0.01em] text-foreground">Recent BOLs</h2>
+        <div className="flex items-center justify-between">
+          <h2 className="text-[17px] font-medium tracking-[-0.01em] text-foreground">Recent BOLs</h2>
+          <Link href="/bols" className="text-xs font-medium text-[var(--brand-link)] hover:underline">
+            View all
+          </Link>
+        </div>
         <BolTable bols={recentBols} />
       </div>
     </div>

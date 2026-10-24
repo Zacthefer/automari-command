@@ -64,8 +64,8 @@ function renderEventDetail(detail: Record<string, unknown>): React.ReactNode {
   return (
     <div className="mt-0.5 space-y-0.5">
       {entries.map(([key, val]) => (
-        <p key={key} className="text-xs text-[#8aa3bd]">
-          <span className="text-[#6f8aaa]">{key.replace(/_/g, " ")}:</span>{" "}
+        <p key={key} className="text-xs text-muted-foreground">
+          <span className="text-muted-foreground">{key.replace(/_/g, " ")}:</span>{" "}
           {typeof val === "object" && val !== null
             ? JSON.stringify(val)
             : String(val ?? "—")}
@@ -84,7 +84,7 @@ function Field({
 }) {
   return (
     <div>
-      <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#c5d8eb]">
+      <p className="text-xs font-medium uppercase tracking-[0.12em] text-subtle-foreground">
         {label}
       </p>
       <p className="mt-0.5 text-sm text-foreground">{value || "—"}</p>
@@ -98,11 +98,11 @@ function PipelineViz({ steps }: { steps: PipelineStep[] }) {
       case "done":
         return <CheckCircle className="h-4 w-4 text-emerald-500" />;
       case "ready":
-        return <CircleDot className="h-4 w-4 text-[var(--brand-cyan)]" />;
+        return <CircleDot className="h-4 w-4 text-[var(--brand-link)]" />;
       case "attention":
         return <AlertTriangle className="h-4 w-4 text-amber-500" />;
       default:
-        return <Circle className="h-4 w-4 text-[#6f8aaa]" />;
+        return <Circle className="h-4 w-4 text-muted-foreground" />;
     }
   };
 
@@ -119,15 +119,15 @@ function PipelineViz({ steps }: { steps: PipelineStep[] }) {
         <div key={step.key} className="flex items-start">
           <div className="flex flex-col items-center gap-1 min-w-[80px]">
             {stateIcon(step.state)}
-            <span className="text-[11px] font-medium text-center leading-tight text-[#d7e8f8]">
+            <span className="text-[11px] font-medium text-center leading-tight text-foreground">
               {step.key.replace(/_/g, " ").replace(/\b\w/g, (c) => c.toUpperCase())}
             </span>
-            <span className="text-[10px] text-[#8aa3bd]">
+            <span className="text-[10px] text-muted-foreground">
               {step.detail || stateLabel[step.state] || step.state}
             </span>
           </div>
           {i < steps.length - 1 && (
-            <div className="mt-2 h-px w-6 bg-[#3a4f66] flex-shrink-0" />
+            <div className="mt-2 h-px w-6 bg-border flex-shrink-0" />
           )}
         </div>
       ))}
@@ -160,13 +160,13 @@ function RateConCard({
   };
 
   return (
-    <div className="rounded-lg border border-white/10 bg-card/50 p-3">
+    <div className="rounded-lg border border-border bg-card/50 p-3">
       <button
         onClick={() => setExpanded(!expanded)}
         className="flex w-full items-center justify-between text-left"
       >
         <div className="flex items-center gap-2">
-          <span className="font-mono text-xs text-[#8aa3bd]">v{rc.version}</span>
+          <span className="font-mono text-xs text-muted-foreground">v{rc.version}</span>
           <Badge
             variant="secondary"
             className={statusColor[rc.status] || "bg-slate-100 text-slate-700"}
@@ -174,7 +174,7 @@ function RateConCard({
             {rc.status}
           </Badge>
           {isCurrent && (
-            <span className="text-[10px] font-medium text-[var(--brand-cyan)]">
+            <span className="text-[10px] font-medium text-[var(--brand-link)]">
               CURRENT
             </span>
           )}
@@ -185,9 +185,9 @@ function RateConCard({
           )}
         </div>
         {expanded ? (
-          <ChevronUp className="h-4 w-4 text-[#6f8aaa]" />
+          <ChevronUp className="h-4 w-4 text-muted-foreground" />
         ) : (
-          <ChevronDown className="h-4 w-4 text-[#6f8aaa]" />
+          <ChevronDown className="h-4 w-4 text-muted-foreground" />
         )}
       </button>
 
@@ -211,12 +211,12 @@ function RateConCard({
             <>
               <Separator />
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#c5d8eb] mb-2">
+                <p className="text-xs font-medium uppercase tracking-[0.12em] text-subtle-foreground mb-2">
                   Accessorials
                 </p>
                 {rc.accessorial_items.map((item, i) => (
                   <div key={i} className="flex justify-between text-sm">
-                    <span className="text-[#d7e8f8]">
+                    <span className="text-foreground">
                       {item.description || item.type || "Accessorial"}
                     </span>
                     <span className="font-mono text-foreground tabular-nums">
@@ -229,7 +229,7 @@ function RateConCard({
           )}
 
           {rc.confidence != null && (
-            <div className="flex items-center gap-2 text-xs text-[#8aa3bd]">
+            <div className="flex items-center gap-2 text-xs text-muted-foreground">
               <span>AI Confidence: {(rc.confidence * 100).toFixed(0)}%</span>
               {rc.review_reasons && rc.review_reasons.length > 0 && (
                 <span>· {rc.review_reasons.join(", ")}</span>
@@ -277,7 +277,7 @@ function RateConCard({
                     );
                   }
                 }}
-                className="inline-flex items-center gap-1.5 text-xs text-[var(--brand-cyan)] hover:underline"
+                className="inline-flex items-center gap-1.5 text-xs text-[var(--brand-link)] hover:underline"
               >
                 <FileText className="h-3 w-3" />
                 {rc.filename}
@@ -414,7 +414,7 @@ export default function LoadDetailPage() {
   if (!load) {
     return (
       <div className="py-16 text-center">
-        <p className="text-sm text-[#d5e6f6]">Load not found.</p>
+        <p className="text-sm text-subtle-foreground">Load not found.</p>
       </div>
     );
   }
@@ -439,7 +439,7 @@ export default function LoadDetailPage() {
             <ArrowLeft className="h-4 w-4" />
           </Link>
           <div className="flex items-center gap-3">
-            <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+            <h1 className="text-2xl font-medium tracking-tight text-foreground">
               {load.load_number || `Load ${load.id.slice(0, 8)}`}
             </h1>
             <LoadStatusChip status={load.status} />
@@ -500,7 +500,7 @@ export default function LoadDetailPage() {
                     onClick={() => setSubmitPath(path)}
                     className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
                       submitPath === path
-                        ? "bg-[var(--brand-cyan-dim)] text-[var(--brand-cyan)]"
+                        ? "bg-[var(--brand-cyan-dim)] text-[var(--brand-link)]"
                         : "bg-slate-100 text-slate-700 hover:bg-slate-200"
                     }`}
                   >
@@ -559,7 +559,7 @@ export default function LoadDetailPage() {
                     onClick={() => setPaymentStatusValue(opt.value)}
                     className={`rounded-lg px-3 py-1.5 text-xs font-medium transition-colors ${
                       paymentStatusValue === opt.value
-                        ? "bg-[var(--brand-cyan-dim)] text-[var(--brand-cyan)]"
+                        ? "bg-[var(--brand-cyan-dim)] text-[var(--brand-link)]"
                         : "bg-slate-100 text-slate-700 hover:bg-slate-200"
                     }`}
                   >
@@ -652,10 +652,10 @@ export default function LoadDetailPage() {
           <CardContent className="space-y-4">
             <div className="grid gap-4 sm:grid-cols-2">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#c5d8eb]">
+                <p className="text-xs font-medium uppercase tracking-[0.12em] text-subtle-foreground">
                   Current Total
                 </p>
-                <p className="mt-0.5 text-lg font-semibold text-foreground">
+                <p className="mt-0.5 text-lg font-medium text-foreground">
                   {formatCurrency(load.current_total)}
                 </p>
               </div>
@@ -703,7 +703,7 @@ export default function LoadDetailPage() {
                 <Separator />
                 <div>
                   <div className="flex items-center gap-2 mb-2">
-                    <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#c5d8eb]">
+                    <p className="text-xs font-medium uppercase tracking-[0.12em] text-subtle-foreground">
                       Billing Packet
                     </p>
                     <Badge
@@ -727,15 +727,15 @@ export default function LoadDetailPage() {
                       {load.packet.documents.map((doc) => (
                         <div
                           key={doc.id}
-                          className="flex items-center gap-2 text-xs text-[#d7e8f8]"
+                          className="flex items-center gap-2 text-xs text-foreground"
                         >
-                          <FileText className="h-3 w-3 text-[#6f8aaa]" />
+                          <FileText className="h-3 w-3 text-muted-foreground" />
                           {doc.url ? (
                             <a
                               href={doc.url}
                               target="_blank"
                               rel="noopener noreferrer"
-                              className="hover:text-[var(--brand-cyan)] hover:underline"
+                              className="hover:text-[var(--brand-link)] hover:underline"
                             >
                               {doc.label}
                             </a>
@@ -765,7 +765,7 @@ export default function LoadDetailPage() {
           </CardHeader>
           <CardContent>
             {load.rate_confirmations.length === 0 ? (
-              <p className="text-sm text-[#b7cce0]">
+              <p className="text-sm text-subtle-foreground">
                 No rate confirmations yet.
               </p>
             ) : (
@@ -796,15 +796,15 @@ export default function LoadDetailPage() {
                 {load.documents.map((doc) => (
                   <div
                     key={doc.id}
-                    className="flex items-center justify-between rounded-lg border border-white/10 bg-card/50 p-3"
+                    className="flex items-center justify-between rounded-lg border border-border bg-card/50 p-3"
                   >
                     <div className="flex items-center gap-2">
-                      <FileText className="h-4 w-4 text-[#6f8aaa]" />
+                      <FileText className="h-4 w-4 text-muted-foreground" />
                       <div>
                         <p className="text-sm text-foreground">
                           {doc.filename || doc.kind}
                         </p>
-                        <p className="text-xs text-[#8aa3bd]">
+                        <p className="text-xs text-muted-foreground">
                           {doc.kind.toUpperCase()} ·{" "}
                           {safeFormatDate(doc.created_at)}
                         </p>
@@ -827,13 +827,13 @@ export default function LoadDetailPage() {
               <div className="space-y-3">
                 {load.events.map((event) => (
                   <div key={event.id} className="flex items-start gap-3">
-                    <div className="mt-1 h-1.5 w-1.5 rounded-full bg-[#6f8aaa] flex-shrink-0" />
+                    <div className="mt-1 h-1.5 w-1.5 rounded-full bg-muted-foreground flex-shrink-0" />
                     <div>
                       <p className="text-sm text-foreground">
                         {event.event_type.replace(/_/g, " ")}
                       </p>
                       {event.detail && renderEventDetail(event.detail)}
-                      <p className="text-[11px] text-[#6f8aaa]">
+                      <p className="text-[11px] text-muted-foreground">
                         {safeFormatDate(event.created_at, "MMM d, yyyy h:mm a")}
                       </p>
                     </div>

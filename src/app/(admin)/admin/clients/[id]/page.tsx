@@ -27,7 +27,7 @@ function Field({
 }) {
   return (
     <div>
-      <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#c5d8eb]">{label}</p>
+      <p className="text-xs font-medium uppercase tracking-[0.12em] text-subtle-foreground">{label}</p>
       <p className="mt-0.5 text-sm text-foreground">{value || "—"}</p>
     </div>
   );
@@ -120,7 +120,7 @@ export default function ClientDetailPage() {
   if (!client) {
     return (
       <div className="text-center py-16">
-        <p className="text-sm text-[#d5e6f6]">Client not found.</p>
+        <p className="text-sm text-subtle-foreground">Client not found.</p>
       </div>
     );
   }
@@ -135,7 +135,7 @@ export default function ClientDetailPage() {
           <ArrowLeft className="h-4 w-4" />
         </Link>
         <div className="flex items-center gap-3">
-          <h1 className="text-2xl font-semibold tracking-tight text-foreground">
+          <h1 className="text-2xl font-medium tracking-tight text-foreground">
             {client.company_name}
           </h1>
           <Badge
@@ -193,7 +193,7 @@ export default function ClientDetailPage() {
           <CardContent className="space-y-5">
             <div className="grid gap-4 sm:grid-cols-4">
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#c5d8eb]">Tier</p>
+                <p className="text-xs font-medium uppercase tracking-[0.12em] text-subtle-foreground">Tier</p>
                 <div className="mt-1">
                   {billingError ? (
                     <span className="text-sm text-slate-400">Unknown</span>
@@ -207,7 +207,7 @@ export default function ClientDetailPage() {
                 </div>
               </div>
               <div>
-                <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#c5d8eb]">Status</p>
+                <p className="text-xs font-medium uppercase tracking-[0.12em] text-subtle-foreground">Status</p>
                 <div className="mt-1">
                   {billing?.subscription_status ? (
                     <Badge
@@ -315,7 +315,7 @@ export default function ClientDetailPage() {
           </CardHeader>
           <CardContent className="space-y-4">
             <div>
-              <p className="text-xs font-semibold uppercase tracking-[0.12em] text-[#c5d8eb]">API Key</p>
+              <p className="text-xs font-medium uppercase tracking-[0.12em] text-subtle-foreground">API Key</p>
               <div className="mt-1 flex items-center gap-2">
                 <code className="rounded bg-slate-100 px-3 py-1.5 text-sm font-mono text-slate-700">
                   {client.api_key.slice(0, 12)}{"••••••••"}

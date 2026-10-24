@@ -49,27 +49,27 @@ export default function TrucksPage() {
       </div>
 
       {trucks.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-white/10 bg-card py-16 shadow-[var(--shadow-elevated-1)]">
-          <p className="text-sm text-[#d5e6f6]">No trucks found</p>
-          <p className="mt-1 text-xs text-[#b7cce0]">
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-border bg-card py-16 shadow-[var(--shadow-elevated-1)]">
+          <p className="text-sm text-subtle-foreground">No trucks found</p>
+          <p className="mt-1 text-xs text-subtle-foreground">
             Add trucks to start tracking cost per mile.
           </p>
         </div>
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-white/10 bg-card shadow-[var(--shadow-elevated-1)]">
+        <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-[var(--shadow-elevated-1)]">
           <Table>
             <TableHeader>
               <TableRow className="hover:bg-transparent">
-                <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
+                <TableHead className="text-[11px] font-medium uppercase tracking-[0.14em] text-subtle-foreground">
                   Unit #
                 </TableHead>
-                <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
+                <TableHead className="text-[11px] font-medium uppercase tracking-[0.14em] text-subtle-foreground">
                   Vehicle
                 </TableHead>
-                <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
+                <TableHead className="text-[11px] font-medium uppercase tracking-[0.14em] text-subtle-foreground">
                   VIN
                 </TableHead>
-                <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
+                <TableHead className="text-[11px] font-medium uppercase tracking-[0.14em] text-subtle-foreground">
                   Status
                 </TableHead>
               </TableRow>
@@ -80,12 +80,12 @@ export default function TrucksPage() {
                   <TableCell className="font-mono text-[13px] font-medium text-foreground">
                     {truck.unit_number}
                   </TableCell>
-                  <TableCell className="text-sm text-[#d7e8f8]">
+                  <TableCell className="text-sm text-foreground">
                     {[truck.year, truck.make, truck.model]
                       .filter(Boolean)
                       .join(" ") || "—"}
                   </TableCell>
-                  <TableCell className="font-mono text-[13px] text-[#d7e8f8]">
+                  <TableCell className="font-mono text-[13px] text-foreground">
                     {truck.vin || "—"}
                   </TableCell>
                   <TableCell>

@@ -10,17 +10,17 @@ const holderMeta = {
   driver: {
     label: "Driver",
     icon: HolderDriverMark,
-    className: "text-[#7ed6ff] bg-[#12324a] ring-[#2a5d7a]",
+    className: "text-sky-800 bg-sky-50 ring-sky-200",
   },
   vehicle: {
     label: "Vehicle",
     icon: HolderVehicleMark,
-    className: "text-[#9ae6b4] bg-[#143528] ring-[#2d6a48]",
+    className: "text-emerald-800 bg-emerald-50 ring-emerald-200",
   },
   company: {
     label: "Company",
     icon: HolderCompanyMark,
-    className: "text-[#f3d48a] bg-[#3a2d12] ring-[#7a6126]",
+    className: "text-amber-800 bg-amber-50 ring-amber-200",
   },
 } as const;
 
@@ -35,7 +35,7 @@ export function HolderTypeChip({
   return (
     <span
       className={cn(
-        "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[12px] font-semibold tracking-wide ring-1",
+        "inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-[12px] font-medium tracking-wide ring-1",
         meta.className
       )}
     >

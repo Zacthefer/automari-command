@@ -20,9 +20,9 @@ interface ClientTableProps {
 export function ClientTable({ clients }: ClientTableProps) {
   if (clients.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-2xl border border-white/10 bg-card py-16 shadow-[var(--shadow-elevated-1)]">
-        <p className="text-sm text-[#d5e6f6]">No clients yet</p>
-        <p className="mt-1 text-xs text-[#b7cce0]">
+      <div className="flex flex-col items-center justify-center rounded-2xl border border-border bg-card py-16 shadow-[var(--shadow-elevated-1)]">
+        <p className="text-sm text-subtle-foreground">No clients yet</p>
+        <p className="mt-1 text-xs text-subtle-foreground">
           Add your first client to get started.
         </p>
       </div>
@@ -30,23 +30,23 @@ export function ClientTable({ clients }: ClientTableProps) {
   }
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-white/10 bg-card shadow-[var(--shadow-elevated-1)]">
+    <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-[var(--shadow-elevated-1)]">
       <Table>
         <TableHeader>
           <TableRow className="hover:bg-transparent">
-            <TableHead className="text-xs font-semibold uppercase tracking-[0.12em] text-[#c5d8eb]">
+            <TableHead className="text-xs font-medium uppercase tracking-[0.12em] text-subtle-foreground">
               Company
             </TableHead>
-            <TableHead className="text-xs font-semibold uppercase tracking-[0.12em] text-[#c5d8eb]">
+            <TableHead className="text-xs font-medium uppercase tracking-[0.12em] text-subtle-foreground">
               Contact
             </TableHead>
-            <TableHead className="text-xs font-semibold uppercase tracking-[0.12em] text-[#c5d8eb]">
+            <TableHead className="text-xs font-medium uppercase tracking-[0.12em] text-subtle-foreground">
               Email
             </TableHead>
-            <TableHead className="text-xs font-semibold uppercase tracking-[0.12em] text-[#c5d8eb]">
+            <TableHead className="text-xs font-medium uppercase tracking-[0.12em] text-subtle-foreground">
               Status
             </TableHead>
-            <TableHead className="text-xs font-semibold uppercase tracking-[0.12em] text-[#c5d8eb]">
+            <TableHead className="text-xs font-medium uppercase tracking-[0.12em] text-subtle-foreground">
               Created
             </TableHead>
           </TableRow>
@@ -57,15 +57,15 @@ export function ClientTable({ clients }: ClientTableProps) {
               <TableCell>
                 <Link
                   href={`/admin/clients/${client.id}`}
-                  className="font-medium text-foreground group-hover:text-[var(--brand-cyan)] transition-colors"
+                  className="font-medium text-foreground group-hover:text-[var(--brand-link)] transition-colors"
                 >
                   {client.company_name}
                 </Link>
               </TableCell>
-              <TableCell className="text-[#d7e8f8]">
+              <TableCell className="text-foreground">
                 {client.contact_name}
               </TableCell>
-              <TableCell className="text-[#d7e8f8]">
+              <TableCell className="text-foreground">
                 {client.contact_email}
               </TableCell>
               <TableCell>
@@ -80,7 +80,7 @@ export function ClientTable({ clients }: ClientTableProps) {
                   {client.is_active ? "Active" : "Inactive"}
                 </Badge>
               </TableCell>
-              <TableCell className="text-sm text-[#d7e8f8]">
+              <TableCell className="text-sm text-foreground">
                 {format(new Date(client.created_at), "MMM d, yyyy")}
               </TableCell>
             </TableRow>

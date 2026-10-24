@@ -20,9 +20,9 @@ interface BolTableProps {
 export function BolTable({ bols }: BolTableProps) {
   if (bols.length === 0) {
     return (
-      <div className="flex flex-col items-center justify-center rounded-2xl border border-white/10 bg-card py-16 shadow-[var(--shadow-elevated-1)]">
-        <p className="text-sm text-[#d5e6f6]">No BOLs found</p>
-        <p className="mt-1 text-xs text-[#b7cce0]">
+      <div className="flex flex-col items-center justify-center rounded-2xl border border-border bg-card py-16 shadow-[var(--shadow-elevated-1)]">
+        <p className="text-sm text-subtle-foreground">No BOLs found</p>
+        <p className="mt-1 text-xs text-subtle-foreground">
           BOLs will appear here once drivers submit them via text.
         </p>
       </div>
@@ -30,26 +30,26 @@ export function BolTable({ bols }: BolTableProps) {
   }
 
   return (
-    <div className="overflow-hidden rounded-2xl border border-white/10 bg-card shadow-[var(--shadow-elevated-1)]">
+    <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-[var(--shadow-elevated-1)]">
       <Table>
         <TableHeader>
           <TableRow className="hover:bg-transparent">
-            <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
+            <TableHead className="text-[11px] font-medium uppercase tracking-[0.14em] text-subtle-foreground">
               PRO #
             </TableHead>
-            <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
+            <TableHead className="text-[11px] font-medium uppercase tracking-[0.14em] text-subtle-foreground">
               BOL #
             </TableHead>
-            <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
+            <TableHead className="text-[11px] font-medium uppercase tracking-[0.14em] text-subtle-foreground">
               Shipper
             </TableHead>
-            <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
+            <TableHead className="text-[11px] font-medium uppercase tracking-[0.14em] text-subtle-foreground">
               Consignee
             </TableHead>
-            <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
+            <TableHead className="text-[11px] font-medium uppercase tracking-[0.14em] text-subtle-foreground">
               Status
             </TableHead>
-            <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
+            <TableHead className="text-[11px] font-medium uppercase tracking-[0.14em] text-subtle-foreground">
               Date
             </TableHead>
           </TableRow>
@@ -60,24 +60,24 @@ export function BolTable({ bols }: BolTableProps) {
               <TableCell>
                 <Link
                   href={`/bols/${bol.id}`}
-                  className="font-mono text-[13px] font-medium text-foreground transition-colors group-hover:text-[var(--brand-cyan)]"
+                  className="font-mono text-[13px] font-medium text-foreground transition-colors group-hover:text-[var(--brand-link)]"
                 >
                   {bol.pro_number || "—"}
                 </Link>
               </TableCell>
-              <TableCell className="font-mono text-[13px] text-[#d7e8f8]">
+              <TableCell className="font-mono text-[13px] text-foreground">
                 {bol.bol_number || "—"}
               </TableCell>
-              <TableCell className="text-sm text-[#d7e8f8]">
+              <TableCell className="text-sm text-foreground">
                 {bol.shipper_name || "—"}
               </TableCell>
-              <TableCell className="text-sm text-[#d7e8f8]">
+              <TableCell className="text-sm text-foreground">
                 {bol.consignee_name || "—"}
               </TableCell>
               <TableCell>
                 <BolStatusChip status={bol.status} />
               </TableCell>
-              <TableCell className="text-[13px] text-[#d7e8f8] tabular-nums">
+              <TableCell className="text-[13px] text-foreground tabular-nums">
                 {format(new Date(bol.created_at), "MMM d, yyyy")}
               </TableCell>
             </TableRow>

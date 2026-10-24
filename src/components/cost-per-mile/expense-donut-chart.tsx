@@ -60,16 +60,16 @@ export function ExpenseDonutChart({
   }));
 
   return (
-    <Card className="rounded-2xl border border-white/10 bg-card shadow-[var(--shadow-elevated-1)]">
+    <Card className="rounded-2xl border border-border bg-card shadow-[var(--shadow-elevated-1)]">
       <CardHeader className="pb-2">
-        <CardTitle className="text-base font-semibold text-foreground">
+        <CardTitle className="text-base font-medium text-foreground">
           Expense Breakdown
         </CardTitle>
       </CardHeader>
       <CardContent>
         {data.length === 0 ? (
           <div className="flex h-[280px] items-center justify-center">
-            <p className="text-sm text-[#b7cce0]">No expenses recorded</p>
+            <p className="text-sm text-subtle-foreground">No expenses recorded</p>
           </div>
         ) : (
           <div className="relative">
@@ -110,7 +110,7 @@ export function ExpenseDonutChart({
                   iconType="circle"
                   iconSize={8}
                   formatter={(value) => (
-                    <span className="text-xs text-[#d7e8f8]">{value}</span>
+                    <span className="text-xs text-foreground">{value}</span>
                   )}
                 />
               </PieChart>
@@ -118,8 +118,8 @@ export function ExpenseDonutChart({
             {/* Center label */}
             <div className="pointer-events-none absolute inset-0 flex items-center justify-center" style={{ paddingBottom: 40 }}>
               <div className="text-center">
-                <p className="text-xs text-[#b7cce0]">Total</p>
-                <p className="text-lg font-semibold text-foreground tabular-nums">
+                <p className="text-xs text-subtle-foreground">Total</p>
+                <p className="text-lg font-medium text-foreground tabular-nums">
                   {formatCurrency(totalExpenses)}
                 </p>
               </div>

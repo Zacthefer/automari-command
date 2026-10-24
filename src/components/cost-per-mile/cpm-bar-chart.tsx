@@ -32,16 +32,16 @@ export function CpmBarChart({
   }));
 
   return (
-    <Card className="rounded-2xl border border-white/10 bg-card shadow-[var(--shadow-elevated-1)]">
+    <Card className="rounded-2xl border border-border bg-card shadow-[var(--shadow-elevated-1)]">
       <CardHeader className="pb-2">
-        <CardTitle className="text-base font-semibold text-foreground">
+        <CardTitle className="text-base font-medium text-foreground">
           {title}
         </CardTitle>
       </CardHeader>
       <CardContent>
         {data.length === 0 ? (
           <div className="flex h-[280px] items-center justify-center">
-            <p className="text-sm text-[#b7cce0]">No data available</p>
+            <p className="text-sm text-subtle-foreground">No data available</p>
           </div>
         ) : (
           <ResponsiveContainer width="100%" height={280}>

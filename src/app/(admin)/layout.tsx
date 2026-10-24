@@ -4,8 +4,7 @@ import { useEffect } from "react";
 import { usePathname, useRouter } from "next/navigation";
 import { AuthProvider, useAuth } from "@/lib/auth";
 import { isTestSectionEnabled } from "@/lib/test-section";
-import { Sidebar } from "@/components/layout/sidebar";
-import { Header } from "@/components/layout/header";
+import { AppShell } from "@/components/layout/app-shell";
 import { PageSkeleton } from "@/components/layout/page-skeleton";
 
 function AdminGate({ children }: { children: React.ReactNode }) {
@@ -34,15 +33,7 @@ function AdminGate({ children }: { children: React.ReactNode }) {
 
   if (!user || (user.role !== "admin" && !devTest)) return null;
 
-  return (
-    <div className="min-h-screen bg-background">
-      <Sidebar />
-      <div className="pl-64">
-        <Header />
-        <main className="px-10 py-10">{children}</main>
-      </div>
-    </div>
-  );
+  return <AppShell>{children}</AppShell>;
 }
 
 export default function AdminLayout({

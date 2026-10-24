@@ -20,7 +20,7 @@ import type { Trip } from "@/types/cost-per-mile";
 
 const statusStyles: Record<string, string> = {
   completed: "bg-emerald-50 text-emerald-700 hover:bg-emerald-50",
-  in_transit: "bg-[var(--brand-cyan-dim)] text-[var(--brand-cyan)] hover:bg-[var(--brand-cyan-dim)]",
+  in_transit: "bg-[var(--brand-cyan-dim)] text-[var(--brand-link)] hover:bg-[var(--brand-cyan-dim)]",
   planned: "bg-slate-100 text-slate-500 hover:bg-slate-100",
 };
 
@@ -75,33 +75,33 @@ export default function TripsPage() {
       </div>
 
       {trips.length === 0 ? (
-        <div className="flex flex-col items-center justify-center rounded-2xl border border-white/10 bg-card py-16 shadow-[var(--shadow-elevated-1)]">
-          <p className="text-sm text-[#d5e6f6]">No trips found</p>
-          <p className="mt-1 text-xs text-[#b7cce0]">
+        <div className="flex flex-col items-center justify-center rounded-2xl border border-border bg-card py-16 shadow-[var(--shadow-elevated-1)]">
+          <p className="text-sm text-subtle-foreground">No trips found</p>
+          <p className="mt-1 text-xs text-subtle-foreground">
             Log trips to start tracking cost per mile.
           </p>
         </div>
       ) : (
-        <div className="overflow-hidden rounded-2xl border border-white/10 bg-card shadow-[var(--shadow-elevated-1)]">
+        <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-[var(--shadow-elevated-1)]">
           <Table>
             <TableHeader>
               <TableRow className="hover:bg-transparent">
-                <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
+                <TableHead className="text-[11px] font-medium uppercase tracking-[0.14em] text-subtle-foreground">
                   Lane
                 </TableHead>
-                <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
+                <TableHead className="text-[11px] font-medium uppercase tracking-[0.14em] text-subtle-foreground">
                   Miles
                 </TableHead>
-                <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
+                <TableHead className="text-[11px] font-medium uppercase tracking-[0.14em] text-subtle-foreground">
                   Revenue
                 </TableHead>
-                <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
+                <TableHead className="text-[11px] font-medium uppercase tracking-[0.14em] text-subtle-foreground">
                   $/Mile
                 </TableHead>
-                <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
+                <TableHead className="text-[11px] font-medium uppercase tracking-[0.14em] text-subtle-foreground">
                   Date
                 </TableHead>
-                <TableHead className="text-[11px] font-semibold uppercase tracking-[0.14em] text-[#c5d8eb]">
+                <TableHead className="text-[11px] font-medium uppercase tracking-[0.14em] text-subtle-foreground">
                   Status
                 </TableHead>
               </TableRow>
@@ -116,16 +116,16 @@ export default function TripsPage() {
                     {trip.origin_city}, {trip.origin_state} →{" "}
                     {trip.destination_city}, {trip.destination_state}
                   </TableCell>
-                  <TableCell className="font-mono text-[13px] text-[#d7e8f8] tabular-nums">
+                  <TableCell className="font-mono text-[13px] text-foreground tabular-nums">
                     {formatNumber(trip.miles)}
                   </TableCell>
                   <TableCell className="font-mono text-[13px] font-medium text-foreground tabular-nums">
                     {formatCurrency(trip.revenue)}
                   </TableCell>
-                  <TableCell className="font-mono text-[13px] text-[#d7e8f8] tabular-nums">
+                  <TableCell className="font-mono text-[13px] text-foreground tabular-nums">
                     ${(trip.revenue / trip.miles).toFixed(2)}
                   </TableCell>
-                  <TableCell className="text-[13px] text-[#d7e8f8] tabular-nums">
+                  <TableCell className="text-[13px] text-foreground tabular-nums">
                     {format(new Date(trip.start_date), "MMM d, yyyy")}
                   </TableCell>
                   <TableCell>
