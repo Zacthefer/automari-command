@@ -19,6 +19,7 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
+import { UndoCountdownButton } from "@/components/ui/undo-countdown-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Badge } from "@/components/ui/badge";
@@ -323,6 +324,7 @@ export default function LoadDetailPage() {
   const [showSubmitForm, setShowSubmitForm] = useState(false);
   const [submitPath, setSubmitPath] = useState<PaymentPath>("direct");
   const [submitRef, setSubmitRef] = useState("");
+  const [submitBusy, setSubmitBusy] = useState(false);
   const [showPaymentForm, setShowPaymentForm] = useState(false);
   const [paymentStatusValue, setPaymentStatusValue] = useState("processing");
   const [paymentRef, setPaymentRef] = useState("");
@@ -370,21 +372,14 @@ export default function LoadDetailPage() {
 
   async function handleSubmitPayment() {
     if (!load) return;
-    setActionLoading(true);
     setError(null);
-    try {
-      const updated = await submitForPayment(load.id, {
-        path: submitPath,
-        external_reference: submitRef || undefined,
-      });
-      setLoad(updated);
-      setShowSubmitForm(false);
-      setSubmitRef("");
-    } catch (err) {
-      setError(err instanceof Error ? err.message : "Submission failed");
-    } finally {
-      setActionLoading(false);
-    }
+    const updated = await submitForPayment(load.id, {
+      path: submitPath,
+      external_reference: submitRef || undefined,
+    });
+    setLoad(updated);
+    setShowSubmitForm(false);
+    setSubmitRef("");
   }
 
   async function handleUpdatePaymentStatus() {
@@ -450,7 +445,7 @@ export default function LoadDetailPage() {
           {canSubmit && (
             <Button
               onClick={() => setShowSubmitForm(!showSubmitForm)}
-              disabled={actionLoading}
+              disabled={actionLoading || submitBusy}
             >
               <Send className="mr-2 h-4 w-4" />
               Submit for Payment
@@ -525,12 +520,22 @@ export default function LoadDetailPage() {
               />
             </div>
             <div className="flex gap-2">
-              <Button onClick={handleSubmitPayment} disabled={actionLoading}>
-                Submit
-              </Button>
+              <UndoCountdownButton
+                label="Submit"
+                onCommit={handleSubmitPayment}
+                onError={(err) =>
+                  setError(err instanceof Error ? err.message : "Submission failed")
+                }
+                onBusyChange={setSubmitBusy}
+                undoLabel="Undo submit"
+                committingLabel="Submitting…"
+                doneLabel="Submitted"
+                disabled={actionLoading}
+              />
               <Button
                 variant="outline"
                 onClick={() => setShowSubmitForm(false)}
+                disabled={submitBusy}
               >
                 Cancel
               </Button>

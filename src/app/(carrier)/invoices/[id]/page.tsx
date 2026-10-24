@@ -18,6 +18,7 @@ import { ErrorBanner } from "@/components/layout/error-banner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
+import { UndoCountdownButton } from "@/components/ui/undo-countdown-button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PageSkeleton } from "@/components/layout/page-skeleton";
@@ -64,6 +65,8 @@ export default function InvoiceDetailPage() {
   const [actionLoading, setActionLoading] = useState(false);
   const [downloading, setDownloading] = useState(false);
   const [downloadError, setDownloadError] = useState<string | null>(null);
+  const [sendError, setSendError] = useState<string | null>(null);
+  const [sendBusy, setSendBusy] = useState(false);
   // Bumped after each download so the icon's draw-in animation replays
   const [downloadCount, setDownloadCount] = useState(0);
   const [editing, setEditing] = useState(false);
@@ -123,13 +126,17 @@ export default function InvoiceDetailPage() {
 
   async function handleSend() {
     if (!invoice) return;
-    setActionLoading(true);
-    try {
-      const updated = await sendInvoice(invoice.id);
-      setInvoice(updated);
-    } finally {
-      setActionLoading(false);
-    }
+    setSendError(null);
+    const updated = await sendInvoice(invoice.id);
+    setInvoice(updated);
+  }
+
+  function handleSendError(err: unknown) {
+    setSendError(
+      err instanceof ApiError
+        ? err.message
+        : "Couldn't send the invoice. Check your connection and try again."
+    );
   }
 
   async function handleMarkPaid() {
@@ -215,16 +222,23 @@ export default function InvoiceDetailPage() {
             {downloading ? "Downloading…" : "Download PDF"}
           </Button>
           {canEdit && !editing && (
-            <Button onClick={startEditing} variant="outline">
+            <Button onClick={startEditing} variant="outline" disabled={sendBusy}>
               <Pencil className="mr-2 h-4 w-4" />
               Edit
             </Button>
           )}
           {canSend && !editing && (
-            <Button onClick={handleSend} disabled={actionLoading}>
-              <Send className="mr-2 h-4 w-4" />
-              Send Invoice
-            </Button>
+            <UndoCountdownButton
+              label="Send Invoice"
+              icon={<Send className="h-4 w-4" />}
+              onCommit={handleSend}
+              onError={handleSendError}
+              onBusyChange={setSendBusy}
+              undoLabel="Undo send"
+              committingLabel="Sending…"
+              doneLabel="Sent"
+              disabled={actionLoading}
+            />
           )}
           {canMarkPaid && (
             <Button
@@ -238,6 +252,8 @@ export default function InvoiceDetailPage() {
           )}
         </div>
       </div>
+
+      {sendError ? <ErrorBanner message={sendError} /> : null}
 
       {downloadError ? (
         <ErrorBanner message={downloadError} onRetry={handleDownloadPdf} retryLabel="Try again" />

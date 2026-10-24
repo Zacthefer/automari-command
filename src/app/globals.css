@@ -170,6 +170,16 @@
   mask-image: radial-gradient(ellipse 70% 60% at 40% 40%, black 20%, transparent 75%);
 }
 
+/* Undo button countdown bar: drains left to right over the undo window */
+@keyframes undo-countdown {
+  from {
+    transform: scaleX(1);
+  }
+  to {
+    transform: scaleX(0);
+  }
+}
+
 @keyframes signin-ring-spin {
   to {
     transform: rotate(360deg);

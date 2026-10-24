@@ -8,11 +8,14 @@ import Link from "next/link";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
+import { UndoCountdownButton } from "@/components/ui/undo-countdown-button";
+import { ErrorBanner } from "@/components/layout/error-banner";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { PageSkeleton } from "@/components/layout/page-skeleton";
 import { ApplicantStatusChip } from "@/components/recruiting/applicant-status-chip";
 import {
+  ApiError,
   deleteApplicant,
   getApplicant,
   updateApplicant,
@@ -49,6 +52,8 @@ export default function ApplicantDetailPage() {
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
   const [editing, setEditing] = useState(false);
+  const [deleteError, setDeleteError] = useState<string | null>(null);
+  const [deleteBusy, setDeleteBusy] = useState(false);
 
   const [editName, setEditName] = useState("");
   const [editPhone, setEditPhone] = useState("");
@@ -94,14 +99,9 @@ export default function ApplicantDetailPage() {
 
   async function handleDelete() {
     if (!applicant) return;
-    if (!confirm("Are you sure you want to delete this applicant?")) return;
-    setActionLoading(true);
-    try {
-      await deleteApplicant(applicant.id);
-      router.push("/recruiting");
-    } finally {
-      setActionLoading(false);
-    }
+    setDeleteError(null);
+    await deleteApplicant(applicant.id);
+    router.push("/recruiting");
   }
 
   if (loading) return <PageSkeleton />;
@@ -132,22 +132,33 @@ export default function ApplicantDetailPage() {
         </div>
         <div className="flex gap-2">
           {!editing && (
-            <Button onClick={startEditing} variant="outline">
+            <Button onClick={startEditing} variant="outline" disabled={deleteBusy}>
               <Pencil className="mr-2 h-4 w-4" />
               Edit
             </Button>
           )}
-          <Button
-            onClick={handleDelete}
+          <UndoCountdownButton
+            label="Delete"
+            icon={<Trash2 className="h-4 w-4" />}
+            onCommit={handleDelete}
+            onError={(err) =>
+              setDeleteError(
+                err instanceof ApiError
+                  ? err.message
+                  : "Couldn't delete this applicant. Check your connection and try again."
+              )
+            }
+            onBusyChange={setDeleteBusy}
+            undoLabel="Undo delete"
+            committingLabel="Deleting…"
+            doneLabel="Deleted"
+            variant="destructive"
             disabled={actionLoading}
-            variant="outline"
-            className="text-red-600 hover:bg-red-50 hover:text-red-700"
-          >
-            <Trash2 className="mr-2 h-4 w-4" />
-            Delete
-          </Button>
+          />
         </div>
       </div>
+
+      {deleteError ? <ErrorBanner message={deleteError} /> : null}
 
       <div className="grid gap-6 lg:grid-cols-2">
         <Card className="border-slate-200 shadow-sm">
