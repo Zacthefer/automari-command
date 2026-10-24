@@ -118,6 +118,12 @@ export interface DashboardStats {
   compliance_total: number;
   compliance_expiring_soon: number;
   compliance_expired: number;
+  loads_submitted: number;
+  loads_action_required: number;
+  aging_0_30: number;
+  aging_31_60: number;
+  aging_61_90: number;
+  aging_90_plus: number;
   fleet_avg_cpm: number;
   fleet_total_miles: number;
   fleet_total_expenses: number;
@@ -291,4 +297,32 @@ export interface LoadDetail extends LoadSummary {
   rate_confirmations: RateConfirmation[];
   documents: LoadDocument[];
   events: LoadEvent[];
+}
+
+export interface CarrierBillingStatus {
+  subscription_tier: string | null;
+  subscription_status: string | null;
+  trial_end: string | null;
+}
+
+export interface AgingBucket {
+  label: string;
+  count: number;
+  total_amount: number;
+}
+
+export interface BrokerPaymentSummary {
+  broker_name: string;
+  count: number;
+  total_amount: number;
+  oldest_days: number;
+}
+
+export interface PaymentSummaryResponse {
+  total_outstanding: number;
+  total_paid_30d: number;
+  action_required_count: number;
+  avg_days_to_payment: number | null;
+  aging_buckets: AgingBucket[];
+  by_broker: BrokerPaymentSummary[];
 }

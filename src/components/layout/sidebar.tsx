@@ -1,5 +1,6 @@
 "use client";
 
+import { useState } from "react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import {
@@ -13,9 +14,12 @@ import {
   UserPlus,
   FlaskConical,
   Truck,
+  Wallet,
+  CreditCard,
   type LucideIcon,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
+import { openCarrierBillingPortal } from "@/lib/billing";
 import { isTestSectionEnabled } from "@/lib/test-section";
 import { BrandMark } from "@/components/layout/brand-mark";
 import {
@@ -50,6 +54,7 @@ const finance: NavGroup = {
   label: "Finance",
   items: [
     { label: "Invoices", href: "/invoices", icon: Receipt },
+    { label: "Payments", href: "/payments", icon: Wallet },
     { label: "Cost Per Mile", href: "/cost-per-mile", icon: TrendingUp },
   ],
 };
@@ -82,8 +87,18 @@ export function Sidebar() {
   const pathname = usePathname();
   const { user, logout } = useAuth();
   const { isMobile, setOpenMobile } = useSidebar();
+  const [billingError, setBillingError] = useState<string | null>(null);
+  const [billingLoading, setBillingLoading] = useState(false);
 
-  const groups = user?.role === "admin" ? adminNav : carrierNav;
+  const isAdmin = user?.role === "admin";
+  const groups = isAdmin ? adminNav : carrierNav;
+
+  async function handleBilling() {
+    setBillingError(null);
+    setBillingLoading(true);
+    setBillingError(await openCarrierBillingPortal());
+    setBillingLoading(false);
+  }
 
   // The mobile drawer stays open after a link is tapped unless we close it
   const closeMobile = () => {
@@ -135,7 +150,25 @@ export function Sidebar() {
           <p className="truncate text-sm font-medium text-white">{user?.name}</p>
           <p className="truncate text-xs text-[var(--sidebar-muted)]">{user?.email}</p>
         </div>
+        {billingError ? (
+          <p role="alert" className="px-2 text-xs text-amber-300 group-data-[collapsible=icon]:hidden">
+            {billingError}
+          </p>
+        ) : null}
         <SidebarMenu>
+          {!isAdmin ? (
+            <SidebarMenuItem>
+              <SidebarMenuButton
+                tooltip="Billing"
+                onClick={handleBilling}
+                disabled={billingLoading}
+                className="text-[var(--sidebar-subtle)] hover:text-[var(--brand-cyan)]"
+              >
+                <CreditCard />
+                <span>{billingLoading ? "Opening…" : "Billing"}</span>
+              </SidebarMenuButton>
+            </SidebarMenuItem>
+          ) : null}
           <SidebarMenuItem>
             <SidebarMenuButton
               tooltip="Sign out"

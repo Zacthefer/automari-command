@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { PieChart, Pie, Cell, Tooltip, ResponsiveContainer } from "recharts";
-import { AlertTriangle, CheckCircle2, Send } from "lucide-react";
+import { AlertTriangle, CheckCircle2, ChevronRight, Send, Wallet } from "lucide-react";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 
 interface ReceivablesCardProps {
@@ -11,6 +11,9 @@ interface ReceivablesCardProps {
   invoicesSent: number;
   invoicesPaid: number;
   invoicesOverdue: number;
+  awaitingAmount: number;
+  awaitingCount: number;
+  actionRequired: number;
 }
 
 function formatCurrency(amount: number): string {
@@ -33,6 +36,9 @@ export function ReceivablesCard({
   invoicesSent,
   invoicesPaid,
   invoicesOverdue,
+  awaitingAmount,
+  awaitingCount,
+  actionRequired,
 }: ReceivablesCardProps) {
   const total = outstanding + collected;
   const collectedPct = total > 0 ? Math.round((collected / total) * 100) : 0;
@@ -120,6 +126,25 @@ export function ReceivablesCard({
               </div>
             ))}
           </div>
+          <Link
+            href="/payments"
+            className="group flex items-center gap-3 rounded-xl border border-border bg-[var(--brand-cyan-dim)] px-3 py-2.5 transition-colors hover:border-[var(--brand-cyan)]/40"
+          >
+            <Wallet className="size-4 shrink-0 text-[var(--brand-link)]" />
+            <div className="min-w-0 flex-1">
+              <p className="text-[11px] text-subtle-foreground">Awaiting payment</p>
+              <p className="text-sm font-medium text-foreground tabular-nums">
+                {formatCurrency(awaitingAmount)}
+                <span className="ml-1 text-xs font-normal text-subtle-foreground">
+                  · {awaitingCount} {awaitingCount === 1 ? "load" : "loads"}
+                </span>
+                {actionRequired > 0 ? (
+                  <span className="ml-2 text-xs font-medium text-amber-700">{actionRequired} need action</span>
+                ) : null}
+              </p>
+            </div>
+            <ChevronRight className="size-4 shrink-0 text-subtle-foreground transition-transform group-hover:translate-x-0.5" />
+          </Link>
         </div>
       </CardContent>
     </Card>

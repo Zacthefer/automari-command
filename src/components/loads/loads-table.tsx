@@ -16,6 +16,8 @@ import type { LoadSummary } from "@/types";
 
 interface LoadsTableProps {
   loads: LoadSummary[];
+  /** True when a status filter is applied, so an empty result isn't an empty account */
+  filtered?: boolean;
 }
 
 function formatCurrency(cents: number | null): string {
@@ -28,13 +30,17 @@ function formatRoute(origin: string | null, destination: string | null): string 
   return origin || destination || "—";
 }
 
-export function LoadsTable({ loads }: LoadsTableProps) {
+export function LoadsTable({ loads, filtered = false }: LoadsTableProps) {
   if (loads.length === 0) {
     return (
       <div className="flex flex-col items-center justify-center rounded-2xl border border-border bg-card py-16 shadow-[var(--shadow-elevated-1)]">
-        <p className="text-sm text-subtle-foreground">No loads found</p>
+        <p className="text-sm text-subtle-foreground">
+          {filtered ? "No loads in this status" : "No loads found"}
+        </p>
         <p className="mt-1 text-xs text-subtle-foreground">
-          Upload a rate confirmation to create your first load.
+          {filtered
+            ? "Try another status, or choose All to see every load."
+            : "Upload a rate confirmation to create your first load."}
         </p>
       </div>
     );

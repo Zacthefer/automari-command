@@ -9,6 +9,7 @@ import {
   Gauge,
   Route,
 } from "lucide-react";
+import { openCarrierBillingPortal } from "@/lib/billing";
 import { PageHeader } from "@/components/layout/page-header";
 import { PageSkeleton } from "@/components/layout/page-skeleton";
 import { StatCard } from "@/components/dashboard/stat-card";
@@ -20,6 +21,7 @@ import {
   getDashboardStats,
   getAdminStats,
   getBols,
+  getMyBillingStatus,
 } from "@/lib/api";
 import type { DashboardStats, AdminStats, BOL } from "@/types";
 
@@ -38,6 +40,8 @@ export default function DashboardPage() {
   const [adminStats, setAdminStats] = useState<AdminStats | null>(null);
   const [recentBols, setRecentBols] = useState<BOL[]>([]);
   const [loading, setLoading] = useState(true);
+  const [pastDue, setPastDue] = useState(false);
+  const [billingError, setBillingError] = useState<string | null>(null);
 
   const isAdmin = user?.role === "admin";
 
@@ -51,6 +55,12 @@ export default function DashboardPage() {
             : getDashboardStats().then(setCarrierStats),
         ]);
         setRecentBols(bols);
+        if (!isAdmin) {
+          // Optional banner: billing may not be configured yet, so failures are ignored
+          getMyBillingStatus()
+            .then((b) => setPastDue(b.subscription_status === "past_due"))
+            .catch(() => {});
+        }
       } catch {
         // errors handled by api client
       } finally {
@@ -72,6 +82,55 @@ export default function DashboardPage() {
             : `Welcome back, ${user?.name?.split(" ")[0]}.`
         }
       />
+
+      {!isAdmin && pastDue ? (
+        <div
+          role="alert"
+          className="flex flex-col gap-3 rounded-xl border border-amber-200 bg-amber-50 px-4 py-3 sm:flex-row sm:items-center sm:justify-between"
+        >
+          <div className="flex items-start gap-2 text-sm text-amber-900">
+            <AlertTriangle className="mt-0.5 size-4 shrink-0" />
+            <span>
+              Your last payment didn&apos;t go through. Update your payment method to keep Automari running.
+              {billingError ? <span className="mt-1 block text-xs text-amber-800">{billingError}</span> : null}
+            </span>
+          </div>
+          <button
+            onClick={async () => setBillingError(await openCarrierBillingPortal())}
+            className="shrink-0 rounded-lg bg-amber-700 px-3 py-1.5 text-xs font-medium text-white transition-colors hover:bg-amber-800"
+          >
+            Update payment
+          </button>
+        </div>
+      ) : null}
+
+      {!isAdmin && carrierStats && carrierStats.bols_total === 0 && carrierStats.invoices_total === 0 ? (
+        <div className="rounded-2xl border border-[var(--brand-cyan)]/25 bg-[var(--brand-cyan-dim)] p-6">
+          <h2 className="text-base font-medium text-foreground">Get started in 3 steps</h2>
+          <ol className="mt-4 space-y-3 text-sm text-subtle-foreground">
+            {[
+              ["Upload a rate confirmation", "we pull the broker, amounts, and load details for you."],
+              ["Upload a photo of the BOL", "once it's attached, the invoice is created automatically."],
+              ["Submit the billing packet", "send it to your broker and track payment on the Payments page."],
+            ].map(([title, body], i) => (
+              <li key={title} className="flex items-start gap-3">
+                <span className="flex size-6 shrink-0 items-center justify-center rounded-full bg-white text-xs font-medium text-[var(--brand-link)] ring-1 ring-[var(--brand-cyan)]/30">
+                  {i + 1}
+                </span>
+                <span>
+                  <span className="font-medium text-foreground">{title}</span> — {body}
+                </span>
+              </li>
+            ))}
+          </ol>
+          <Link
+            href="/loads"
+            className="mt-5 inline-flex items-center rounded-lg bg-primary px-4 py-2 text-sm font-medium text-primary-foreground transition-colors hover:bg-primary/90"
+          >
+            Upload a rate confirmation
+          </Link>
+        </div>
+      ) : null}
 
       {/* Stats grid */}
       {isAdmin && adminStats ? (
@@ -139,6 +198,14 @@ export default function DashboardPage() {
                 invoicesSent={carrierStats.invoices_sent}
                 invoicesPaid={carrierStats.invoices_paid}
                 invoicesOverdue={carrierStats.invoices_overdue}
+                awaitingAmount={
+                  carrierStats.aging_0_30 +
+                  carrierStats.aging_31_60 +
+                  carrierStats.aging_61_90 +
+                  carrierStats.aging_90_plus
+                }
+                awaitingCount={carrierStats.loads_submitted + carrierStats.loads_action_required}
+                actionRequired={carrierStats.loads_action_required}
               />
             </div>
             <div className="lg:col-span-2">

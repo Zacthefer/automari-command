@@ -106,7 +106,8 @@ async function request<T>(
   if (!response.ok) {
     const body = await response.json().catch(() => ({}));
     throw new ApiError(
-      readApiDetail(body.detail, response.status),
+      // FastAPI validation errors use "detail"; Automari app errors use "error"
+      readApiDetail(body.detail ?? body.error, response.status),
       response.status
     );
   }
@@ -207,7 +208,8 @@ export async function uploadBol(file: File): Promise<import("@/types").BOL> {
     const raw = await response.text();
     let detail: unknown;
     try {
-      detail = JSON.parse(raw).detail;
+      const parsed = JSON.parse(raw);
+      detail = parsed.detail ?? parsed.error;
     } catch {
       detail = raw;
     }
@@ -493,7 +495,8 @@ export async function uploadRateCon(file: File): Promise<{
     const raw = await response.text();
     let detail: unknown;
     try {
-      detail = JSON.parse(raw).detail;
+      const parsed = JSON.parse(raw);
+      detail = parsed.detail ?? parsed.error;
     } catch {
       detail = raw;
     }
@@ -664,6 +667,25 @@ export async function createPortalSession(tenantId: string) {
   return request<{ portal_url: string }>(
     `/api/billing/portal/${tenantId}`,
     { method: "POST" }
+  );
+}
+
+// Carrier-scoped: the backend resolves the tenant from the JWT
+export async function getMyBillingStatus() {
+  return request<import("@/types").CarrierBillingStatus>("/api/billing/my-status");
+}
+
+export async function createMyPortalSession() {
+  return request<{ portal_url: string }>("/api/billing/my-portal", {
+    method: "POST",
+  });
+}
+
+// ── Payments ─────────────────────────────────────────
+
+export async function getPaymentSummary() {
+  return request<import("@/types").PaymentSummaryResponse>(
+    "/api/loads/payments/summary"
   );
 }
 
