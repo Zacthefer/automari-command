@@ -332,9 +332,9 @@ export function TestSection() {
             <span
               className={
                 status === "passed"
-                  ? "rounded-full bg-emerald-500/15 px-2.5 py-1 text-xs font-medium text-emerald-300"
+                  ? "rounded-full bg-emerald-500/15 px-2.5 py-1 text-xs font-medium text-emerald-700"
                   : status === "failed"
-                    ? "rounded-full bg-red-500/15 px-2.5 py-1 text-xs font-medium text-red-300"
+                    ? "rounded-full bg-red-500/15 px-2.5 py-1 text-xs font-medium text-red-700"
                     : "rounded-full bg-muted px-2.5 py-1 text-xs font-medium text-muted-foreground"
               }
             >
@@ -477,10 +477,10 @@ export function TestSection() {
 
 function StepMark({ state }: { state: StepState }) {
   if (state === "pass") {
-    return <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-300" />;
+    return <Check className="mt-0.5 h-4 w-4 shrink-0 text-emerald-700" />;
   }
   if (state === "fail") {
-    return <X className="mt-0.5 h-4 w-4 shrink-0 text-red-300" />;
+    return <X className="mt-0.5 h-4 w-4 shrink-0 text-red-700" />;
   }
   return <span className="mt-1.5 h-2 w-2 shrink-0 rounded-full bg-muted-foreground" />;
 }

@@ -19,19 +19,19 @@ const accentStyles = {
     ring: "ring-[rgba(0,191,255,0.22)]",
   },
   green: {
-    ink: "text-emerald-300",
-    wash: "bg-emerald-400/10",
-    ring: "ring-emerald-300/25",
+    ink: "text-emerald-700",
+    wash: "bg-emerald-50",
+    ring: "ring-emerald-200",
   },
   amber: {
-    ink: "text-amber-200",
-    wash: "bg-amber-400/10",
-    ring: "ring-amber-300/25",
+    ink: "text-amber-700",
+    wash: "bg-amber-50",
+    ring: "ring-amber-200",
   },
   red: {
-    ink: "text-rose-300",
-    wash: "bg-rose-400/10",
-    ring: "ring-rose-300/25",
+    ink: "text-rose-700",
+    wash: "bg-rose-50",
+    ring: "ring-rose-200",
   },
 };
 
@@ -49,7 +49,7 @@ export function FleetStatCard({
     <Card className="h-full rounded-2xl border border-border bg-card shadow-[var(--shadow-elevated-1)] transition-all duration-200 hover:-translate-y-0.5 hover:border-foreground/20 hover:shadow-[var(--shadow-elevated-2)]">
       <CardContent className="flex h-full flex-col gap-4 p-5">
         <div className="flex items-center justify-between gap-3">
-          <p className="text-[11px] font-medium uppercase tracking-[0.14em] text-subtle-foreground">
+          <p className="min-w-0 text-[11px] font-medium uppercase tracking-[0.14em] text-subtle-foreground">
             {label}
           </p>
           <span
