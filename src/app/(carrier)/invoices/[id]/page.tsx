@@ -7,13 +7,14 @@ import {
   ArrowLeft,
   Send,
   CheckCircle,
-  Download,
   Pencil,
   X,
   Save,
   FileText,
 } from "lucide-react";
 import Link from "next/link";
+import { CloudDownIcon, CloudDownloadingIcon } from "@/components/icons/animated";
+import { ErrorBanner } from "@/components/layout/error-banner";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { Separator } from "@/components/ui/separator";
 import { Button } from "@/components/ui/button";
@@ -29,6 +30,7 @@ import {
   downloadInvoicePdf,
   getBol,
   getBolImageUrl,
+  ApiError,
 } from "@/lib/api";
 import type { Invoice, BOL } from "@/types";
 
@@ -60,6 +62,10 @@ export default function InvoiceDetailPage() {
   const [bol, setBol] = useState<BOL | null>(null);
   const [loading, setLoading] = useState(true);
   const [actionLoading, setActionLoading] = useState(false);
+  const [downloading, setDownloading] = useState(false);
+  const [downloadError, setDownloadError] = useState<string | null>(null);
+  // Bumped after each download so the icon's draw-in animation replays
+  const [downloadCount, setDownloadCount] = useState(0);
   const [editing, setEditing] = useState(false);
 
   // Edit form state
@@ -139,7 +145,8 @@ export default function InvoiceDetailPage() {
 
   async function handleDownloadPdf() {
     if (!invoice) return;
-    setActionLoading(true);
+    setDownloading(true);
+    setDownloadError(null);
     try {
       const blob = await downloadInvoicePdf(invoice.id);
       const url = URL.createObjectURL(blob);
@@ -150,8 +157,16 @@ export default function InvoiceDetailPage() {
       a.click();
       document.body.removeChild(a);
       URL.revokeObjectURL(url);
+    } catch (err) {
+      // Server errors carry a useful message; network failures ("Failed to fetch") don't
+      setDownloadError(
+        err instanceof ApiError
+          ? err.message
+          : "Couldn't download the PDF. Check your connection and try again."
+      );
     } finally {
-      setActionLoading(false);
+      setDownloading(false);
+      setDownloadCount((n) => n + 1);
     }
   }
 
@@ -189,11 +204,15 @@ export default function InvoiceDetailPage() {
         <div className="flex gap-2">
           <Button
             onClick={handleDownloadPdf}
-            disabled={actionLoading}
+            disabled={downloading}
             variant="outline"
           >
-            <Download className="mr-2 h-4 w-4" />
-            Download PDF
+            {downloading ? (
+              <CloudDownloadingIcon className="mr-2 size-4" />
+            ) : (
+              <CloudDownIcon key={downloadCount} className="mr-2 size-4" />
+            )}
+            {downloading ? "Downloading…" : "Download PDF"}
           </Button>
           {canEdit && !editing && (
             <Button onClick={startEditing} variant="outline">
@@ -219,6 +238,10 @@ export default function InvoiceDetailPage() {
           )}
         </div>
       </div>
+
+      {downloadError ? (
+        <ErrorBanner message={downloadError} onRetry={handleDownloadPdf} retryLabel="Try again" />
+      ) : null}
 
       <div className="grid gap-6 lg:grid-cols-2">
         {/* Invoice Details Card */}
