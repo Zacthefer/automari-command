@@ -123,7 +123,7 @@ export default function TripsPage() {
                     {formatCurrency(trip.revenue)}
                   </TableCell>
                   <TableCell className="font-mono text-[13px] text-foreground tabular-nums">
-                    ${(trip.revenue / trip.miles).toFixed(2)}
+                    {trip.miles > 0 ? `$${(trip.revenue / trip.miles).toFixed(2)}` : "—"}
                   </TableCell>
                   <TableCell className="text-[13px] text-foreground tabular-nums">
                     {format(new Date(trip.start_date), "MMM d, yyyy")}

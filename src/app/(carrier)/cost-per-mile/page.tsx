@@ -26,6 +26,27 @@ function formatCurrency(amount: number): string {
   }).format(amount);
 }
 
+// Round to cents before formatting so tiny negatives don't render as "-$0.00"
+function roundToCents(amount: number): number {
+  return Math.round(amount * 100) / 100 || 0;
+}
+
+function formatPerMile(amount: number): string {
+  return new Intl.NumberFormat("en-US", {
+    style: "currency",
+    currency: "USD",
+    minimumFractionDigits: 2,
+    maximumFractionDigits: 2,
+  }).format(roundToCents(amount));
+}
+
+function profitAccent(amount: number): "green" | "red" | "blue" {
+  const cents = roundToCents(amount);
+  if (cents > 0) return "green";
+  if (cents < 0) return "red";
+  return "blue";
+}
+
 function formatNumber(n: number): string {
   return new Intl.NumberFormat("en-US", {
     minimumFractionDigits: 0,
@@ -68,47 +89,49 @@ export default function CostPerMilePage() {
 
       {overview && (
         <>
-          {/* Stat cards */}
-          <div className="grid gap-4 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-6">
-            <FleetStatCard
-              label="Avg Cost/Mile"
-              value={`$${overview.avg_cost_per_mile.toFixed(2)}`}
-              icon={GaugeMark}
-              accent="blue"
-            />
-            <FleetStatCard
-              label="Revenue/Mile"
-              value={`$${overview.avg_revenue_per_mile.toFixed(2)}`}
-              icon={RevenueMark}
-              accent="green"
-            />
-            <FleetStatCard
-              label="Profit/Mile"
-              value={`$${overview.avg_profit_per_mile.toFixed(2)}`}
-              icon={ProfitMark}
-              accent={overview.avg_profit_per_mile > 0 ? "green" : "red"}
-            />
-            <FleetStatCard
-              label="Total Miles"
-              value={formatNumber(overview.total_miles)}
-              icon={MilesMark}
-              detail={`${formatNumber(overview.total_empty_miles)} empty`}
-              accent="blue"
-            />
-            <FleetStatCard
-              label="Trucks"
-              value={overview.truck_count}
-              icon={TruckMark}
-              accent="blue"
-              href="/cost-per-mile/trucks"
-            />
-            <FleetStatCard
-              label="Drivers"
-              value={overview.driver_count}
-              icon={DriversMark}
-              accent="blue"
-              href="/cost-per-mile/drivers"
-            />
+          {/* Stat cards: sized by available width so sidebar state can't squeeze them */}
+          <div className="@container">
+            <div className="grid gap-4 @2xl:grid-cols-2 @4xl:grid-cols-3 @7xl:grid-cols-6">
+              <FleetStatCard
+                label="Avg Cost/Mile"
+                value={formatPerMile(overview.avg_cost_per_mile)}
+                icon={GaugeMark}
+                accent="blue"
+              />
+              <FleetStatCard
+                label="Revenue/Mile"
+                value={formatPerMile(overview.avg_revenue_per_mile)}
+                icon={RevenueMark}
+                accent="green"
+              />
+              <FleetStatCard
+                label="Profit/Mile"
+                value={formatPerMile(overview.avg_profit_per_mile)}
+                icon={ProfitMark}
+                accent={profitAccent(overview.avg_profit_per_mile)}
+              />
+              <FleetStatCard
+                label="Total Miles"
+                value={formatNumber(overview.total_miles)}
+                icon={MilesMark}
+                detail={`${formatNumber(overview.total_empty_miles)} empty`}
+                accent="blue"
+              />
+              <FleetStatCard
+                label="Trucks"
+                value={overview.truck_count}
+                icon={TruckMark}
+                accent="blue"
+                href="/cost-per-mile/trucks"
+              />
+              <FleetStatCard
+                label="Drivers"
+                value={overview.driver_count}
+                icon={DriversMark}
+                accent="blue"
+                href="/cost-per-mile/drivers"
+              />
+            </div>
           </div>
 
           {/* Charts row */}
