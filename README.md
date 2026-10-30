@@ -32,7 +32,7 @@ Carriers bring trucks and drivers in from a spreadsheet on the Trucks and Driver
 
 **Bundle budget:** only the button and the state machine are in the page bundle. `motion` and the panel load with `next/dynamic` when an import starts; `papaparse` loads with `import()` when a file is picked (prefetched on hover/focus). Neither may appear in a route's initial JS.
 
-**Privacy:** cell values, file bytes and the preview token live in React memory only, while the panel is open. Never put them in `localStorage`/`sessionStorage`, never log them, and render cells as plain text (no `dangerouslySetInnerHTML`, no links).
+**Privacy:** cell values, file bytes and the preview token live in React memory only, until the import is closed, a new file is picked, or the page is left. Never put them in `localStorage`/`sessionStorage`, never log them, and render cells as plain text (no `dangerouslySetInnerHTML`, no links).
 
 ## Learn More
 

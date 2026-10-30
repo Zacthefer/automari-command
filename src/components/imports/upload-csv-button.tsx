@@ -39,9 +39,10 @@ function ProgressRing({ done }: { done: boolean }) {
         strokeLinecap="round"
         strokeDasharray={RING_LENGTH}
         transform="rotate(-90 10 10)"
-        className="stroke-[var(--brand-cyan)] [stroke-dashoffset:var(--ring-offset)] starting:[stroke-dashoffset:50.27]"
+        className="stroke-[var(--brand-cyan)] [stroke-dashoffset:var(--ring-offset)] starting:[stroke-dashoffset:var(--ring-length)]"
         style={
           {
+            "--ring-length": RING_LENGTH,
             "--ring-offset": RING_LENGTH * (1 - progress / 100),
             transition: `stroke-dashoffset ${transition} ease-out`,
           } as CSSProperties

@@ -1,6 +1,6 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import {
@@ -18,11 +18,10 @@ import { PageSkeleton } from "@/components/layout/page-skeleton";
 import { LazyImportSheet } from "@/components/imports/lazy-import-sheet";
 import { UploadCsvButton } from "@/components/imports/upload-csv-button";
 import { useCsvImport } from "@/components/imports/use-csv-import";
+import { useImportHighlight } from "@/components/imports/use-import-highlight";
 import { getTrucks } from "@/lib/api-cpm";
 import { cn } from "@/lib/utils";
 import type { Truck } from "@/types/cost-per-mile";
-
-const HIGHLIGHT_MS = 1600;
 
 const statusStyles: Record<string, string> = {
   active: "bg-emerald-50 text-emerald-700 hover:bg-emerald-50",
@@ -34,8 +33,6 @@ export default function TrucksPage() {
   const [trucks, setTrucks] = useState<Truck[]>([]);
   const [loading, setLoading] = useState(true);
   const [loadFailed, setLoadFailed] = useState(false);
-  const [highlight, setHighlight] = useState<Set<string>>(() => new Set());
-  const highlightTimer = useRef<number | undefined>(undefined);
 
   // Only the first load (and a retry) shows the skeleton; a reload after an import doesn't
   const load = useCallback(
@@ -50,18 +47,11 @@ export default function TrucksPage() {
     []
   );
 
-  const importer = useCsvImport("trucks", {
-    onImported: async (createdIds) => {
-      await load();
-      setHighlight(new Set(createdIds));
-      window.clearTimeout(highlightTimer.current);
-      highlightTimer.current = window.setTimeout(() => setHighlight(new Set()), HIGHLIGHT_MS);
-    },
-  });
+  const { highlight, onImported } = useImportHighlight(load);
+  const importer = useCsvImport("trucks", { onImported });
 
   useEffect(() => {
     void load();
-    return () => window.clearTimeout(highlightTimer.current);
   }, [load]);
 
   if (loading) return <PageSkeleton />;

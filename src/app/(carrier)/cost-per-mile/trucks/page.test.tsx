@@ -108,4 +108,17 @@ describe("TrucksPage import entry points", () => {
     await act(() => vi.advanceTimersByTimeAsync(1));
     expect(rowFor("T-102").className).not.toContain("import-row-glow");
   });
+
+  it("does nothing after an import if the page was left during the reload", async () => {
+    getTrucks.mockResolvedValueOnce([truck("id1", "T-101")]);
+    const { unmount } = render(<TrucksPage />);
+    await act(() => vi.advanceTimersByTimeAsync(0));
+    let resolve!: (list: Truck[]) => void;
+    getTrucks.mockReturnValueOnce(new Promise((r) => (resolve = r)));
+    const finished = Promise.resolve(onImported!(["id2"]));
+    unmount();
+    resolve([truck("id1", "T-101"), truck("id2", "T-102")]);
+    await finished;
+    expect(vi.getTimerCount()).toBe(0);
+  });
 });
