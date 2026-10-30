@@ -250,3 +250,13 @@
 .signin-core {
   animation: signin-ring-pulse 2.4s ease-in-out infinite;
 }
+
+/* CSV import: the ✓ in the upload ring draws itself (path uses pathLength=1) */
+@keyframes import-check-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
