@@ -74,20 +74,30 @@ export function hangingFetch() {
     });
 }
 
+// motion reads the media query once and then listens for changes, so every query object
+// handed out is kept and updated when a test switches the preference
+type FakeQuery = { matches: boolean; media: string; listeners: Set<() => void> };
+const queries: FakeQuery[] = [];
+let reduceMotion = false;
+
 export function stubReducedMotion(reduce: boolean) {
-  vi.stubGlobal(
-    "matchMedia",
-    vi.fn((query: string) => ({
-      matches: reduce && query.includes("reduce"),
-      media: query,
+  reduceMotion = reduce;
+  for (const query of queries) {
+    query.matches = reduce && query.media.includes("reduce");
+    query.listeners.forEach((listener) => listener());
+  }
+  vi.stubGlobal("matchMedia", (media: string) => {
+    const query: FakeQuery = { matches: reduceMotion && media.includes("reduce"), media, listeners: new Set() };
+    queries.push(query);
+    return Object.assign(query, {
       onchange: null,
-      addEventListener: vi.fn(),
-      removeEventListener: vi.fn(),
-      addListener: vi.fn(),
-      removeListener: vi.fn(),
-      dispatchEvent: vi.fn(),
-    }))
-  );
+      addEventListener: (_type: string, listener: () => void) => query.listeners.add(listener),
+      removeEventListener: (_type: string, listener: () => void) => query.listeners.delete(listener),
+      addListener: (listener: () => void) => query.listeners.add(listener),
+      removeListener: (listener: () => void) => query.listeners.delete(listener),
+      dispatchEvent: () => true,
+    });
+  });
 }
 
 // jsdom's Blob has no arrayBuffer(); FileReader works with real timers
