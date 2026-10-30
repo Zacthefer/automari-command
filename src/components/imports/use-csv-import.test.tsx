@@ -5,6 +5,7 @@ import "@/lib/csv-read";
 import "./import-sheet";
 import {
   buildSkipRows,
+  reducer,
   doneText,
   importLabels,
   NOTE_CHANGED,
@@ -71,6 +72,22 @@ describe("helpers", () => {
     expect(doneText("trucks", 297, 3)).toBe("297 trucks added, 3 updated ✓");
     expect(doneText("drivers", 1, 0)).toBe("1 driver added ✓");
     expect(doneText("trucks", 0, 0)).toBe("Your fleet is already up to date ✓");
+  });
+});
+
+describe("reducer", () => {
+  it("moves to done when the step timer fires a little early with a result in hand", () => {
+    const preview = makePreview();
+    const confirming: ImportState = {
+      status: "confirming",
+      file: { name: "f.csv", bytes: new ArrayBuffer(0) },
+      parsed: { records: [], dataRowCount: 0, parseErrorCount: 0, encoding: "utf-8" },
+      preview,
+      shownStep: 1,
+      stepShownAt: 1000,
+      result: makePreview({ status: "committed", created_ids: ["a"] }),
+    };
+    expect(reducer(confirming, { type: "STEP", now: 1000 + 699 })).toMatchObject({ status: "done", createdIds: ["a"] });
   });
 });
 

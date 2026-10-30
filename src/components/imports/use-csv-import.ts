@@ -201,7 +201,9 @@ export function reducer(state: ImportState, action: ImportAction): ImportState {
     case "STEP":
       if (state.status !== "confirming") return state;
       if (state.shownStep === 0) return { ...state, shownStep: 1, stepShownAt: action.now };
-      return state.result && action.now - state.stepShownAt >= STEP_HOLD_MS ? toDone(state, state.result) : state;
+      // The timer that sent this already waited out the hold; re-checking the clock here
+      // could strand the flow if the timer fired a little early
+      return state.result ? toDone(state, state.result) : state;
     case "CONFIRM_OK":
       if (state.status !== "confirming") return state;
       // "added" only shows after a 2xx, and only once "Saving" has had its full hold
@@ -323,13 +325,13 @@ export function useCsvImport(
   }, [runPreview, send]);
 
   const confirm = useCallback(async () => {
-    if (!send({ type: "CONFIRM", now: Date.now() })) return;
+    if (!send({ type: "CONFIRM", now: performance.now() })) return;
     const current = stateRef.current as Extract<ImportState, { status: "confirming" }>;
     const seq = ++seqRef.current;
     try {
       // No abort signal: leaving the page must not cut off a save that may already be committing
       const result = await confirmImport(entity, current.file, current.preview.preview_token, buildSkipRows(current.preview));
-      if (seq === seqRef.current && mountedRef.current) send({ type: "CONFIRM_OK", result, now: Date.now() });
+      if (seq === seqRef.current && mountedRef.current) send({ type: "CONFIRM_OK", result, now: performance.now() });
     } catch (error) {
       if (seq !== seqRef.current || !mountedRef.current) return;
       if (!(error instanceof ImportApiError)) {
@@ -379,8 +381,9 @@ export function useCsvImport(
     if (state.status === "confirming") {
       // Step 1 waits for the response; CONFIRM_OK moves on if it arrives after the hold
       if (state.shownStep === 1 && !state.result) return;
-      const wait = Math.max(0, state.stepShownAt + STEP_HOLD_MS - Date.now());
-      const timer = window.setTimeout(() => send({ type: "STEP", now: Date.now() }), wait);
+      // performance.now() is monotonic, so a wall-clock change can't stretch or skip a hold
+      const wait = Math.max(0, state.stepShownAt + STEP_HOLD_MS - performance.now());
+      const timer = window.setTimeout(() => send({ type: "STEP", now: performance.now() }), wait);
       return () => window.clearTimeout(timer);
     }
     if (state.status === "done") {
