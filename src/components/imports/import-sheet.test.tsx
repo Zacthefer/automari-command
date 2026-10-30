@@ -122,6 +122,16 @@ describe("ImportSheet review", () => {
     expect(screen.getByRole("button", { name: "Import 297 · Skip 3" })).toBeTruthy();
   });
 
+  it("names and describes the dialog", () => {
+    render(<ImportSheet importer={fakeImporter(reviewing(makePreview()))} />);
+    const dialog = screen.getByRole("dialog", { name: "Import trucks" });
+    const describedBy = dialog.getAttribute("aria-describedby");
+    expect(describedBy).toBeTruthy();
+    expect(document.getElementById(describedBy!)?.textContent).toBe(
+      "Check what will change. Nothing is saved until you import."
+    );
+  });
+
   it("renders server problem groups, errors first, including unknown codes", () => {
     const g = (code: string, severity: "error" | "warning", rows: number[]) => ({
       code,

@@ -4,7 +4,7 @@ import { useEffect, useRef } from "react";
 import { LazyMotion, domAnimation } from "motion/react";
 import { Loader2 } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Sheet, SheetContent, SheetHeader, SheetTitle } from "@/components/ui/sheet";
+import { Sheet, SheetContent, SheetDescription, SheetHeader, SheetTitle } from "@/components/ui/sheet";
 import { FleetDiffBar } from "@/components/imports/fleet-diff-bar";
 import { ImportProgress } from "@/components/imports/import-progress";
 import { PreviewTable } from "@/components/imports/preview-table";
@@ -72,6 +72,7 @@ export default function ImportSheet({ importer }: { importer: CsvImport }) {
         <LazyMotion features={domAnimation} strict>
           <SheetHeader className="border-b border-border px-6 py-4 pr-14">
             <SheetTitle className="text-lg">Import {entity}</SheetTitle>
+            <SheetDescription>Check what will change. Nothing is saved until you import.</SheetDescription>
             {state.status === "reviewing" && state.note ? (
               <p role="status" className="mt-2 rounded-lg bg-[var(--brand-cyan-dim)] px-3 py-2 text-sm text-foreground">
                 {state.note}

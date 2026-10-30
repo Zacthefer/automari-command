@@ -31,6 +31,7 @@ describe("ProblemGroups", () => {
     expect(items[1].textContent).toContain("FOO_BAR message from the server");
     expect(items[2].textContent).toContain("Will import");
     expect(items[2].textContent).toContain("Row 5");
+    expect(items[0].querySelector('[role="group"]')?.getAttribute("aria-label")).toBe("Rows for this problem");
   });
 
   it("renders nothing without problems", () => {

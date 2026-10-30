@@ -28,9 +28,11 @@ export function ProblemGroups({ errors, warnings }: { errors: ImportProblemGroup
             </span>
             <p className="mt-1.5 text-sm font-medium text-foreground">{group.message}</p>
             <p className="mt-0.5 text-sm text-muted-foreground">{group.fix_hint}</p>
+            {/* Scrollable, so it must be focusable; a named group gives it a valid role */}
             <div
+              role="group"
               tabIndex={0}
-              aria-label={group.rows.length === 1 ? "Row" : "Rows"}
+              aria-label={`${group.rows.length === 1 ? "Row" : "Rows"} for this problem`}
               className="mt-2 max-h-24 overflow-y-auto font-mono text-xs text-muted-foreground"
             >
               {group.rows.length === 1 ? "Row" : "Rows"} {group.rows.join(", ")}
