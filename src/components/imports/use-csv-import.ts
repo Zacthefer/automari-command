@@ -293,6 +293,8 @@ export function useCsvImport(
       if (!send({ type: "PICK", fileName: file.name }) && !send({ type: "REPICK" })) return;
       abortRef.current?.abort();
       const seq = ++seqRef.current;
+      // Start loading the panel now so it is ready when the preview returns
+      void import("@/components/imports/import-sheet").catch(() => undefined);
       let result: Awaited<ReturnType<typeof import("@/lib/csv-read").readCsv>>;
       let text: typeof import("@/lib/csv-read").PRECHECK_TEXT;
       try {
