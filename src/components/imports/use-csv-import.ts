@@ -29,6 +29,7 @@ export const DONE_HOLD_MS = 1000;
 
 export const NOTE_CHANGED = "Something changed. Here's the updated preview.";
 export const NOTE_UNKNOWN = "We couldn't confirm the import finished. Here's the current preview of your file.";
+export const NOTE_BUG = `${GENERIC_TEXT.bug} Here's a fresh preview of your file.`;
 
 export interface ShownError {
   message: string;
@@ -36,6 +37,16 @@ export interface ShownError {
 }
 
 type Loaded = { file: HeldFile; parsed: ParsedCsv };
+
+/** Why the panel is re-running the preview: a 409, a lost confirm response, a bug-path 422, or a new file. */
+type RecheckReason = "changed" | "unknown" | "bug" | "repick";
+
+const RECHECK_NOTE: Record<RecheckReason, string | null> = {
+  changed: NOTE_CHANGED,
+  unknown: NOTE_UNKNOWN,
+  bug: NOTE_BUG,
+  repick: null,
+};
 
 export type ImportState =
   | { status: "idle"; error?: ShownError; retry?: Loaded }
@@ -58,7 +69,7 @@ export type ImportState =
     } & Loaded)
   | { status: "done"; importing: number; createdIds: string[]; created: number; filled: number }
   // file/parsed are missing while a re-picked file is still being read
-  | { status: "rechecking"; reason: "changed" | "unknown" | "repick"; file?: HeldFile; parsed?: ParsedCsv }
+  | { status: "rechecking"; reason: RecheckReason; file?: HeldFile; parsed?: ParsedCsv }
   | { status: "panelError"; error: ShownError };
 
 export type ImportStatus = ImportState["status"];
@@ -79,7 +90,7 @@ export type ImportAction =
   | { type: "CONFIRM"; now: number }
   | { type: "STEP"; now: number }
   | { type: "CONFIRM_OK"; result: ImportResponse; now: number }
-  | { type: "CONFIRM_FAIL"; outcome: "changed" | "unknown" | "panel"; error?: ShownError }
+  | { type: "CONFIRM_FAIL"; outcome: Exclude<RecheckReason, "repick"> | "panel"; error?: ShownError }
   | { type: "FINISH" };
 
 const PANEL_STATES: ImportStatus[] = ["reviewing", "confirming", "done", "rechecking", "panelError"];
@@ -151,7 +162,7 @@ export function reducer(state: ImportState, action: ImportAction): ImportState {
         return { status: "checked", file: state.file, parsed: state.parsed, preview: action.preview };
       }
       if (state.status === "rechecking" && state.file && state.parsed) {
-        const note = state.reason === "changed" ? NOTE_CHANGED : state.reason === "unknown" ? NOTE_UNKNOWN : null;
+        const note = RECHECK_NOTE[state.reason];
         return {
           status: "reviewing",
           file: state.file,
@@ -239,7 +250,8 @@ export function prefersReducedMotion() {
 const shown = (error: ImportApiError): ShownError => ({ message: error.message, fixHint: error.fixHint });
 
 const UNKNOWN_ERROR: ShownError = { message: GENERIC_TEXT.unknown, fixHint: null };
-const BUG_ERROR: ShownError = { message: GENERIC_TEXT.bug, fixHint: GENERIC_TEXT.bugHint };
+
+const isCode = (codes: readonly string[], code: string | null) => code !== null && codes.includes(code);
 
 export function useCsvImport(
   entity: ImportEntity,
@@ -283,7 +295,12 @@ export function useCsvImport(
         const preview = await previewImport(entity, file, { signal: controller.signal });
         if (seq === seqRef.current) send({ type: "PREVIEW_OK", preview });
       } catch (error) {
-        if (seq !== seqRef.current || !(error instanceof ImportApiError) || error.status === 401) return;
+        if (seq !== seqRef.current) return;
+        if (!(error instanceof ImportApiError)) {
+          send({ type: "PREVIEW_FAIL", error: UNKNOWN_ERROR, retryable: true });
+          return;
+        }
+        if (error.status === 401) return;
         send({ type: "PREVIEW_FAIL", error: shown(error), retryable: error.kind !== "http" });
       }
     },
@@ -338,13 +355,15 @@ export function useCsvImport(
         send({ type: "CONFIRM_FAIL", outcome: "panel", error: UNKNOWN_ERROR });
       } else if (error.status === 401) {
         return;
-      } else if (error.kind !== "http") {
-        // The save may or may not have gone through; a fresh preview shows which (Q8)
+      } else if (error.kind !== "http" || (error.status !== null && error.status >= 500 && error.code === null)) {
+        // The save may or may not have gone through (no response, or a 5xx we can't read);
+        // a fresh preview shows which (Q8)
         if (send({ type: "CONFIRM_FAIL", outcome: "unknown" })) await runPreview(current.file);
-      } else if (error.status === 409 && (REPREVIEW_CODES as readonly string[]).includes(error.code ?? "")) {
+      } else if (error.status === 409 && isCode(REPREVIEW_CODES, error.code)) {
         if (send({ type: "CONFIRM_FAIL", outcome: "changed" })) await runPreview(current.file);
-      } else if ((BUG_PATH_CODES as readonly string[]).includes(error.code ?? "")) {
-        send({ type: "CONFIRM_FAIL", outcome: "panel", error: BUG_ERROR });
+      } else if (isCode(BUG_PATH_CODES, error.code)) {
+        // Our request was malformed; a fresh preview gives a fresh token and skip list
+        if (send({ type: "CONFIRM_FAIL", outcome: "bug" })) await runPreview(current.file);
       } else {
         send({ type: "CONFIRM_FAIL", outcome: "panel", error: shown(error) });
       }

@@ -19,7 +19,6 @@ export const GENERIC_TEXT = {
   network: "We couldn't reach Automari. Check your connection and try again.",
   timeout: "This is taking too long.",
   bug: "Something went wrong on our side. Nothing was imported.",
-  bugHint: "Preview the file again.",
   unknown: "Something went wrong. Try again.",
 } as const;
 

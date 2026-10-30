@@ -8,6 +8,7 @@ import {
   reducer,
   doneText,
   importLabels,
+  NOTE_BUG,
   NOTE_CHANGED,
   NOTE_UNKNOWN,
   useCsvImport,
@@ -125,15 +126,64 @@ describe("useCsvImport", () => {
     }
   );
 
-  it("shows the bug-path error for PREVIEW_TOKEN_REQUIRED without re-previewing", async () => {
+  it.each(["PREVIEW_TOKEN_REQUIRED", "INVALID_SKIP_ROWS", "INVALID_PREVIEW_TOKEN"])(
+    "re-previews after a bug-path 422 %s and says nothing was imported",
+    async (code) => {
+      const hook = setup();
+      await toReviewing(hook);
+      fetchMock.mockResolvedValueOnce(problem(422, code));
+      fetchMock.mockResolvedValueOnce(jsonResponse(200, makePreview({ preview_token: "token-3" })));
+      await act(() => hook.result.current.confirm());
+      expect(fetchMock).toHaveBeenCalledTimes(3);
+      expect(formOf(2).get("dry_run")).toBe("true");
+      expect(hook.result.current.state).toMatchObject({ status: "reviewing", note: NOTE_BUG, error: null });
+      fetchMock.mockReturnValueOnce(new Promise(() => {}));
+      await act(async () => void hook.result.current.confirm());
+      expect(formOf(3).get("preview_token")).toBe("token-3");
+    }
+  );
+
+  it("treats an unshaped 5xx on confirm as an unknown outcome and re-checks", async () => {
     const hook = setup();
     await toReviewing(hook);
-    fetchMock.mockResolvedValueOnce(problem(422, "PREVIEW_TOKEN_REQUIRED"));
+    fetchMock.mockResolvedValueOnce(new Response("<html>Bad gateway</html>", { status: 502 }));
+    fetchMock.mockReturnValueOnce(new Promise(() => {}));
+    await act(async () => void hook.result.current.confirm());
+    expect(hook.result.current.state).toMatchObject({ status: "rechecking", reason: "unknown" });
+    expect(formOf(2).get("dry_run")).toBe("true");
+  });
+
+  it("re-checks after a confirm network error", async () => {
+    const hook = setup();
+    await toReviewing(hook);
+    fetchMock.mockRejectedValueOnce(new TypeError("Failed to fetch"));
+    fetchMock.mockResolvedValueOnce(jsonResponse(200, makePreview()));
+    await act(() => hook.result.current.confirm());
+    expect(hook.result.current.state).toMatchObject({ status: "reviewing", note: NOTE_UNKNOWN });
+    expect(fetchMock).toHaveBeenCalledTimes(3);
+  });
+
+  it("does not re-preview after a 409 IMPORT_IN_PROGRESS and lets the carrier confirm again", async () => {
+    const hook = setup();
+    await toReviewing(hook);
+    fetchMock.mockResolvedValueOnce(problem(409, "IMPORT_IN_PROGRESS"));
     await act(() => hook.result.current.confirm());
     expect(fetchMock).toHaveBeenCalledTimes(2);
     expect(hook.result.current.state).toMatchObject({
       status: "reviewing",
-      error: { message: "Something went wrong on our side. Nothing was imported.", fixHint: "Preview the file again." },
+      error: { message: "IMPORT_IN_PROGRESS message", fixHint: "IMPORT_IN_PROGRESS hint" },
+    });
+  });
+
+  it("turns an unexpected preview failure into a retryable error instead of hanging", async () => {
+    const hook = setup();
+    // Not a Response at all: the API layer throws a plain TypeError
+    fetchMock.mockResolvedValueOnce(undefined);
+    await act(() => hook.result.current.pick(csvFile("Unit\n1\n")));
+    expect(hook.result.current.state).toMatchObject({
+      status: "idle",
+      error: { message: "Something went wrong. Try again.", fixHint: null },
+      retry: expect.anything(),
     });
   });
 

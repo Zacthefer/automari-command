@@ -62,7 +62,7 @@ export interface ImportErrorDetail {
 export const IMPORT_MAX_BYTES = 2 * 1024 * 1024; // constants.MAX_IMPORT_BYTES
 export const IMPORT_MAX_ROWS = 5000; // constants.MAX_IMPORT_ROWS (non-blank data rows)
 export const REPREVIEW_CODES = ["PREVIEW_STALE", "SKIP_ROWS_MISMATCH", "IMPORT_CONFLICT"] as const;
-export const BUG_PATH_CODES = ["PREVIEW_TOKEN_REQUIRED", "INVALID_SKIP_ROWS"] as const;
+export const BUG_PATH_CODES = ["PREVIEW_TOKEN_REQUIRED", "INVALID_SKIP_ROWS", "INVALID_PREVIEW_TOKEN"] as const;
 
 // Copy of constants.FIELD_LABELS; update both together. Unknown fields show their raw name.
 export const FIELD_LABELS: Record<string, string> = {
