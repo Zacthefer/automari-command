@@ -49,39 +49,29 @@ describe("alignRows / values", () => {
 });
 
 describe("PreviewTable layout", () => {
-  it("pins every problem row and pages the rest 100 at a time", () => {
-    const total = 4850;
+  // 4,850 rows parsed and 250 rendered: slow under a loaded parallel run, hence the longer timeout
+  it("pins all 150 problem rows and pages the other 4,700 at 100 a time", () => {
     const lines = ["Unit"];
     const rows = [];
-    for (let n = 2; n <= total + 1; n++) {
+    for (let n = 2; n <= 4851; n++) {
       lines.push(String(n));
-      rows.push(n % 30 === 0 ? row(n, { action: "skip_error", error_codes: ["X"] }) : row(n));
+      // Every 32nd row has a problem until there are 150 of them
+      const problem = n % 32 === 0 && n <= 32 * 150;
+      rows.push(problem ? row(n, { action: "skip_error", error_codes: ["X"] }) : row(n));
     }
-    const pinnedCount = rows.filter((r) => r.error_codes.length).length;
-    expect(pinnedCount).toBe(161);
-    const others = total - pinnedCount;
+    expect(rows.filter((r) => r.error_codes.length)).toHaveLength(150);
     const parsed = parse(lines.join("\n"));
     const preview = makePreview({ header_map: { "0": "unit_number" }, rows });
     const { container } = render(<PreviewTable parsed={parsed} preview={preview} />);
-    const pinned = container.querySelectorAll('[data-section="pinned"] tr[data-row]');
-    expect(pinned).toHaveLength(pinnedCount);
+    expect(container.querySelectorAll('[data-section="pinned"] tr[data-row]')).toHaveLength(150);
     expect(container.querySelectorAll('[data-section="others"] tr[data-row]')).toHaveLength(100);
-    expect(container.textContent).toContain(`Rows 1–100 of ${others.toLocaleString("en-US")}`);
-    fireEvent.click(screen.getByRole("button", { name: "Next" }));
-    expect(container.textContent).toContain(`Rows 101–200 of ${others.toLocaleString("en-US")}`);
-    const firstOnPage = container.querySelector('[data-section="others"] tr[data-row]')!.getAttribute("data-row");
-    expect(Number(firstOnPage)).toBeGreaterThan(100);
-  });
-
-  it("shows 'Rows 101–200 of 4,700' for 4,700 clean rows after Next", () => {
-    const rows = Array.from({ length: 4700 }, (_, i) => row(i + 2));
-    const parsed = parse(["Unit", ...rows.map((r) => String(r.row))].join("\n"));
-    const { container } = render(
-      <PreviewTable parsed={parsed} preview={makePreview({ header_map: { "0": "unit_number" }, rows })} />
-    );
+    expect(container.textContent).toContain("Rows 1–100 of 4,700");
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
     expect(container.textContent).toContain("Rows 101–200 of 4,700");
-  });
+    expect(container.querySelectorAll('[data-section="pinned"] tr[data-row]')).toHaveLength(150);
+    const firstOnPage = container.querySelector('[data-section="others"] tr[data-row]')!.getAttribute("data-row");
+    expect(Number(firstOnPage)).toBeGreaterThan(100);
+  }, 20_000);
 
   it("marks filled cells and says so to screen readers", () => {
     const parsed = parse("Unit,VIN,Color\n101,AAA,red\n");

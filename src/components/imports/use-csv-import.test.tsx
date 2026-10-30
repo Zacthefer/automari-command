@@ -1,7 +1,8 @@
 import { act, cleanup, renderHook } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-// Loaded up front so the hook's import() resolves without real I/O under fake timers
+// Loaded up front so the hook's import() calls resolve without real I/O under fake timers
 import "@/lib/csv-read";
+import "./import-sheet";
 import {
   buildSkipRows,
   doneText,

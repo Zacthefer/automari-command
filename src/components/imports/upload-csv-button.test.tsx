@@ -1,7 +1,9 @@
 import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { createRef } from "react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
+// Loaded up front so the hook's import() calls resolve without real I/O under fake timers
 import "@/lib/csv-read";
+import "./import-sheet";
 import { UploadCsvButton } from "./upload-csv-button";
 import { useCsvImport } from "./use-csv-import";
 import { csvFile, hangingFetch, jsonResponse, makePreview, problem, readBlob, stubReducedMotion } from "./test-fixtures";
