@@ -81,6 +81,42 @@ function MovingFlow() {
   );
 }
 
+// The reload after an import is controlled by the test: rows, or a failed load that
+// replaces the list (and its Upload button) with an error state
+function ReloadFlow({ reload }: { reload: () => Promise<"rows" | "error"> }) {
+  const [view, setView] = useState<"empty" | "rows" | "error">("empty");
+  const importer = useCsvImport("trucks", { onImported: () => reload().then(setView) });
+  const button = (
+    <UploadCsvButton
+      state={importer.state}
+      onPick={(file) => void importer.pick(file)}
+      onRetry={importer.retry}
+      inputRef={importer.inputRef}
+      triggerRef={importer.triggerRef}
+    />
+  );
+  return (
+    <>
+      <button type="button">Elsewhere</button>
+      {view === "error" ? <p role="alert">Couldn&apos;t load your trucks. Try again.</p> : button}
+      {importer.panelOpen ? <ImportSheet importer={importer} /> : null}
+    </>
+  );
+}
+
+async function importTwoTrucks(container: HTMLElement) {
+  fetchMock.mockResolvedValueOnce(jsonResponse(200, makePreview({ rows: [row(2), row(3)] })));
+  fetchMock.mockResolvedValueOnce(jsonResponse(200, makePreview({ status: "committed", created_ids: ["a", "b"] })));
+  await act(async () => {
+    fireEvent.change(container.querySelector('input[type="file"]')!, { target: { files: [csvFile("Unit\n101\n102\n")] } });
+  });
+  await act(() => vi.advanceTimersByTimeAsync(450));
+  await act(async () => fireEvent.click(screen.getByRole("button", { name: "Import 2 trucks" })));
+  await act(() => vi.advanceTimersByTimeAsync(700));
+  await act(() => vi.advanceTimersByTimeAsync(700));
+  await act(() => vi.advanceTimersByTimeAsync(1000));
+}
+
 const status = () => screen.getByTestId("status").textContent;
 const closeButton = () => screen.queryByRole("button", { name: "Close" });
 
@@ -221,6 +257,28 @@ describe("focus after an import", () => {
     const headerButton = screen.getByTestId("header").querySelector("button");
     expect(headerButton).toBeTruthy();
     expect(document.activeElement).toBe(headerButton);
+  });
+});
+
+describe("focus guard after an import", () => {
+  it("leaves focus where the carrier moved it during the reload", async () => {
+    let finish!: (view: "rows") => void;
+    const { container } = render(<ReloadFlow reload={() => new Promise((r) => (finish = r))} />);
+    await importTwoTrucks(container);
+    const elsewhere = screen.getByRole("button", { name: "Elsewhere" });
+    act(() => elsewhere.focus());
+    await act(async () => finish("rows"));
+    await act(() => vi.advanceTimersByTimeAsync(0));
+    expect(document.activeElement).toBe(elsewhere);
+  });
+
+  it("leaves focus alone when the reload fails and the Upload button is gone", async () => {
+    const { container } = render(<ReloadFlow reload={() => Promise.resolve("error")} />);
+    await importTwoTrucks(container);
+    await act(() => vi.advanceTimersByTimeAsync(0));
+    expect(screen.getByRole("alert").textContent).toContain("Couldn't load your trucks");
+    expect(screen.queryByRole("button", { name: "Upload CSV" })).toBeNull();
+    expect(document.activeElement).toBe(document.body);
   });
 });
 

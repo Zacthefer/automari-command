@@ -390,17 +390,20 @@ export function useCsvImport(
     if (send({ type: "DISCARD" })) cancelRequests();
   }, [cancelRequests, send]);
 
+  // Only when nothing else has focus: never pull focus away from where the carrier moved it,
+  // and never to a button that is gone (a failed reload shows an error state instead)
   const focusTrigger = useCallback(() => {
     const el = triggerElRef.current;
-    if (el?.isConnected) el.focus();
+    const active = document.activeElement;
+    if (el?.isConnected && (!active || active === document.body)) el.focus();
   }, []);
 
   // A ref callback, because the button moves (empty-state invite → page header) when the
   // list reloads after an import; a pending focus follows it to the new element
   const triggerRef = useCallback((el: HTMLButtonElement | null) => {
     triggerElRef.current = el;
-    if (el && focusPendingRef.current) el.focus();
-  }, []);
+    if (el && focusPendingRef.current) focusTrigger();
+  }, [focusTrigger]);
 
   const panelLoadFailed = useCallback(() => {
     if (send({ type: "PANEL_LOAD_FAIL" })) cancelRequests();
