@@ -104,6 +104,16 @@ describe("errors", () => {
     expect(error).toMatchObject({ kind: "http", status, code, message: `${code} message`, fixHint: `${code} hint` });
   });
 
+  it("caps a shaped message and fix_hint at 400 characters", async () => {
+    fetchMock.mockResolvedValue(
+      jsonResponse(422, { detail: { code: "LONG", message: "m".repeat(1000), fix_hint: "h".repeat(1000) } })
+    );
+    const error = await caught(previewImport("trucks", held));
+    expect(error.code).toBe("LONG");
+    expect(error.message).toBe("m".repeat(400));
+    expect(error.fixHint).toBe("h".repeat(400));
+  });
+
   it("reads a 403 string detail from the auth dependency without crashing", async () => {
     fetchMock.mockResolvedValue(jsonResponse(403, { detail: "Not enough permissions" }));
     const error = await caught(previewImport("trucks", held));

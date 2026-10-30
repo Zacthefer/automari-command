@@ -18,8 +18,9 @@ import {
 } from "@/components/imports/use-csv-import";
 import type { ImportEntity } from "@/types/imports";
 
-// The import review panel. Loaded only through next/dynamic, so motion and the table
-// stay out of the page bundle. All state lives in useCsvImport; this only renders it.
+// The import review panel. Loaded only through LazyImportSheet (a manual import() loader),
+// so motion and the table stay out of the page bundle. All state lives in useCsvImport;
+// this only renders it.
 
 function ErrorText({ error }: { error: ShownError }) {
   return (

@@ -63,7 +63,12 @@ async function readError(response: Response): Promise<ImportApiError> {
   }
   const status = response.status;
   if (isErrorDetail(detail)) {
-    return new ImportApiError("http", detail.message, { status, code: detail.code, fixHint: detail.fix_hint });
+    // Same 400-character cap as a string detail: server text is shown as-is, but bounded
+    return new ImportApiError("http", detail.message.slice(0, 400), {
+      status,
+      code: detail.code,
+      fixHint: detail.fix_hint.slice(0, 400),
+    });
   }
   const message = typeof detail === "string" && detail.trim() ? detail.slice(0, 400) : GENERIC_TEXT.unknown;
   return new ImportApiError("http", message, { status });

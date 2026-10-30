@@ -30,7 +30,7 @@ Carriers bring trucks and drivers in from a spreadsheet on the Trucks and Driver
 
 **Code:** `src/lib/api-imports.ts` (requests, `ImportApiError`, 60s timeout), `src/lib/csv-read.ts` (read, decode, parse), `src/components/imports/` (state machine hook, button, panel), `src/types/imports.ts` (mirrors the backend `schemas.py`; update both together).
 
-**Bundle budget:** only the button and the state machine are in the page bundle. `motion` and the panel load with `next/dynamic` when an import starts; `papaparse` loads with `import()` when a file is picked (prefetched on hover/focus). Neither may appear in a route's initial JS.
+**Bundle budget:** only the button and the state machine are in the page bundle. The panel (with `motion`) loads through `LazyImportSheet`, a small manual `import()` loader, when a file is picked; if that chunk fails to load, the flow returns to the button with a connection message. The parser (`csv-read`, with `papaparse`) and the API client (`api-imports`) load together with `import()` when a file is picked, prefetched on hover/focus. None of these may appear in a route's initial JS.
 
 **Privacy:** cell values, file bytes and the preview token live in React memory only, until the import is closed, a new file is picked, or the page is left. Never put them in `localStorage`/`sessionStorage`, never log them, and render cells as plain text (no `dangerouslySetInnerHTML`, no links).
 
