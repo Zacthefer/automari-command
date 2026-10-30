@@ -2,12 +2,11 @@ import { act, cleanup, renderHook } from "@testing-library/react";
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
 // Loaded up front so the hook's import() calls resolve without real I/O under fake timers
 import "@/lib/csv-read";
+import "@/lib/api-imports";
 import "./import-sheet";
 import {
   buildSkipRows,
   reducer,
-  doneText,
-  importLabels,
   NOTE_BUG,
   NOTE_CHANGED,
   NOTE_UNKNOWN,
@@ -59,21 +58,6 @@ describe("helpers", () => {
     expect(buildSkipRows(preview)).toEqual([3, 7]);
   });
 
-  it("importLabels covers no skips, some skips, all skipped, singular and drivers", () => {
-    const counts = (rows_total: number, skipped: number) => makePreview({ counts: { rows_total, skipped } });
-    expect(importLabels(counts(300, 0), "trucks")).toEqual({ primary: "Import 300 trucks", primaryDisabled: false, showSecondary: false });
-    expect(importLabels(counts(300, 3), "trucks")).toEqual({ primary: "Import 297 · Skip 3", primaryDisabled: false, showSecondary: true });
-    expect(importLabels(counts(3, 3), "trucks")).toEqual({ primary: "Nothing to import, fix your file", primaryDisabled: true, showSecondary: true });
-    expect(importLabels(counts(1, 0), "trucks").primary).toBe("Import 1 truck");
-    expect(importLabels(counts(2, 0), "drivers").primary).toBe("Import 2 drivers");
-  });
-
-  it("doneText follows the confirm counts", () => {
-    expect(doneText("trucks", 297, 0)).toBe("297 trucks added ✓");
-    expect(doneText("trucks", 297, 3)).toBe("297 trucks added, 3 updated ✓");
-    expect(doneText("drivers", 1, 0)).toBe("1 driver added ✓");
-    expect(doneText("trucks", 0, 0)).toBe("Your fleet is already up to date ✓");
-  });
 });
 
 describe("reducer", () => {

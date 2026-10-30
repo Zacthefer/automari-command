@@ -2,6 +2,7 @@ import { act, cleanup, fireEvent, render, screen } from "@testing-library/react"
 import { MotionGlobalConfig } from "motion/react";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import "@/lib/csv-read";
+import "@/lib/api-imports";
 import { parseCsv } from "@/lib/csv-read";
 import ImportSheet from "./import-sheet";
 import { UploadCsvButton } from "./upload-csv-button";
@@ -31,6 +32,7 @@ function fakeImporter(state: ImportState): CsvImport {
     keep: vi.fn(),
     discard: vi.fn(),
     repick: vi.fn(),
+    panelLoadFailed: vi.fn(),
   };
 }
 

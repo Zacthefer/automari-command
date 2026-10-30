@@ -85,3 +85,14 @@ export const ENTITY_NOUN = {
   trucks: ["truck", "trucks"],
   drivers: ["driver", "drivers"],
 } as const;
+
+// Shown when the server gives no usable text (Q6b). Here, not in api-imports, so the page
+// bundle can use them without loading the API client
+export const GENERIC_TEXT = {
+  network: "We couldn't reach Automari. Check your connection and try again.",
+  read: "We couldn't read this file. Make sure it's saved and downloaded, then try again.",
+  timeout: "This is taking too long.",
+  bug: "Something went wrong on our side. Nothing was imported.",
+  unknown: "Something went wrong. Try again.",
+} as const;
+

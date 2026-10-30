@@ -1,25 +1,21 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import {
-  confirmImport,
-  GENERIC_TEXT,
-  ImportApiError,
-  previewImport,
-  type HeldFile,
-} from "@/lib/api-imports";
+import { loadImportSheet } from "@/components/imports/lazy-import-sheet";
+import type { HeldFile, ImportApiError } from "@/lib/api-imports";
 import type { ParsedCsv } from "@/lib/csv-read";
 import {
   BUG_PATH_CODES,
-  ENTITY_NOUN,
+  GENERIC_TEXT,
   REPREVIEW_CODES,
   type ImportEntity,
   type ImportResponse,
 } from "@/types/imports";
 
 // The import state machine. Lives in the page bundle (the button's ring runs before the
-// lazy panel loads), so it must not import motion or papaparse; csv-read is loaded with
-// import(). Parsed rows, bytes and the preview token live in React state only.
+// lazy panel loads), so it imports only types from the parser and the API client: both
+// load with import() when a file is picked. Parsed rows, bytes and the preview token live
+// in React state only.
 
 export const CHECKED_HOLD_MS = 450;
 export const CHECKED_HOLD_REDUCED_MS = 150;
@@ -91,7 +87,8 @@ export type ImportAction =
   | { type: "STEP"; now: number }
   | { type: "CONFIRM_OK"; result: ImportResponse; now: number }
   | { type: "CONFIRM_FAIL"; outcome: Exclude<RecheckReason, "repick"> | "panel"; error?: ShownError }
-  | { type: "FINISH" };
+  | { type: "FINISH" }
+  | { type: "PANEL_LOAD_FAIL" };
 
 const PANEL_STATES: ImportStatus[] = ["reviewing", "confirming", "done", "rechecking", "panelError"];
 
@@ -106,23 +103,6 @@ export function buildSkipRows(preview: ImportResponse): number[] {
 /** N in "Import N": every row that isn't skipped. */
 export const importableCount = (preview: ImportResponse) => preview.counts.rows_total - preview.counts.skipped;
 
-export const nounFor = (entity: ImportEntity, n: number) => ENTITY_NOUN[entity][n === 1 ? 0 : 1];
-
-export function importLabels(preview: ImportResponse, entity: ImportEntity) {
-  const { rows_total, skipped } = preview.counts;
-  const n = importableCount(preview);
-  if (skipped === 0) return { primary: `Import ${n} ${nounFor(entity, n)}`, primaryDisabled: false, showSecondary: false };
-  if (skipped < rows_total) return { primary: `Import ${n} · Skip ${skipped}`, primaryDisabled: false, showSecondary: true };
-  return { primary: "Nothing to import, fix your file", primaryDisabled: true, showSecondary: true };
-}
-
-export function doneText(entity: ImportEntity, created: number, filled: number) {
-  if (created > 0) {
-    return `${created} ${nounFor(entity, created)} added${filled > 0 ? `, ${filled} updated` : ""} ✓`;
-  }
-  if (filled > 0) return `${filled} ${nounFor(entity, filled)} updated ✓`;
-  return "Your fleet is already up to date ✓";
-}
 
 function toDone(state: Extract<ImportState, { status: "confirming" }>, result: ImportResponse): ImportState {
   return {
@@ -200,7 +180,8 @@ export function reducer(state: ImportState, action: ImportAction): ImportState {
       return state.status === "reviewing" ? { status: "idle" } : state;
     case "CONFIRM":
       if (state.status !== "reviewing" || state.discardPrompt) return state;
-      if (importLabels(state.preview, state.preview.entity).primaryDisabled) return state;
+      // Every row is skipped: nothing to import (the panel shows the button disabled)
+      if (importableCount(state.preview) === 0) return state;
       return {
         status: "confirming",
         file: state.file,
@@ -236,6 +217,11 @@ export function reducer(state: ImportState, action: ImportAction): ImportState {
       return { status: "rechecking", reason: action.outcome, file: state.file, parsed: state.parsed };
     case "FINISH":
       return state.status === "done" ? { status: "idle" } : state;
+    case "PANEL_LOAD_FAIL":
+      // The panel chunk didn't load; once confirming, it already had
+      return state.status === "reviewing" || state.status === "rechecking" || state.status === "panelError"
+        ? { status: "idle", error: { message: GENERIC_TEXT.network, fixHint: null } }
+        : state;
   }
 }
 
@@ -247,7 +233,28 @@ export function prefersReducedMotion() {
   );
 }
 
+// By name, not instanceof: the class lives in the lazily loaded API client
+const isApiError = (error: unknown): error is ImportApiError =>
+  error instanceof Error && error.name === "ImportApiError";
+
 const shown = (error: ImportApiError): ShownError => ({ message: error.message, fixHint: error.fixHint });
+
+type Io = [typeof import("@/lib/csv-read"), typeof import("@/lib/api-imports")];
+let io: Promise<Io> | null = null;
+
+/** Parser and API client, loaded together on first use and then cached (module code only, no data). */
+function loadIo(): Promise<Io> {
+  io ??= Promise.all([import("@/lib/csv-read"), import("@/lib/api-imports")]).catch((error) => {
+    io = null;
+    throw error;
+  });
+  return io;
+}
+
+/** Warm the parser and API client chunks when the carrier shows intent. */
+export function prefetchImportIo() {
+  void loadIo().catch(() => undefined);
+}
 
 const UNKNOWN_ERROR: ShownError = { message: GENERIC_TEXT.unknown, fixHint: null };
 
@@ -292,11 +299,12 @@ export function useCsvImport(
       const controller = new AbortController();
       abortRef.current = controller;
       try {
-        const preview = await previewImport(entity, file, { signal: controller.signal });
+        const [, api] = await loadIo();
+        const preview = await api.previewImport(entity, file, { signal: controller.signal });
         if (seq === seqRef.current) send({ type: "PREVIEW_OK", preview });
       } catch (error) {
         if (seq !== seqRef.current) return;
-        if (!(error instanceof ImportApiError)) {
+        if (!isApiError(error)) {
           send({ type: "PREVIEW_FAIL", error: UNKNOWN_ERROR, retryable: true });
           return;
         }
@@ -313,12 +321,12 @@ export function useCsvImport(
       abortRef.current?.abort();
       const seq = ++seqRef.current;
       // Start loading the panel now so it is ready when the preview returns
-      void import("@/components/imports/import-sheet").catch(() => undefined);
+      void loadImportSheet().catch(() => undefined);
       let csv: typeof import("@/lib/csv-read");
       try {
-        csv = await import("@/lib/csv-read");
+        [csv] = await loadIo();
       } catch {
-        // The parser chunk didn't load: a connection problem, not the file
+        // The parser or API chunk didn't load: a connection problem, not the file
         if (seq === seqRef.current) send({ type: "READ_FAIL", error: { message: GENERIC_TEXT.network, fixHint: null } });
         return;
       }
@@ -353,11 +361,17 @@ export function useCsvImport(
     const seq = ++seqRef.current;
     try {
       // No abort signal: leaving the page must not cut off a save that may already be committing
-      const result = await confirmImport(entity, current.file, current.preview.preview_token, buildSkipRows(current.preview));
+      const [, api] = await loadIo();
+      const result = await api.confirmImport(
+        entity,
+        current.file,
+        current.preview.preview_token,
+        buildSkipRows(current.preview)
+      );
       if (seq === seqRef.current && mountedRef.current) send({ type: "CONFIRM_OK", result, now: performance.now() });
     } catch (error) {
       if (seq !== seqRef.current || !mountedRef.current) return;
-      if (!(error instanceof ImportApiError)) {
+      if (!isApiError(error)) {
         send({ type: "CONFIRM_FAIL", outcome: "panel", error: UNKNOWN_ERROR });
       } else if (error.status === 401) {
         return;
@@ -385,6 +399,10 @@ export function useCsvImport(
 
   const discard = useCallback(() => {
     if (send({ type: "DISCARD" })) cancelRequests();
+  }, [cancelRequests, send]);
+
+  const panelLoadFailed = useCallback(() => {
+    if (send({ type: "PANEL_LOAD_FAIL" })) cancelRequests();
   }, [cancelRequests, send]);
 
   const repick = useCallback(() => {
@@ -441,6 +459,7 @@ export function useCsvImport(
     keep,
     discard,
     repick,
+    panelLoadFailed,
   };
 }
 

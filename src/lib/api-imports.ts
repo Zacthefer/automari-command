@@ -1,5 +1,5 @@
 import { clearToken, getToken } from "@/lib/api";
-import type { ImportEntity, ImportErrorDetail, ImportResponse } from "@/types/imports";
+import { GENERIC_TEXT, type ImportEntity, type ImportErrorDetail, type ImportResponse } from "@/types/imports";
 
 // CSV import calls. Kept apart from api.ts because the import needs multipart bodies, a
 // timeout, and the server's error `code`, which api.ts's ApiError drops.
@@ -13,15 +13,6 @@ export interface HeldFile {
   name: string;
   bytes: ArrayBuffer;
 }
-
-// Shown when the server gives no usable text (Q6b)
-export const GENERIC_TEXT = {
-  network: "We couldn't reach Automari. Check your connection and try again.",
-  read: "We couldn't read this file. Make sure it's saved and downloaded, then try again.",
-  timeout: "This is taking too long.",
-  bug: "Something went wrong on our side. Nothing was imported.",
-  unknown: "Something went wrong. Try again.",
-} as const;
 
 export type ImportErrorKind = "http" | "network" | "timeout";
 

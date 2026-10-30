@@ -9,11 +9,9 @@ import { FleetDiffBar } from "@/components/imports/fleet-diff-bar";
 import { ImportProgress } from "@/components/imports/import-progress";
 import { PreviewTable } from "@/components/imports/preview-table";
 import { ProblemGroups } from "@/components/imports/problem-groups";
+import { doneText, importLabels, nounFor } from "@/components/imports/import-text";
 import {
-  doneText,
   importableCount,
-  importLabels,
-  nounFor,
   type CsvImport,
   type ImportState,
   type ShownError,

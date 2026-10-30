@@ -4,7 +4,7 @@ import { useEffect, useRef, useState, type CSSProperties, type RefObject } from 
 import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
-import { prefersReducedMotion, type ImportState } from "@/components/imports/use-csv-import";
+import { prefersReducedMotion, prefetchImportIo, type ImportState } from "@/components/imports/use-csv-import";
 
 // Adapted from 21st.dev button-6 (hover roll) and save-with-progress (ring face). CSS only:
 // this sits in the page bundle, so it imports nothing from motion. The ring is a timer,
@@ -80,13 +80,11 @@ export function UploadCsvButton({ state, onPick, onRetry, inputRef, className }:
   const reduced = (checking || checked) && prefersReducedMotion();
   const checkingText = status === "checking" && state.still ? "Still checking…" : "Checking…";
 
-  // Warm the parser chunk as soon as the carrier shows intent
+  // Warm the parser and API chunks as soon as the carrier shows intent
   function prefetch() {
     if (prefetched.current) return;
     prefetched.current = true;
-    void import("@/lib/csv-read").catch(() => {
-      prefetched.current = false;
-    });
+    prefetchImportIo();
   }
 
   return (

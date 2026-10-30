@@ -1,7 +1,6 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
-import dynamic from "next/dynamic";
 import Link from "next/link";
 import { ArrowLeft } from "lucide-react";
 import {
@@ -16,14 +15,12 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { PageHeader } from "@/components/layout/page-header";
 import { PageSkeleton } from "@/components/layout/page-skeleton";
+import { LazyImportSheet } from "@/components/imports/lazy-import-sheet";
 import { UploadCsvButton } from "@/components/imports/upload-csv-button";
 import { useCsvImport } from "@/components/imports/use-csv-import";
 import { getTrucks } from "@/lib/api-cpm";
 import { cn } from "@/lib/utils";
 import type { Truck } from "@/types/cost-per-mile";
-
-// The review panel (with motion and the table) loads only when an import starts
-const ImportSheet = dynamic(() => import("@/components/imports/import-sheet"), { ssr: false });
 
 const HIGHLIGHT_MS = 1600;
 
@@ -181,7 +178,8 @@ export default function TrucksPage() {
         </div>
       )}
 
-      {importer.panelOpen ? <ImportSheet importer={importer} /> : null}
+      {/* The review panel (motion, table) loads only when an import starts */}
+      {importer.panelOpen ? <LazyImportSheet importer={importer} /> : null}
     </div>
   );
 }
