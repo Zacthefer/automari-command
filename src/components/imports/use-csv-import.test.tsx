@@ -236,6 +236,40 @@ describe("useCsvImport", () => {
     expect(hook.status()).toBe("idle");
   });
 
+  it("goes to done at 1400ms when the response lands mid-hold at 900ms", async () => {
+    const hook = setup();
+    await toReviewing(hook);
+    const result = makePreview({ status: "committed", dry_run: false });
+    fetchMock.mockImplementationOnce(() => new Promise((r) => setTimeout(() => r(jsonResponse(200, result)), 900)));
+    await act(async () => void hook.result.current.confirm());
+    await act(() => vi.advanceTimersByTimeAsync(700));
+    await act(() => vi.advanceTimersByTimeAsync(200));
+    expect(hook.result.current.state).toMatchObject({ status: "confirming", shownStep: 1, result: expect.anything() });
+    await act(() => vi.advanceTimersByTimeAsync(499));
+    expect(hook.status()).toBe("confirming");
+    await act(() => vi.advanceTimersByTimeAsync(1));
+    expect(hook.status()).toBe("done");
+  });
+
+  it("ignores a confirm that finishes after unmount: no onImported, no state change", async () => {
+    const hook = setup();
+    await toReviewing(hook);
+    let resolve!: (r: Response) => void;
+    fetchMock.mockReturnValueOnce(new Promise((r) => (resolve = r)));
+    await act(async () => void hook.result.current.confirm());
+    const before = hook.result.current.state;
+    const consoleError = vi.spyOn(console, "error").mockImplementation(() => {});
+    hook.unmount();
+    // The confirm was not aborted: leaving the page must not cut off a save
+    expect((fetchMock.mock.calls[1][1].signal as AbortSignal | undefined)?.aborted ?? false).toBe(false);
+    await act(async () => resolve(jsonResponse(200, makePreview({ status: "committed", created_ids: ["x"] }))));
+    await act(() => vi.advanceTimersByTimeAsync(5000));
+    expect(hook.onImported).not.toHaveBeenCalled();
+    expect(hook.result.current.state).toBe(before);
+    expect(consoleError).not.toHaveBeenCalled();
+    consoleError.mockRestore();
+  });
+
   it("never shows done before the confirm response arrives", async () => {
     const hook = setup();
     await toReviewing(hook);

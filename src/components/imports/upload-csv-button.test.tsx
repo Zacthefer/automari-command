@@ -69,7 +69,7 @@ describe("UploadCsvButton", () => {
   });
 
   it("runs the ring to 90 then 95 and never 100 while waiting", async () => {
-    fetchMock.mockReturnValue(new Promise(() => {}));
+    fetchMock.mockImplementation(hangingFetch());
     const { container } = render(<Harness />);
     await pickIn(container);
     await act(() => vi.advanceTimersByTimeAsync(0));
@@ -81,10 +81,18 @@ describe("UploadCsvButton", () => {
     expect(screen.queryByText("Still checking…")).toBeNull();
     await act(() => vi.advanceTimersByTimeAsync(1));
     expect(screen.getAllByText("Still checking…").length).toBeGreaterThan(0);
-    for (let t = 3000; t < 59_999; t += 1000) {
+    // Through 59,999ms in 1s steps (3,000 → 59,000, then 999), never 100
+    for (let t = 3000; t < 59_000; t += 1000) {
       await act(() => vi.advanceTimersByTimeAsync(1000));
       expect(container.querySelector('[data-progress="100"]')).toBeNull();
     }
+    await act(() => vi.advanceTimersByTimeAsync(999));
+    expect(container.querySelector('[data-progress="100"]')).toBeNull();
+    expect(screen.queryByRole("alert")).toBeNull();
+    // The final 1ms is the 60s timeout: the ring goes away and never reaches 100
+    await act(() => vi.advanceTimersByTimeAsync(1));
+    expect(container.querySelector("[data-progress]")).toBeNull();
+    expect(screen.getByRole("alert").textContent).toContain("This is taking too long.");
   });
 
   it("fills to 100 with a ✓ on success and opens the panel 450ms later", async () => {
