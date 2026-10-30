@@ -1,5 +1,5 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { confirmImport, ImportApiError, previewImport, type HeldFile } from "./api-imports";
+import { classifyConfirmError, confirmImport, ImportApiError, previewImport, type HeldFile } from "./api-imports";
 
 const held: HeldFile = { name: "Fleet List.csv", bytes: new TextEncoder().encode("Unit\n101\n").buffer };
 
@@ -167,5 +167,24 @@ describe("errors", () => {
     caller.abort();
     expect(signal.aborted).toBe(true);
     expect((await pending).kind).toBe("network");
+  });
+});
+
+describe("classifyConfirmError", () => {
+  const http = (status: number, code: string | null) =>
+    new ImportApiError("http", "server text", { status, code, fixHint: code ? "server hint" : null });
+
+  it.each([
+    ["401", http(401, null), { outcome: "ignore" }],
+    ["a network error", new ImportApiError("network", "x"), { outcome: "unknown" }],
+    ["a timeout", new ImportApiError("timeout", "x"), { outcome: "unknown" }],
+    ["an unshaped 502", http(502, null), { outcome: "unknown" }],
+    ["409 PREVIEW_STALE", http(409, "PREVIEW_STALE"), { outcome: "changed" }],
+    ["409 IMPORT_IN_PROGRESS", http(409, "IMPORT_IN_PROGRESS"), { outcome: "panel", error: { message: "server text", fixHint: "server hint" } }],
+    ["422 INVALID_PREVIEW_TOKEN", http(422, "INVALID_PREVIEW_TOKEN"), { outcome: "bug" }],
+    ["500 IMPORT_FAILED", http(500, "IMPORT_FAILED"), { outcome: "panel", error: { message: "server text", fixHint: "server hint" } }],
+    ["a non-API error", new TypeError("boom"), { outcome: "panel", error: { message: "Something went wrong. Try again.", fixHint: null } }],
+  ])("%s", (_name, error, verdict) => {
+    expect(classifyConfirmError(error)).toEqual(verdict);
   });
 });

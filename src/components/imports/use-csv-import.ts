@@ -4,13 +4,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import { loadImportSheet } from "@/components/imports/lazy-import-sheet";
 import type { HeldFile, ImportApiError } from "@/lib/api-imports";
 import type { ParsedCsv } from "@/lib/csv-read";
-import {
-  BUG_PATH_CODES,
-  GENERIC_TEXT,
-  REPREVIEW_CODES,
-  type ImportEntity,
-  type ImportResponse,
-} from "@/types/imports";
+import { GENERIC_TEXT, type ImportEntity, type ImportResponse } from "@/types/imports";
 
 // The import state machine. Lives in the page bundle (the button's ring runs before the
 // lazy panel loads), so it imports only types from the parser and the API client: both
@@ -258,8 +252,6 @@ export function prefetchImportIo() {
 
 const UNKNOWN_ERROR: ShownError = { message: GENERIC_TEXT.unknown, fixHint: null };
 
-const isCode = (codes: readonly string[], code: string | null) => code !== null && codes.includes(code);
-
 export function useCsvImport(
   entity: ImportEntity,
   { onImported }: { onImported?: (createdIds: string[]) => void } = {}
@@ -359,9 +351,10 @@ export function useCsvImport(
     if (!send({ type: "CONFIRM", now: performance.now() })) return;
     const current = stateRef.current as Extract<ImportState, { status: "confirming" }>;
     const seq = ++seqRef.current;
+    let api: Io[1] | undefined;
     try {
       // No abort signal: leaving the page must not cut off a save that may already be committing
-      const [, api] = await loadIo();
+      [, api] = await loadIo();
       const result = await api.confirmImport(
         entity,
         current.file,
@@ -371,21 +364,13 @@ export function useCsvImport(
       if (seq === seqRef.current && mountedRef.current) send({ type: "CONFIRM_OK", result, now: performance.now() });
     } catch (error) {
       if (seq !== seqRef.current || !mountedRef.current) return;
-      if (!isApiError(error)) {
-        send({ type: "CONFIRM_FAIL", outcome: "panel", error: UNKNOWN_ERROR });
-      } else if (error.status === 401) {
-        return;
-      } else if (error.kind !== "http" || (error.status !== null && error.status >= 500 && error.code === null)) {
-        // The save may or may not have gone through (no response, or a 5xx we can't read);
-        // a fresh preview shows which (Q8)
-        if (send({ type: "CONFIRM_FAIL", outcome: "unknown" })) await runPreview(current.file);
-      } else if (error.status === 409 && isCode(REPREVIEW_CODES, error.code)) {
-        if (send({ type: "CONFIRM_FAIL", outcome: "changed" })) await runPreview(current.file);
-      } else if (isCode(BUG_PATH_CODES, error.code)) {
-        // Our request was malformed; a fresh preview gives a fresh token and skip list
-        if (send({ type: "CONFIRM_FAIL", outcome: "bug" })) await runPreview(current.file);
-      } else {
-        send({ type: "CONFIRM_FAIL", outcome: "panel", error: shown(error) });
+      // Classified inside the lazily loaded API client (see classifyConfirmError)
+      const verdict = api ? api.classifyConfirmError(error) : ({ outcome: "panel", error: UNKNOWN_ERROR } as const);
+      if (verdict.outcome === "ignore") return;
+      if (verdict.outcome === "panel") {
+        send({ type: "CONFIRM_FAIL", outcome: "panel", error: verdict.error });
+      } else if (send({ type: "CONFIRM_FAIL", outcome: verdict.outcome })) {
+        await runPreview(current.file);
       }
     }
   }, [entity, runPreview, send]);

@@ -1,5 +1,12 @@
 import { clearToken, getToken } from "@/lib/api";
-import { GENERIC_TEXT, type ImportEntity, type ImportErrorDetail, type ImportResponse } from "@/types/imports";
+import {
+  BUG_PATH_CODES,
+  GENERIC_TEXT,
+  REPREVIEW_CODES,
+  type ImportEntity,
+  type ImportErrorDetail,
+  type ImportResponse,
+} from "@/types/imports";
 
 // CSV import calls. Kept apart from api.ts because the import needs multipart bodies, a
 // timeout, and the server's error `code`, which api.ts's ApiError drops.
@@ -133,4 +140,27 @@ export function confirmImport(
 ) {
   const skip = [...new Set(skipRows)].sort((a, b) => a - b).join(",");
   return postImport(entity, held, { dry_run: "false", preview_token: previewToken, skip_rows: skip }, options);
+}
+
+const isCode = (codes: readonly string[], code: string | null) => code !== null && codes.includes(code);
+
+/** What the import flow does after a failed confirm. Lives here so it loads with the API client. */
+export type ConfirmVerdict =
+  | { outcome: "ignore" } // 401: the redirect to /login is already under way
+  | { outcome: "unknown" | "changed" | "bug" } // re-run the preview, with the matching note
+  | { outcome: "panel"; error: { message: string; fixHint: string | null } };
+
+export function classifyConfirmError(error: unknown): ConfirmVerdict {
+  if (!(error instanceof ImportApiError)) {
+    return { outcome: "panel", error: { message: GENERIC_TEXT.unknown, fixHint: null } };
+  }
+  if (error.status === 401) return { outcome: "ignore" };
+  // No response, or a 5xx we can't read: the save may or may not have gone through (Q8)
+  if (error.kind !== "http" || (error.status !== null && error.status >= 500 && error.code === null)) {
+    return { outcome: "unknown" };
+  }
+  if (error.status === 409 && isCode(REPREVIEW_CODES, error.code)) return { outcome: "changed" };
+  // Our request was malformed; a fresh preview gives a fresh token and skip list
+  if (isCode(BUG_PATH_CODES, error.code)) return { outcome: "bug" };
+  return { outcome: "panel", error: { message: error.message, fixHint: error.fixHint } };
 }
