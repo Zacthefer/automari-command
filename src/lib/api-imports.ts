@@ -155,8 +155,9 @@ export function classifyConfirmError(error: unknown): ConfirmVerdict {
     return { outcome: "panel", error: { message: GENERIC_TEXT.unknown, fixHint: null } };
   }
   if (error.status === 401) return { outcome: "ignore" };
-  // No response, or a 5xx we can't read: the save may or may not have gone through (Q8)
-  if (error.kind !== "http" || (error.status !== null && error.status >= 500 && error.code === null)) {
+  // No response, or any 5xx (shaped or not, e.g. IMPORT_FAILED, SERVER_ERROR): the commit
+  // outcome can't be trusted, so re-check instead of saying it failed (Q8)
+  if (error.kind !== "http" || (error.status !== null && error.status >= 500)) {
     return { outcome: "unknown" };
   }
   if (error.status === 409 && isCode(REPREVIEW_CODES, error.code)) return { outcome: "changed" };

@@ -104,6 +104,13 @@ describe("errors", () => {
     expect(error).toMatchObject({ kind: "http", status, code, message: `${code} message`, fixHint: `${code} hint` });
   });
 
+  it("reads a 403 string detail from the auth dependency without crashing", async () => {
+    fetchMock.mockResolvedValue(jsonResponse(403, { detail: "Not enough permissions" }));
+    const error = await caught(previewImport("trucks", held));
+    expect(error).toMatchObject({ kind: "http", status: 403, code: null, message: "Not enough permissions", fixHint: null });
+    expect(localStorage.getItem("automari_token")).toBe("tok");
+  });
+
   it("uses a string detail cut to 400 characters, with no code", async () => {
     fetchMock.mockResolvedValue(jsonResponse(400, { detail: "x".repeat(500) }));
     const error = await caught(previewImport("trucks", held));
@@ -182,7 +189,12 @@ describe("classifyConfirmError", () => {
     ["409 PREVIEW_STALE", http(409, "PREVIEW_STALE"), { outcome: "changed" }],
     ["409 IMPORT_IN_PROGRESS", http(409, "IMPORT_IN_PROGRESS"), { outcome: "panel", error: { message: "server text", fixHint: "server hint" } }],
     ["422 INVALID_PREVIEW_TOKEN", http(422, "INVALID_PREVIEW_TOKEN"), { outcome: "bug" }],
-    ["500 IMPORT_FAILED", http(500, "IMPORT_FAILED"), { outcome: "panel", error: { message: "server text", fixHint: "server hint" } }],
+    ["500 IMPORT_FAILED", http(500, "IMPORT_FAILED"), { outcome: "unknown" }],
+    ["500 SERVER_ERROR", http(500, "SERVER_ERROR"), { outcome: "unknown" }],
+    ["422 INVALID_REQUEST", http(422, "INVALID_REQUEST"), { outcome: "bug" }],
+    ["429 RATE_LIMITED", http(429, "RATE_LIMITED"), { outcome: "panel", error: { message: "server text", fixHint: "server hint" } }],
+    ["429 IMPORT_BUSY", http(429, "IMPORT_BUSY"), { outcome: "panel", error: { message: "server text", fixHint: "server hint" } }],
+    ["403 with a string detail", new ImportApiError("http", "Not enough permissions", { status: 403 }), { outcome: "panel", error: { message: "Not enough permissions", fixHint: null } }],
     ["a non-API error", new TypeError("boom"), { outcome: "panel", error: { message: "Something went wrong. Try again.", fixHint: null } }],
   ])("%s", (_name, error, verdict) => {
     expect(classifyConfirmError(error)).toEqual(verdict);

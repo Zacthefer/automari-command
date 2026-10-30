@@ -110,7 +110,7 @@ describe("useCsvImport", () => {
     }
   );
 
-  it.each(["PREVIEW_TOKEN_REQUIRED", "INVALID_SKIP_ROWS", "INVALID_PREVIEW_TOKEN"])(
+  it.each(["PREVIEW_TOKEN_REQUIRED", "INVALID_SKIP_ROWS", "INVALID_PREVIEW_TOKEN", "INVALID_REQUEST"])(
     "re-previews after a bug-path 422 %s and says nothing was imported",
     async (code) => {
       const hook = setup();
@@ -183,19 +183,64 @@ describe("useCsvImport", () => {
     });
   });
 
-  it("shows the server text for a 500 IMPORT_FAILED and allows another confirm", async () => {
+  it.each([
+    ["500 IMPORT_FAILED", () => problem(500, "IMPORT_FAILED")],
+    ["500 SERVER_ERROR", () => problem(500, "SERVER_ERROR")],
+  ])("treats a shaped %s on confirm as an unknown outcome and re-checks", async (_name, response) => {
     const hook = setup();
     await toReviewing(hook);
-    fetchMock.mockResolvedValueOnce(problem(500, "IMPORT_FAILED"));
+    fetchMock.mockResolvedValueOnce(response());
+    fetchMock.mockResolvedValueOnce(jsonResponse(200, makePreview()));
     await act(() => hook.result.current.confirm());
-    expect(hook.result.current.state).toMatchObject({
-      status: "reviewing",
-      error: { message: "IMPORT_FAILED message", fixHint: "IMPORT_FAILED hint" },
-    });
+    expect(formOf(2).get("dry_run")).toBe("true");
+    expect(hook.result.current.state).toMatchObject({ status: "reviewing", note: NOTE_UNKNOWN, error: null });
+  });
+
+  it.each(["RATE_LIMITED", "IMPORT_BUSY"])(
+    "shows the server text for a 429 %s, does not retry, and allows another confirm",
+    async (code) => {
+      const hook = setup();
+      await toReviewing(hook);
+      fetchMock.mockResolvedValueOnce(
+        new Response(JSON.stringify({ detail: { code, message: `${code} message`, fix_hint: `${code} hint` } }), {
+          status: 429,
+          headers: { "Retry-After": "60" },
+        })
+      );
+      await act(() => hook.result.current.confirm());
+      await act(() => vi.advanceTimersByTimeAsync(120_000));
+      expect(fetchMock).toHaveBeenCalledTimes(2);
+      expect(hook.result.current.state).toMatchObject({
+        status: "reviewing",
+        error: { message: `${code} message`, fixHint: `${code} hint` },
+      });
+      fetchMock.mockReturnValueOnce(new Promise(() => {}));
+      await act(async () => void hook.result.current.confirm());
+      expect(fetchMock).toHaveBeenCalledTimes(3);
+      expect(hook.status()).toBe("confirming");
+    }
+  );
+
+  it("never sends a preview while a confirm is in flight", async () => {
+    const hook = setup();
+    await toReviewing(hook);
+    hook.result.current.inputRef.current = document.createElement("input");
     fetchMock.mockReturnValueOnce(new Promise(() => {}));
     await act(async () => void hook.result.current.confirm());
-    expect(fetchMock).toHaveBeenCalledTimes(3);
+    await act(async () => {
+      await hook.result.current.pick(csvFile("Unit\n9\n"));
+      hook.result.current.repick();
+      hook.result.current.retry();
+    });
+    expect(fetchMock).toHaveBeenCalledTimes(2);
     expect(hook.status()).toBe("confirming");
+  });
+
+  it("shows a 403 string detail on preview as a plain error", async () => {
+    const hook = setup();
+    fetchMock.mockResolvedValueOnce(jsonResponse(403, { detail: "Not enough permissions" }));
+    await act(() => hook.result.current.pick(csvFile("Unit\n1\n")));
+    expect(hook.result.current.state).toEqual({ status: "idle", error: { message: "Not enough permissions", fixHint: null } });
   });
 
   it("re-previews after a confirm timeout and says the outcome is unknown", async () => {
