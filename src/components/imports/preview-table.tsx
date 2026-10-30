@@ -6,6 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table";
 import { cn } from "@/lib/utils";
 import type { ParsedCsv } from "@/lib/csv-read";
+import { isBlankRecord } from "@/lib/csv-rows";
 import { FIELD_LABELS, type ImportResponse, type ImportRowAction, type ImportRowResult } from "@/types/imports";
 
 // The server returns row numbers, never cell values. Values shown here come from the
@@ -13,6 +14,8 @@ import { FIELD_LABELS, type ImportResponse, type ImportRowAction, type ImportRow
 // shown to line up, every value is hidden rather than risk one next to the wrong row.
 
 export const PAGE_SIZE = 100;
+/** Problem rows shown before "N more"; every row number is already listed in the problem groups. */
+export const PINNED_LIMIT = 100;
 
 export const HIDDEN_VALUES_TEXT =
   "We can't line up the cells in this file with our check, so values are hidden. Row numbers and problems below are exact.";
@@ -31,9 +34,6 @@ const ACTION_STYLE: Record<ImportRowAction, string> = {
   skip_error: "bg-destructive/10 text-destructive",
 };
 
-// Same rule as the server's blank-row check (any cell with non-whitespace)
-const isBlank = (record: string[] | undefined) => !record || record.every((cell) => !cell.trim());
-
 export type Alignment = { ok: true; valueAt: (row: number, position: number) => string } | { ok: false };
 
 /** Proves the browser parse numbers rows the way the server did; otherwise values stay hidden. */
@@ -47,7 +47,7 @@ export function alignRows(parsed: ParsedCsv, preview: ImportResponse): Alignment
   if (parsed.records[0]?.length !== k) return { ok: false };
 
   for (const { row } of preview.rows) {
-    if (row < 2 || isBlank(parsed.records[row - 1])) return { ok: false };
+    if (row < 2 || isBlankRecord(parsed.records[row - 1])) return { ok: false };
   }
   if (parsed.dataRowCount !== preview.rows.length) return { ok: false };
 
@@ -56,6 +56,8 @@ export function alignRows(parsed: ParsedCsv, preview: ImportResponse): Alignment
 
 const hasProblem = (r: ImportRowResult) => r.error_codes.length > 0 || r.warning_codes.length > 0;
 const format = (n: number) => n.toLocaleString("en-US");
+// Own-property lookup only: a column named like "__proto__" must not reach Object.prototype
+const labelFor = (field: string) => (Object.hasOwn(FIELD_LABELS, field) ? FIELD_LABELS[field] : field);
 
 export function PreviewTable({ parsed, preview }: { parsed: ParsedCsv; preview: ImportResponse }) {
   const alignment = useMemo(() => alignRows(parsed, preview), [parsed, preview]);
@@ -138,7 +140,7 @@ export function PreviewTable({ parsed, preview }: { parsed: ParsedCsv; preview: 
               <TableHead className={head}>Action</TableHead>
               {shownColumns.map(({ field }) => (
                 <TableHead key={field} className={head}>
-                  {FIELD_LABELS[field] ?? field}
+                  {labelFor(field)}
                 </TableHead>
               ))}
             </TableRow>
@@ -150,7 +152,15 @@ export function PreviewTable({ parsed, preview }: { parsed: ParsedCsv; preview: 
                   Rows with problems ({format(pinned.length)})
                 </TableCell>
               </TableRow>
-              {pinned.map(renderRow)}
+              {pinned.slice(0, PINNED_LIMIT).map(renderRow)}
+              {pinned.length > PINNED_LIMIT ? (
+                <TableRow className="hover:bg-transparent">
+                  <TableCell colSpan={colSpan} className="text-xs text-muted-foreground">
+                    {format(pinned.length - PINNED_LIMIT)} more {pinned.length - PINNED_LIMIT === 1 ? "row" : "rows"} with
+                    problems. Every row number is listed in the problems above.
+                  </TableCell>
+                </TableRow>
+              ) : null}
             </TableBody>
           ) : null}
           {others.length > 0 ? (

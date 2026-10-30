@@ -1,5 +1,6 @@
 import Papa from "papaparse";
 import type { HeldFile } from "@/lib/api-imports";
+import { isBlankRecord } from "@/lib/csv-rows";
 import { IMPORT_MAX_BYTES, IMPORT_MAX_ROWS } from "@/types/imports";
 
 // Reads a picked CSV once and parses it for display. Only ever loaded with import(),
@@ -38,8 +39,6 @@ export interface ParsedCsv {
 }
 
 export type ReadCsvResult = { ok: true; held: HeldFile; parsed: ParsedCsv } | { ok: false; code: PrecheckCode };
-
-export const isBlankRecord = (record: string[] | undefined) => !record || record.every((cell) => !cell.trim());
 
 function readBytes(file: File): Promise<ArrayBuffer> {
   if (typeof file.arrayBuffer === "function") return file.arrayBuffer();

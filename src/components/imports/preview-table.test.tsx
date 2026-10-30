@@ -50,7 +50,7 @@ describe("alignRows / values", () => {
 
 describe("PreviewTable layout", () => {
   // 4,850 rows parsed and 250 rendered: slow under a loaded parallel run, hence the longer timeout
-  it("pins all 150 problem rows and pages the other 4,700 at 100 a time", () => {
+  it("pins the first 100 of 150 problem rows and pages the other 4,700 at 100 a time", () => {
     const lines = ["Unit"];
     const rows = [];
     for (let n = 2; n <= 4851; n++) {
@@ -63,12 +63,14 @@ describe("PreviewTable layout", () => {
     const parsed = parse(lines.join("\n"));
     const preview = makePreview({ header_map: { "0": "unit_number" }, rows });
     const { container } = render(<PreviewTable parsed={parsed} preview={preview} />);
-    expect(container.querySelectorAll('[data-section="pinned"] tr[data-row]')).toHaveLength(150);
+    expect(container.querySelectorAll('[data-section="pinned"] tr[data-row]')).toHaveLength(100);
+    expect(container.textContent).toContain("Rows with problems (150)");
+    expect(container.textContent).toContain("50 more rows with problems.");
     expect(container.querySelectorAll('[data-section="others"] tr[data-row]')).toHaveLength(100);
     expect(container.textContent).toContain("Rows 1–100 of 4,700");
     fireEvent.click(screen.getByRole("button", { name: "Next" }));
     expect(container.textContent).toContain("Rows 101–200 of 4,700");
-    expect(container.querySelectorAll('[data-section="pinned"] tr[data-row]')).toHaveLength(150);
+    expect(container.querySelectorAll('[data-section="pinned"] tr[data-row]')).toHaveLength(100);
     const firstOnPage = container.querySelector('[data-section="others"] tr[data-row]')!.getAttribute("data-row");
     expect(Number(firstOnPage)).toBeGreaterThan(100);
   }, 20_000);
@@ -101,6 +103,14 @@ describe("PreviewTable layout", () => {
     expect(container.querySelector("img")).toBeNull();
     expect(container.querySelector("a")).toBeNull();
     expect((window as unknown as { __x?: number }).__x).toBeUndefined();
+  });
+
+  it("labels a column named __proto__ with its raw name", () => {
+    const parsed = parse("A,B\n1,2\n");
+    const preview = makePreview({ header_map: { "0": "__proto__", "1": "unit_number" }, rows: [row(2)] });
+    const { container } = render(<PreviewTable parsed={parsed} preview={preview} />);
+    const headers = Array.from(container.querySelectorAll("th")).map((th) => th.textContent);
+    expect(headers).toEqual(["Row", "Action", "__proto__", "Unit number"]);
   });
 
   it("never shows ignored columns' values", () => {
