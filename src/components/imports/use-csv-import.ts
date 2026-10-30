@@ -254,7 +254,7 @@ const UNKNOWN_ERROR: ShownError = { message: GENERIC_TEXT.unknown, fixHint: null
 
 export function useCsvImport(
   entity: ImportEntity,
-  { onImported }: { onImported?: (createdIds: string[]) => void } = {}
+  { onImported }: { onImported?: (createdIds: string[]) => unknown } = {}
 ) {
   const [state, setState] = useState<ImportState>({ status: "idle" });
   // Events are applied to the ref first so two clicks in the same tick see the same truth
@@ -265,6 +265,10 @@ export function useCsvImport(
   const seqRef = useRef(0);
   const abortRef = useRef<AbortController | null>(null);
   const onImportedRef = useRef(onImported);
+  // Focus goes back to the Upload CSV button when the panel closes
+  const triggerElRef = useRef<HTMLButtonElement | null>(null);
+  const focusPendingRef = useRef(false);
+  const prevStatusRef = useRef<ImportStatus>("idle");
 
   useEffect(() => {
     onImportedRef.current = onImported;
@@ -386,6 +390,18 @@ export function useCsvImport(
     if (send({ type: "DISCARD" })) cancelRequests();
   }, [cancelRequests, send]);
 
+  const focusTrigger = useCallback(() => {
+    const el = triggerElRef.current;
+    if (el?.isConnected) el.focus();
+  }, []);
+
+  // A ref callback, because the button moves (empty-state invite → page header) when the
+  // list reloads after an import; a pending focus follows it to the new element
+  const triggerRef = useCallback((el: HTMLButtonElement | null) => {
+    triggerElRef.current = el;
+    if (el && focusPendingRef.current) el.focus();
+  }, []);
+
   const panelLoadFailed = useCallback(() => {
     if (send({ type: "PANEL_LOAD_FAIL" })) cancelRequests();
   }, [cancelRequests, send]);
@@ -417,11 +433,30 @@ export function useCsvImport(
     if (state.status === "done") {
       const ids = state.createdIds;
       const timer = window.setTimeout(() => {
-        if (send({ type: "FINISH" })) onImportedRef.current?.(ids);
+        if (!send({ type: "FINISH" })) return;
+        focusPendingRef.current = true;
+        // After the page's reload settles, focus whichever Upload button is now on screen
+        void Promise.resolve(onImportedRef.current?.(ids))
+          .catch(() => undefined)
+          .finally(() => {
+            window.setTimeout(() => {
+              focusPendingRef.current = false;
+              if (mountedRef.current) focusTrigger();
+            }, 0);
+          });
       }, DONE_HOLD_MS);
       return () => window.clearTimeout(timer);
     }
-  }, [state, send]);
+  }, [state, send, focusTrigger]);
+
+  useEffect(() => {
+    const wasPanel = PANEL_STATES.includes(prevStatusRef.current);
+    prevStatusRef.current = state.status;
+    if (state.status !== "idle" || !wasPanel) return;
+    // After the sheet unmounts and its own focus handling runs
+    const timer = window.setTimeout(focusTrigger, 0);
+    return () => window.clearTimeout(timer);
+  }, [state.status, focusTrigger]);
 
   useEffect(() => {
     mountedRef.current = true;
@@ -436,6 +471,7 @@ export function useCsvImport(
     entity,
     state,
     inputRef,
+    triggerRef,
     panelOpen: isPanelOpen(state),
     pick,
     retry,

@@ -72,6 +72,7 @@ export default function TrucksPage() {
       onPick={(file) => void importer.pick(file)}
       onRetry={importer.retry}
       inputRef={importer.inputRef}
+      triggerRef={importer.triggerRef}
     />
   );
 
@@ -123,6 +124,7 @@ export default function TrucksPage() {
               onPick={(file) => void importer.pick(file)}
               onRetry={importer.retry}
               inputRef={importer.inputRef}
+              triggerRef={importer.triggerRef}
               className="items-center text-center"
             />
           </div>

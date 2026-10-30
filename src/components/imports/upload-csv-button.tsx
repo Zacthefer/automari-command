@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState, type CSSProperties, type RefObject } from "react";
+import { useEffect, useRef, useState, type CSSProperties, type Ref, type RefObject } from "react";
 import { Check } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import { cn } from "@/lib/utils";
@@ -69,10 +69,12 @@ export interface UploadCsvButtonProps {
   onPick: (file: File) => void;
   onRetry: () => void;
   inputRef: RefObject<HTMLInputElement | null>;
+  /** Lets the import flow return focus here when the panel closes. */
+  triggerRef?: Ref<HTMLButtonElement>;
   className?: string;
 }
 
-export function UploadCsvButton({ state, onPick, onRetry, inputRef, className }: UploadCsvButtonProps) {
+export function UploadCsvButton({ state, onPick, onRetry, inputRef, triggerRef, className }: UploadCsvButtonProps) {
   const prefetched = useRef(false);
   const status = state.status;
   const checking = status === "reading" || status === "checking";
@@ -90,6 +92,7 @@ export function UploadCsvButton({ state, onPick, onRetry, inputRef, className }:
   return (
     <div className={cn("flex flex-col items-end gap-2 text-right", className)}>
       <Button
+        ref={triggerRef}
         type="button"
         variant="outline"
         data-state={status}

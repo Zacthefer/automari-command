@@ -1,5 +1,6 @@
 import { act, cleanup, fireEvent, render, screen } from "@testing-library/react";
 import { MotionGlobalConfig } from "motion/react";
+import { useState } from "react";
 import { afterEach, beforeAll, beforeEach, describe, expect, it, vi } from "vitest";
 import "@/lib/csv-read";
 import "@/lib/api-imports";
@@ -24,6 +25,7 @@ function fakeImporter(state: ImportState): CsvImport {
     entity: "trucks",
     state,
     inputRef: { current: null },
+    triggerRef: vi.fn(),
     panelOpen: true,
     pick: vi.fn(),
     retry: vi.fn(),
@@ -46,9 +48,35 @@ function Flow() {
         onPick={(file) => void importer.pick(file)}
         onRetry={importer.retry}
         inputRef={importer.inputRef}
+        triggerRef={importer.triggerRef}
       />
       {importer.panelOpen ? <ImportSheet importer={importer} /> : null}
       <output data-testid="status">{importer.state.status}</output>
+    </>
+  );
+}
+
+// Like the pages: the button sits in an empty-state invite, then moves to the header once
+// the reload after an import finds rows
+function MovingFlow() {
+  const [hasRows, setHasRows] = useState(false);
+  const importer = useCsvImport("trucks", {
+    onImported: () => Promise.resolve().then(() => setHasRows(true)),
+  });
+  const button = (
+    <UploadCsvButton
+      state={importer.state}
+      onPick={(file) => void importer.pick(file)}
+      onRetry={importer.retry}
+      inputRef={importer.inputRef}
+      triggerRef={importer.triggerRef}
+    />
+  );
+  return (
+    <>
+      <header data-testid="header">{hasRows ? button : null}</header>
+      <section data-testid="invite">{hasRows ? null : button}</section>
+      {importer.panelOpen ? <ImportSheet importer={importer} /> : null}
     </>
   );
 }
@@ -94,6 +122,8 @@ describe("ImportSheet closing", () => {
     await act(async () => fireEvent.click(screen.getByRole("button", { name: "Discard" })));
     expect(status()).toBe("idle");
     expect(confirmSpy).not.toHaveBeenCalled();
+    await act(() => vi.advanceTimersByTimeAsync(0));
+    expect(document.activeElement).toBe(screen.getByRole("button", { name: "Upload CSV" }));
   });
 
   it("ignores Escape while confirming and hides the X", async () => {
@@ -174,6 +204,26 @@ describe("ImportSheet review", () => {
   });
 });
 
+describe("focus after an import", () => {
+  it("follows the Upload button from the invite to the header after the reload", async () => {
+    fetchMock.mockResolvedValueOnce(jsonResponse(200, makePreview({ rows: [row(2), row(3)] })));
+    fetchMock.mockResolvedValueOnce(jsonResponse(200, makePreview({ status: "committed", created_ids: ["a", "b"] })));
+    const { container } = render(<MovingFlow />);
+    await act(async () => {
+      fireEvent.change(container.querySelector('input[type="file"]')!, { target: { files: [csvFile("Unit\n101\n102\n")] } });
+    });
+    await act(() => vi.advanceTimersByTimeAsync(450));
+    await act(async () => fireEvent.click(screen.getByRole("button", { name: "Import 2 trucks" })));
+    await act(() => vi.advanceTimersByTimeAsync(700));
+    await act(() => vi.advanceTimersByTimeAsync(700));
+    await act(() => vi.advanceTimersByTimeAsync(1000));
+    await act(() => vi.advanceTimersByTimeAsync(0));
+    const headerButton = screen.getByTestId("header").querySelector("button");
+    expect(headerButton).toBeTruthy();
+    expect(document.activeElement).toBe(headerButton);
+  });
+});
+
 describe("full flow privacy", () => {
   it("never writes to storage and never logs a cell value", async () => {
     const SENTINEL = "SENTINEL-CELL-7731";
@@ -203,6 +253,8 @@ describe("full flow privacy", () => {
     await act(() => vi.advanceTimersByTimeAsync(1000));
     expect(status()).toBe("idle");
     expect(document.body.textContent).not.toContain(SENTINEL);
+    await act(() => vi.advanceTimersByTimeAsync(0));
+    expect(document.activeElement).toBe(screen.getByRole("button", { name: "Upload CSV" }));
 
     expect(setLocal).not.toHaveBeenCalled();
     for (const spy of consoleSpies) {
