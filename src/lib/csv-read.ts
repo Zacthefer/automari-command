@@ -50,11 +50,12 @@ function readBytes(file: File): Promise<ArrayBuffer> {
   });
 }
 
-/** Strict UTF-8 first (BOM dropped), then Windows-1252, the same order as the server. */
+/** Strict UTF-8 first, then Windows-1252, the same order as the server. */
 export function decode(bytes: ArrayBuffer): { text: string; encoding: ParsedCsv["encoding"] } {
   try {
-    const text = new TextDecoder("utf-8", { fatal: true }).decode(bytes);
-    return { text: text.startsWith("﻿") ? text.slice(1) : text, encoding: "utf-8" };
+    // The BOM is kept here because papaparse always strips one leading BOM itself:
+    // exactly one is dropped in total, like Python's utf-8-sig on the server
+    return { text: new TextDecoder("utf-8", { fatal: true, ignoreBOM: true }).decode(bytes), encoding: "utf-8" };
   } catch {
     return { text: new TextDecoder("windows-1252").decode(bytes), encoding: "windows-1252" };
   }

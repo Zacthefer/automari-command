@@ -20,6 +20,13 @@ describe("readCsv decoding", () => {
     expect(Array.from(new Uint8Array(held.bytes)).slice(0, 3)).toEqual([0xef, 0xbb, 0xbf]);
   });
 
+  it("drops exactly one BOM, like the server", async () => {
+    const bom = [0xef, 0xbb, 0xbf];
+    const bytes = new Uint8Array([...bom, ...bom, ...new TextEncoder().encode("unit_number\n101\n")]);
+    const { parsed } = ok(await readCsv(csvFile(bytes)));
+    expect(parsed.records[0][0]).toBe("\uFEFFunit_number");
+  });
+
   it("falls back to Windows-1252 for invalid UTF-8", async () => {
     const bytes = new Uint8Array([...new TextEncoder().encode("name\n"), 0x45, 0xe9, 0x0a]);
     const { parsed } = ok(await readCsv(csvFile(bytes)));
