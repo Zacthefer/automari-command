@@ -175,6 +175,18 @@ describe("useCsvImport", () => {
     });
   });
 
+  it("says the file couldn't be read when reading it fails, without calling fetch", async () => {
+    const hook = setup();
+    const file = csvFile("Unit\n1\n");
+    file.arrayBufferSpy.mockRejectedValueOnce(new DOMException("gone", "NotReadableError"));
+    await act(() => hook.result.current.pick(file));
+    expect(fetchMock).not.toHaveBeenCalled();
+    expect(hook.result.current.state).toMatchObject({
+      status: "idle",
+      error: { message: "We couldn't read this file. Make sure it's saved and downloaded, then try again." },
+    });
+  });
+
   it("turns an unexpected preview failure into a retryable error instead of hanging", async () => {
     const hook = setup();
     // Not a Response at all: the API layer throws a plain TypeError

@@ -314,19 +314,25 @@ export function useCsvImport(
       const seq = ++seqRef.current;
       // Start loading the panel now so it is ready when the preview returns
       void import("@/components/imports/import-sheet").catch(() => undefined);
-      let result: Awaited<ReturnType<typeof import("@/lib/csv-read").readCsv>>;
-      let text: typeof import("@/lib/csv-read").PRECHECK_TEXT;
+      let csv: typeof import("@/lib/csv-read");
       try {
-        const csv = await import("@/lib/csv-read");
-        text = csv.PRECHECK_TEXT;
+        csv = await import("@/lib/csv-read");
+      } catch {
+        // The parser chunk didn't load: a connection problem, not the file
+        if (seq === seqRef.current) send({ type: "READ_FAIL", error: { message: GENERIC_TEXT.network, fixHint: null } });
+        return;
+      }
+      let result: Awaited<ReturnType<typeof csv.readCsv>>;
+      try {
         result = await csv.readCsv(file);
       } catch {
-        if (seq === seqRef.current) send({ type: "READ_FAIL", error: { message: GENERIC_TEXT.network, fixHint: null } });
+        // The browser couldn't read the file (moved, still syncing, permissions)
+        if (seq === seqRef.current) send({ type: "READ_FAIL", error: { message: GENERIC_TEXT.read, fixHint: null } });
         return;
       }
       if (seq !== seqRef.current) return;
       if (!result.ok) {
-        send({ type: "READ_FAIL", error: text[result.code] });
+        send({ type: "READ_FAIL", error: csv.PRECHECK_TEXT[result.code] });
         return;
       }
       if (send({ type: "READ_OK", file: result.held, parsed: result.parsed })) await runPreview(result.held);
