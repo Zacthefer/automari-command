@@ -129,9 +129,11 @@ function ProgressiveFluxLoader({ value }: { value: number }) {
 
 // ── Drivers ─────────────────────────────────────────────────────────────────
 
-type Speed = "fast" | "slow";
-// Simulated confirm round trip
-const SERVER_MS: Record<Speed, number> = { fast: 10, slow: 4000 };
+type Speed = "fast" | "slow" | "stuck" | "error";
+// Simulated confirm round trip ("error" never answers OK; it fails at ERROR_MS)
+const SERVER_MS: Record<Speed, number> = { fast: 10, slow: 4000, stuck: 10000, error: Infinity };
+const ERROR_MS = 2500;
+const SPEED_LABEL: Record<Speed, string> = { fast: "Fast server", slow: "Slow server", stuck: "Stuck 10s", error: "Save fails" };
 
 /** The original demo's fake driver: +2% per tick (200ms in the demo; 40ms for "fast"). */
 function useFakePercent(run: number, speed: Speed) {
@@ -169,12 +171,15 @@ function useHeldSteps(run: number, speed: Speed) {
         timers.push(window.setTimeout(() => responded && finish(), STEP_HOLD_MS));
       }, STEP_HOLD_MS)
     );
-    timers.push(
-      window.setTimeout(() => {
-        responded = true;
-        if (Date.now() - stepOneAt >= STEP_HOLD_MS) finish();
-      }, SERVER_MS[speed])
-    );
+    // setTimeout treats Infinity as 0, so a server that never answers schedules nothing
+    if (Number.isFinite(SERVER_MS[speed])) {
+      timers.push(
+        window.setTimeout(() => {
+          responded = true;
+          if (Date.now() - stepOneAt >= STEP_HOLD_MS) finish();
+        }, SERVER_MS[speed])
+      );
+    }
     return () => {
       timers.forEach((t) => window.clearTimeout(t));
       setStep(0);
@@ -183,8 +188,9 @@ function useHeldSteps(run: number, speed: Speed) {
   return step;
 }
 
-function Panel({ title, children, onReplay, speed, onSpeed }: {
+function Panel({ title, children, onReplay, speed, onSpeed, speeds = ["fast", "slow"] }: {
   title: string;
+  speeds?: Speed[];
   children: React.ReactNode;
   onReplay: () => void;
   speed: Speed;
@@ -195,7 +201,7 @@ function Panel({ title, children, onReplay, speed, onSpeed }: {
       <div className="flex flex-wrap items-center justify-between gap-2">
         <h2 className="text-sm font-medium text-foreground">{title}</h2>
         <div className="flex gap-2">
-          {(["fast", "slow"] as const).map((s) => (
+          {speeds.map((s) => (
             <Button
               key={s}
               type="button"
@@ -204,7 +210,7 @@ function Panel({ title, children, onReplay, speed, onSpeed }: {
               aria-pressed={speed === s}
               onClick={() => onSpeed(s)}
             >
-              {s === "fast" ? "Fast server" : "Slow server"}
+              {SPEED_LABEL[s]}
             </Button>
           ))}
           <Button type="button" size="sm" variant="outline" onClick={onReplay}>
@@ -237,11 +243,33 @@ function OursColumn() {
   const [run, setRun] = React.useState(0);
   const [speed, setSpeed] = React.useState<Speed>("fast");
   const step = useHeldSteps(run, speed);
+  const [failedRun, setFailedRun] = React.useState(-1);
+  React.useEffect(() => {
+    if (speed !== "error") return;
+    const timer = window.setTimeout(() => setFailedRun(run), ERROR_MS);
+    return () => window.clearTimeout(timer);
+  }, [run, speed]);
+  const failed = speed === "error" && failedRun === run;
   return (
-    <Panel title="Automari" onReplay={() => setRun((r) => r + 1)} speed={speed} onSpeed={setSpeed}>
-      <LazyMotion features={domAnimation} strict>
-        <ImportProgress steps={["Uploading file", "Saving 297 trucks", "297 trucks added ✓"]} activeStep={step} />
-      </LazyMotion>
+    <Panel
+      title="Automari (original look, gated)"
+      onReplay={() => setRun((r) => r + 1)}
+      speed={speed}
+      onSpeed={setSpeed}
+      speeds={["fast", "slow", "stuck", "error"]}
+    >
+      {failed ? (
+        // Like the sheet: the loader unmounts and the error replaces it
+        <p className="text-sm text-destructive">Save failed: the loader is gone and the error shows here.</p>
+      ) : (
+        <LazyMotion features={domAnimation} strict>
+          <ImportProgress
+            key={`${run}-${speed}`}
+            steps={["Uploading file", "Saving 297 trucks", "297 trucks added ✓"]}
+            activeStep={step}
+          />
+        </LazyMotion>
+      )}
     </Panel>
   );
 }
