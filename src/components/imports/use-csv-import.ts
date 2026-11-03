@@ -374,6 +374,8 @@ export function useCsvImport(
       if (verdict.outcome === "panel") {
         send({ type: "CONFIRM_FAIL", outcome: "panel", error: verdict.error });
       } else if (send({ type: "CONFIRM_FAIL", outcome: verdict.outcome })) {
+        // The save may have committed: refresh the list behind the panel, highlighting nothing
+        if (verdict.outcome === "unknown") void Promise.resolve(onImportedRef.current?.([])).catch(() => undefined);
         await runPreview(current.file);
       }
     }

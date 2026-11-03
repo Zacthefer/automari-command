@@ -121,6 +121,7 @@ describe("useCsvImport", () => {
       expect(fetchMock).toHaveBeenCalledTimes(3);
       expect(formOf(2).get("dry_run")).toBe("true");
       expect(hook.result.current.state).toMatchObject({ status: "reviewing", note: NOTE_BUG, error: null });
+      expect(hook.onImported).not.toHaveBeenCalled();
       fetchMock.mockReturnValueOnce(new Promise(() => {}));
       await act(async () => void hook.result.current.confirm());
       expect(formOf(3).get("preview_token")).toBe("token-3");
@@ -145,6 +146,8 @@ describe("useCsvImport", () => {
     await act(() => hook.result.current.confirm());
     expect(hook.result.current.state).toMatchObject({ status: "reviewing", note: NOTE_UNKNOWN });
     expect(fetchMock).toHaveBeenCalledTimes(3);
+    // The save may have gone through, so the list refreshes with nothing highlighted
+    expect(hook.onImported).toHaveBeenCalledExactlyOnceWith([]);
   });
 
   it("does not re-preview after a 409 IMPORT_IN_PROGRESS and lets the carrier confirm again", async () => {
