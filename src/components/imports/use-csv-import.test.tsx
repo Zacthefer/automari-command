@@ -146,8 +146,27 @@ describe("useCsvImport", () => {
     await act(() => hook.result.current.confirm());
     expect(hook.result.current.state).toMatchObject({ status: "reviewing", note: NOTE_UNKNOWN });
     expect(fetchMock).toHaveBeenCalledTimes(3);
-    // The save may have gone through, so the list refreshes with nothing highlighted
+    // The save may have gone through: the list reloads once the panel closes, not while it's open
+    expect(hook.onImported).not.toHaveBeenCalled();
+    act(() => hook.result.current.discard());
+    expect(hook.status()).toBe("idle");
     expect(hook.onImported).toHaveBeenCalledExactlyOnceWith([]);
+  });
+
+  it("after an unknown outcome, a second import's reload is the only one", async () => {
+    const hook = setup();
+    await toReviewing(hook);
+    fetchMock.mockRejectedValueOnce(new TypeError("Failed to fetch"));
+    fetchMock.mockResolvedValueOnce(jsonResponse(200, makePreview()));
+    await act(() => hook.result.current.confirm());
+    expect(hook.status()).toBe("reviewing");
+
+    fetchMock.mockResolvedValueOnce(jsonResponse(200, makePreview({ status: "committed", dry_run: false, created_ids: ["id-9"] })));
+    await act(() => hook.result.current.confirm());
+    // Each step's timer is set after the previous step renders
+    for (let i = 0; i < 4; i++) await act(() => vi.advanceTimersByTimeAsync(1000));
+    expect(hook.status()).toBe("idle");
+    expect(hook.onImported).toHaveBeenCalledExactlyOnceWith(["id-9"]);
   });
 
   it("does not re-preview after a 409 IMPORT_IN_PROGRESS and lets the carrier confirm again", async () => {

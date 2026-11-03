@@ -269,6 +269,8 @@ export function useCsvImport(
   const triggerElRef = useRef<HTMLButtonElement | null>(null);
   const focusPendingRef = useRef(false);
   const prevStatusRef = useRef<ImportStatus>("idle");
+  // Set when a save's outcome is unknown; the list reloads when the panel closes
+  const listStaleRef = useRef(false);
 
   useEffect(() => {
     onImportedRef.current = onImported;
@@ -374,8 +376,9 @@ export function useCsvImport(
       if (verdict.outcome === "panel") {
         send({ type: "CONFIRM_FAIL", outcome: "panel", error: verdict.error });
       } else if (send({ type: "CONFIRM_FAIL", outcome: verdict.outcome })) {
-        // The save may have committed: refresh the list behind the panel, highlighting nothing
-        if (verdict.outcome === "unknown") void Promise.resolve(onImportedRef.current?.([])).catch(() => undefined);
+        // The save may have committed. Reload the list once the panel closes, not now: a reload
+        // while the panel is open can unmount the Upload button and its file input
+        if (verdict.outcome === "unknown") listStaleRef.current = true;
         await runPreview(current.file);
       }
     }
@@ -405,6 +408,19 @@ export function useCsvImport(
   const triggerRef = useCallback((el: HTMLButtonElement | null) => {
     triggerElRef.current = el;
     if (el && focusPendingRef.current) focusTrigger();
+  }, [focusTrigger]);
+
+  // After the page's reload settles, focus whichever Upload button is now on screen
+  const reloadList = useCallback((createdIds: string[]) => {
+    focusPendingRef.current = true;
+    void Promise.resolve(onImportedRef.current?.(createdIds))
+      .catch(() => undefined)
+      .finally(() => {
+        window.setTimeout(() => {
+          focusPendingRef.current = false;
+          if (mountedRef.current) focusTrigger();
+        }, 0);
+      });
   }, [focusTrigger]);
 
   const panelLoadFailed = useCallback(() => {
@@ -439,29 +455,27 @@ export function useCsvImport(
       const ids = state.createdIds;
       const timer = window.setTimeout(() => {
         if (!send({ type: "FINISH" })) return;
-        focusPendingRef.current = true;
-        // After the page's reload settles, focus whichever Upload button is now on screen
-        void Promise.resolve(onImportedRef.current?.(ids))
-          .catch(() => undefined)
-          .finally(() => {
-            window.setTimeout(() => {
-              focusPendingRef.current = false;
-              if (mountedRef.current) focusTrigger();
-            }, 0);
-          });
+        // This reload also covers an earlier save whose outcome was unknown
+        listStaleRef.current = false;
+        reloadList(ids);
       }, DONE_HOLD_MS);
       return () => window.clearTimeout(timer);
     }
-  }, [state, send, focusTrigger]);
+  }, [state, send, reloadList]);
 
   useEffect(() => {
     const wasPanel = PANEL_STATES.includes(prevStatusRef.current);
     prevStatusRef.current = state.status;
     if (state.status !== "idle" || !wasPanel) return;
+    if (listStaleRef.current) {
+      listStaleRef.current = false;
+      reloadList([]);
+      return;
+    }
     // After the sheet unmounts and its own focus handling runs
     const timer = window.setTimeout(focusTrigger, 0);
     return () => window.clearTimeout(timer);
-  }, [state.status, focusTrigger]);
+  }, [state.status, focusTrigger, reloadList]);
 
   useEffect(() => {
     mountedRef.current = true;
