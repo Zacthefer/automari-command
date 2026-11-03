@@ -1,0 +1,506 @@
+"use client";
+
+import { useCallback, useEffect, useRef, useState } from "react";
+import { loadImportSheet } from "@/components/imports/lazy-import-sheet";
+import type { HeldFile, ImportApiError } from "@/lib/api-imports";
+import type { ParsedCsv } from "@/lib/csv-read";
+import { GENERIC_TEXT, type ImportEntity, type ImportResponse } from "@/types/imports";
+
+// The import state machine. Lives in the page bundle (the button's ring runs before the
+// lazy panel loads), so it imports only types from the parser and the API client: both
+// load with import() when a file is picked. Parsed rows, bytes and the preview token live
+// in React state only.
+
+export const CHECKED_HOLD_MS = 450;
+export const CHECKED_HOLD_REDUCED_MS = 150;
+export const STILL_CHECKING_MS = 3000;
+export const STEP_HOLD_MS = 700;
+export const DONE_HOLD_MS = 1000;
+
+export const NOTE_CHANGED = "Something changed. Here's the updated preview.";
+export const NOTE_UNKNOWN = "We couldn't confirm the import finished. Here's the current preview of your file.";
+export const NOTE_BUG = `${GENERIC_TEXT.bug} Here's a fresh preview of your file.`;
+
+export interface ShownError {
+  message: string;
+  fixHint: string | null;
+}
+
+type Loaded = { file: HeldFile; parsed: ParsedCsv };
+
+/** Why the panel is re-running the preview: a 409, a lost confirm response, a bug-path 422, or a new file. */
+type RecheckReason = "changed" | "unknown" | "bug" | "repick";
+
+const RECHECK_NOTE: Record<RecheckReason, string | null> = {
+  changed: NOTE_CHANGED,
+  unknown: NOTE_UNKNOWN,
+  bug: NOTE_BUG,
+  repick: null,
+};
+
+export type ImportState =
+  | { status: "idle"; error?: ShownError; retry?: Loaded }
+  | { status: "reading"; fileName: string }
+  | ({ status: "checking"; still: boolean } & Loaded)
+  | ({ status: "checked"; preview: ImportResponse } & Loaded)
+  | ({
+      status: "reviewing";
+      preview: ImportResponse;
+      note: string | null;
+      error: ShownError | null;
+      discardPrompt: boolean;
+    } & Loaded)
+  | ({
+      status: "confirming";
+      preview: ImportResponse;
+      shownStep: 0 | 1;
+      stepShownAt: number;
+      result?: ImportResponse;
+    } & Loaded)
+  | { status: "done"; importing: number; createdIds: string[]; created: number; filled: number }
+  // file/parsed are missing while a re-picked file is still being read
+  | { status: "rechecking"; reason: RecheckReason; file?: HeldFile; parsed?: ParsedCsv }
+  | { status: "panelError"; error: ShownError };
+
+export type ImportStatus = ImportState["status"];
+
+export type ImportAction =
+  | { type: "PICK"; fileName: string }
+  | { type: "REPICK" }
+  | ({ type: "READ_OK" } & Loaded)
+  | { type: "READ_FAIL"; error: ShownError }
+  | { type: "STILL" }
+  | { type: "PREVIEW_OK"; preview: ImportResponse }
+  | { type: "PREVIEW_FAIL"; error: ShownError; retryable: boolean }
+  | { type: "OPEN" }
+  | { type: "RETRY" }
+  | { type: "CLOSE_REQUEST" }
+  | { type: "KEEP" }
+  | { type: "DISCARD" }
+  | { type: "CONFIRM"; now: number }
+  | { type: "STEP"; now: number }
+  | { type: "CONFIRM_OK"; result: ImportResponse; now: number }
+  | { type: "CONFIRM_FAIL"; outcome: Exclude<RecheckReason, "repick"> | "panel"; error?: ShownError }
+  | { type: "FINISH" }
+  | { type: "PANEL_LOAD_FAIL" };
+
+const PANEL_STATES: ImportStatus[] = ["reviewing", "confirming", "done", "rechecking", "panelError"];
+
+export const isPanelOpen = (state: ImportState) => PANEL_STATES.includes(state.status);
+
+/** Row numbers the confirm must skip: exactly the preview's skip_error rows, unique, ascending. */
+export function buildSkipRows(preview: ImportResponse): number[] {
+  const rows = new Set(preview.rows.filter((r) => r.action === "skip_error").map((r) => r.row));
+  return [...rows].sort((a, b) => a - b);
+}
+
+/** N in "Import N": every row that isn't skipped. */
+export const importableCount = (preview: ImportResponse) => preview.counts.rows_total - preview.counts.skipped;
+
+
+function toDone(state: Extract<ImportState, { status: "confirming" }>, result: ImportResponse): ImportState {
+  return {
+    status: "done",
+    importing: importableCount(state.preview),
+    createdIds: result.created_ids,
+    created: result.counts.created,
+    filled: result.counts.filled,
+  };
+}
+
+/** Pure transitions. Returns the same state object for any event that doesn't apply. */
+export function reducer(state: ImportState, action: ImportAction): ImportState {
+  switch (action.type) {
+    case "PICK":
+      return state.status === "idle" ? { status: "reading", fileName: action.fileName } : state;
+    case "REPICK":
+      return state.status === "reviewing" || state.status === "panelError"
+        ? { status: "rechecking", reason: "repick" }
+        : state;
+    case "READ_OK":
+      if (state.status === "reading") return { status: "checking", still: false, file: action.file, parsed: action.parsed };
+      if (state.status === "rechecking" && state.reason === "repick" && !state.file) {
+        return { ...state, file: action.file, parsed: action.parsed };
+      }
+      return state;
+    case "READ_FAIL":
+      if (state.status === "reading") return { status: "idle", error: action.error };
+      if (state.status === "rechecking" && state.reason === "repick" && !state.file) {
+        return { status: "panelError", error: action.error };
+      }
+      return state;
+    case "STILL":
+      return state.status === "checking" && !state.still ? { ...state, still: true } : state;
+    case "PREVIEW_OK":
+      if (state.status === "checking") {
+        return { status: "checked", file: state.file, parsed: state.parsed, preview: action.preview };
+      }
+      if (state.status === "rechecking" && state.file && state.parsed) {
+        const note = RECHECK_NOTE[state.reason];
+        return {
+          status: "reviewing",
+          file: state.file,
+          parsed: state.parsed,
+          preview: action.preview,
+          note,
+          error: null,
+          discardPrompt: false,
+        };
+      }
+      return state;
+    case "PREVIEW_FAIL":
+      if (state.status === "checking") {
+        return action.retryable
+          ? { status: "idle", error: action.error, retry: { file: state.file, parsed: state.parsed } }
+          : { status: "idle", error: action.error };
+      }
+      if (state.status === "rechecking") return { status: "panelError", error: action.error };
+      return state;
+    case "OPEN":
+      return state.status === "checked"
+        ? { ...state, status: "reviewing", note: null, error: null, discardPrompt: false }
+        : state;
+    case "RETRY":
+      return state.status === "idle" && state.retry
+        ? { status: "checking", still: false, file: state.retry.file, parsed: state.retry.parsed }
+        : state;
+    case "CLOSE_REQUEST":
+      if (state.status === "reviewing") return state.discardPrompt ? state : { ...state, discardPrompt: true };
+      if (state.status === "rechecking" || state.status === "panelError") return { status: "idle" };
+      return state;
+    case "KEEP":
+      return state.status === "reviewing" && state.discardPrompt ? { ...state, discardPrompt: false } : state;
+    case "DISCARD":
+      return state.status === "reviewing" ? { status: "idle" } : state;
+    case "CONFIRM":
+      if (state.status !== "reviewing" || state.discardPrompt) return state;
+      // Every row is skipped: nothing to import (the panel shows the button disabled)
+      if (importableCount(state.preview) === 0) return state;
+      return {
+        status: "confirming",
+        file: state.file,
+        parsed: state.parsed,
+        preview: state.preview,
+        shownStep: 0,
+        stepShownAt: action.now,
+      };
+    case "STEP":
+      if (state.status !== "confirming") return state;
+      if (state.shownStep === 0) return { ...state, shownStep: 1, stepShownAt: action.now };
+      // The timer that sent this already waited out the hold; re-checking the clock here
+      // could strand the flow if the timer fired a little early
+      return state.result ? toDone(state, state.result) : state;
+    case "CONFIRM_OK":
+      if (state.status !== "confirming") return state;
+      // "added" only shows after a 2xx, and only once "Saving" has had its full hold
+      if (state.shownStep === 1 && action.now - state.stepShownAt >= STEP_HOLD_MS) return toDone(state, action.result);
+      return { ...state, result: action.result };
+    case "CONFIRM_FAIL":
+      if (state.status !== "confirming") return state;
+      if (action.outcome === "panel") {
+        return {
+          status: "reviewing",
+          file: state.file,
+          parsed: state.parsed,
+          preview: state.preview,
+          note: null,
+          error: action.error ?? { message: GENERIC_TEXT.unknown, fixHint: null },
+          discardPrompt: false,
+        };
+      }
+      return { status: "rechecking", reason: action.outcome, file: state.file, parsed: state.parsed };
+    case "FINISH":
+      return state.status === "done" ? { status: "idle" } : state;
+    case "PANEL_LOAD_FAIL":
+      // The panel chunk didn't load; once confirming, it already had
+      return state.status === "reviewing" || state.status === "rechecking" || state.status === "panelError"
+        ? { status: "idle", error: { message: GENERIC_TEXT.network, fixHint: null } }
+        : state;
+  }
+}
+
+export function prefersReducedMotion() {
+  return (
+    typeof window !== "undefined" &&
+    typeof window.matchMedia === "function" &&
+    window.matchMedia("(prefers-reduced-motion: reduce)").matches
+  );
+}
+
+// By name, not instanceof: the class lives in the lazily loaded API client
+const isApiError = (error: unknown): error is ImportApiError =>
+  error instanceof Error && error.name === "ImportApiError";
+
+const shown = (error: ImportApiError): ShownError => ({ message: error.message, fixHint: error.fixHint });
+
+type Io = [typeof import("@/lib/csv-read"), typeof import("@/lib/api-imports")];
+let io: Promise<Io> | null = null;
+
+/** Parser and API client, loaded together on first use and then cached (module code only, no data). */
+function loadIo(): Promise<Io> {
+  io ??= Promise.all([import("@/lib/csv-read"), import("@/lib/api-imports")]).catch((error) => {
+    io = null;
+    throw error;
+  });
+  return io;
+}
+
+/** Warm the parser and API client chunks when the carrier shows intent. */
+export function prefetchImportIo() {
+  void loadIo().catch(() => undefined);
+}
+
+const UNKNOWN_ERROR: ShownError = { message: GENERIC_TEXT.unknown, fixHint: null };
+
+export function useCsvImport(
+  entity: ImportEntity,
+  { onImported }: { onImported?: (createdIds: string[]) => unknown } = {}
+) {
+  const [state, setState] = useState<ImportState>({ status: "idle" });
+  // Events are applied to the ref first so two clicks in the same tick see the same truth
+  const stateRef = useRef<ImportState>(state);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const mountedRef = useRef(false);
+  // Every request gets a sequence id; a response with an old id is dropped
+  const seqRef = useRef(0);
+  const abortRef = useRef<AbortController | null>(null);
+  const onImportedRef = useRef(onImported);
+  // Focus goes back to the Upload CSV button when the panel closes
+  const triggerElRef = useRef<HTMLButtonElement | null>(null);
+  const focusPendingRef = useRef(false);
+  const prevStatusRef = useRef<ImportStatus>("idle");
+  // Set when a save's outcome is unknown; the list reloads when the panel closes
+  const listStaleRef = useRef(false);
+
+  useEffect(() => {
+    onImportedRef.current = onImported;
+  });
+
+  const send = useCallback((action: ImportAction) => {
+    const next = reducer(stateRef.current, action);
+    if (next === stateRef.current) return false;
+    stateRef.current = next;
+    setState(next);
+    return true;
+  }, []);
+
+  const cancelRequests = useCallback(() => {
+    seqRef.current++;
+    abortRef.current?.abort();
+    abortRef.current = null;
+  }, []);
+
+  const runPreview = useCallback(
+    async (file: HeldFile) => {
+      const seq = ++seqRef.current;
+      abortRef.current?.abort();
+      const controller = new AbortController();
+      abortRef.current = controller;
+      try {
+        const [, api] = await loadIo();
+        const preview = await api.previewImport(entity, file, { signal: controller.signal });
+        if (seq === seqRef.current) send({ type: "PREVIEW_OK", preview });
+      } catch (error) {
+        if (seq !== seqRef.current) return;
+        if (!isApiError(error)) {
+          send({ type: "PREVIEW_FAIL", error: UNKNOWN_ERROR, retryable: true });
+          return;
+        }
+        if (error.status === 401) return;
+        send({ type: "PREVIEW_FAIL", error: shown(error), retryable: error.kind !== "http" });
+      }
+    },
+    [entity, send]
+  );
+
+  const pick = useCallback(
+    async (file: File) => {
+      if (!send({ type: "PICK", fileName: file.name }) && !send({ type: "REPICK" })) return;
+      abortRef.current?.abort();
+      const seq = ++seqRef.current;
+      // Start loading the panel now so it is ready when the preview returns
+      void loadImportSheet().catch(() => undefined);
+      let csv: typeof import("@/lib/csv-read");
+      try {
+        [csv] = await loadIo();
+      } catch {
+        // The parser or API chunk didn't load: a connection problem, not the file
+        if (seq === seqRef.current) send({ type: "READ_FAIL", error: { message: GENERIC_TEXT.network, fixHint: null } });
+        return;
+      }
+      let result: Awaited<ReturnType<typeof csv.readCsv>>;
+      try {
+        result = await csv.readCsv(file);
+      } catch {
+        // The browser couldn't read the file (moved, still syncing, permissions)
+        if (seq === seqRef.current) send({ type: "READ_FAIL", error: { message: GENERIC_TEXT.read, fixHint: null } });
+        return;
+      }
+      if (seq !== seqRef.current) return;
+      if (!result.ok) {
+        send({ type: "READ_FAIL", error: csv.PRECHECK_TEXT[result.code] });
+        return;
+      }
+      if (send({ type: "READ_OK", file: result.held, parsed: result.parsed })) await runPreview(result.held);
+    },
+    [runPreview, send]
+  );
+
+  const retry = useCallback(() => {
+    const current = stateRef.current;
+    if (current.status !== "idle" || !current.retry) return;
+    const { file } = current.retry;
+    if (send({ type: "RETRY" })) void runPreview(file);
+  }, [runPreview, send]);
+
+  const confirm = useCallback(async () => {
+    if (!send({ type: "CONFIRM", now: performance.now() })) return;
+    const current = stateRef.current as Extract<ImportState, { status: "confirming" }>;
+    const seq = ++seqRef.current;
+    let api: Io[1] | undefined;
+    try {
+      // No abort signal: leaving the page must not cut off a save that may already be committing
+      [, api] = await loadIo();
+      const result = await api.confirmImport(
+        entity,
+        current.file,
+        current.preview.preview_token,
+        buildSkipRows(current.preview)
+      );
+      if (seq === seqRef.current && mountedRef.current) send({ type: "CONFIRM_OK", result, now: performance.now() });
+    } catch (error) {
+      if (seq !== seqRef.current || !mountedRef.current) return;
+      // Classified inside the lazily loaded API client (see classifyConfirmError)
+      const verdict = api ? api.classifyConfirmError(error) : ({ outcome: "panel", error: UNKNOWN_ERROR } as const);
+      if (verdict.outcome === "ignore") return;
+      if (verdict.outcome === "panel") {
+        send({ type: "CONFIRM_FAIL", outcome: "panel", error: verdict.error });
+      } else if (send({ type: "CONFIRM_FAIL", outcome: verdict.outcome })) {
+        // The save may have committed. Reload the list once the panel closes, not now: a reload
+        // while the panel is open can unmount the Upload button and its file input
+        if (verdict.outcome === "unknown") listStaleRef.current = true;
+        await runPreview(current.file);
+      }
+    }
+  }, [entity, runPreview, send]);
+
+  const closeRequest = useCallback(() => {
+    const status = stateRef.current.status;
+    if (send({ type: "CLOSE_REQUEST" }) && (status === "rechecking" || status === "panelError")) cancelRequests();
+  }, [cancelRequests, send]);
+
+  const keep = useCallback(() => void send({ type: "KEEP" }), [send]);
+
+  const discard = useCallback(() => {
+    if (send({ type: "DISCARD" })) cancelRequests();
+  }, [cancelRequests, send]);
+
+  // Only when nothing else has focus: never pull focus away from where the carrier moved it,
+  // and never to a button that is gone (a failed reload shows an error state instead)
+  const focusTrigger = useCallback(() => {
+    const el = triggerElRef.current;
+    const active = document.activeElement;
+    if (el?.isConnected && (!active || active === document.body)) el.focus();
+  }, []);
+
+  // A ref callback, because the button moves (empty-state invite → page header) when the
+  // list reloads after an import; a pending focus follows it to the new element
+  const triggerRef = useCallback((el: HTMLButtonElement | null) => {
+    triggerElRef.current = el;
+    if (el && focusPendingRef.current) focusTrigger();
+  }, [focusTrigger]);
+
+  // After the page's reload settles, focus whichever Upload button is now on screen
+  const reloadList = useCallback((createdIds: string[]) => {
+    focusPendingRef.current = true;
+    void Promise.resolve(onImportedRef.current?.(createdIds))
+      .catch(() => undefined)
+      .finally(() => {
+        window.setTimeout(() => {
+          focusPendingRef.current = false;
+          if (mountedRef.current) focusTrigger();
+        }, 0);
+      });
+  }, [focusTrigger]);
+
+  const panelLoadFailed = useCallback(() => {
+    if (send({ type: "PANEL_LOAD_FAIL" })) cancelRequests();
+  }, [cancelRequests, send]);
+
+  const repick = useCallback(() => {
+    const status = stateRef.current.status;
+    if (status === "reviewing" || status === "panelError") inputRef.current?.click();
+  }, []);
+
+  // Timers keyed on the state they belong to; leaving the state clears them
+  useEffect(() => {
+    if (state.status === "checking" && !state.still) {
+      const timer = window.setTimeout(() => send({ type: "STILL" }), STILL_CHECKING_MS);
+      return () => window.clearTimeout(timer);
+    }
+    if (state.status === "checked") {
+      const hold = prefersReducedMotion() ? CHECKED_HOLD_REDUCED_MS : CHECKED_HOLD_MS;
+      const timer = window.setTimeout(() => send({ type: "OPEN" }), hold);
+      return () => window.clearTimeout(timer);
+    }
+    if (state.status === "confirming") {
+      // Step 1 waits for the response; CONFIRM_OK moves on if it arrives after the hold
+      if (state.shownStep === 1 && !state.result) return;
+      // performance.now() is monotonic, so a wall-clock change can't stretch or skip a hold
+      const wait = Math.max(0, state.stepShownAt + STEP_HOLD_MS - performance.now());
+      const timer = window.setTimeout(() => send({ type: "STEP", now: performance.now() }), wait);
+      return () => window.clearTimeout(timer);
+    }
+    if (state.status === "done") {
+      const ids = state.createdIds;
+      const timer = window.setTimeout(() => {
+        if (!send({ type: "FINISH" })) return;
+        // This reload also covers an earlier save whose outcome was unknown
+        listStaleRef.current = false;
+        reloadList(ids);
+      }, DONE_HOLD_MS);
+      return () => window.clearTimeout(timer);
+    }
+  }, [state, send, reloadList]);
+
+  useEffect(() => {
+    const wasPanel = PANEL_STATES.includes(prevStatusRef.current);
+    prevStatusRef.current = state.status;
+    if (state.status !== "idle" || !wasPanel) return;
+    if (listStaleRef.current) {
+      listStaleRef.current = false;
+      reloadList([]);
+      return;
+    }
+    // After the sheet unmounts and its own focus handling runs
+    const timer = window.setTimeout(focusTrigger, 0);
+    return () => window.clearTimeout(timer);
+  }, [state.status, focusTrigger, reloadList]);
+
+  useEffect(() => {
+    mountedRef.current = true;
+    return () => {
+      mountedRef.current = false;
+      // Aborts a preview in flight; a confirm in flight is left to finish and ignored
+      cancelRequests();
+    };
+  }, [cancelRequests]);
+
+  return {
+    entity,
+    state,
+    inputRef,
+    triggerRef,
+    panelOpen: isPanelOpen(state),
+    pick,
+    retry,
+    confirm,
+    closeRequest,
+    keep,
+    discard,
+    repick,
+    panelLoadFailed,
+  };
+}
+
+export type CsvImport = ReturnType<typeof useCsvImport>;

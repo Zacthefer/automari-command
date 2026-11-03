@@ -250,3 +250,29 @@
 .signin-core {
   animation: signin-ring-pulse 2.4s ease-in-out infinite;
 }
+
+/* CSV import: the ✓ in the upload ring draws itself (path uses pathLength=1) */
+@keyframes import-check-draw {
+  from {
+    stroke-dashoffset: 1;
+  }
+  to {
+    stroke-dashoffset: 0;
+  }
+}
+
+/* CSV import: rows created by an import fade from cyan to normal. No glow with reduced motion */
+@keyframes import-row-glow {
+  from {
+    background-color: var(--brand-cyan-dim);
+  }
+  to {
+    background-color: transparent;
+  }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  .import-row-glow {
+    animation: import-row-glow 1.5s ease-out;
+  }
+}
