@@ -10,6 +10,7 @@ import { Badge } from "@/components/ui/badge";
 import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { PageSkeleton } from "@/components/layout/page-skeleton";
+import { CreateLoginCard } from "@/components/admin/create-login-card";
 import {
   getTenant,
   getBillingStatus,
@@ -308,6 +309,12 @@ export default function ClientDetailPage() {
             )}
           </CardContent>
         </Card>
+
+        <CreateLoginCard
+          tenantId={client.id}
+          defaultEmail={client.contact_email}
+          defaultName={client.contact_name}
+        />
 
         <Card className="border-slate-200 shadow-sm lg:col-span-2">
           <CardHeader>

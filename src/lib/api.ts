@@ -644,6 +644,20 @@ export async function createTenant(data: {
   });
 }
 
+// ── Users ────────────────────────────────────────────
+
+export async function createUser(data: {
+  email: string;
+  password: string;
+  name: string;
+  tenant_id: string;
+}) {
+  return request<import("@/types").User>("/api/auth/users", {
+    method: "POST",
+    body: JSON.stringify({ ...data, role: "carrier" }),
+  });
+}
+
 // ── Billing ──────────────────────────────────────────
 
 export async function getBillingStatus(tenantId: string) {
