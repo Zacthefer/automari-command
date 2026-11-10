@@ -66,6 +66,26 @@ describe("CreateLoginCard", () => {
     await waitFor(() => expect(screen.getByText(/copy it by hand/)).toBeTruthy());
   });
 
+  it("tells the admin to copy by hand when the browser has no clipboard at all", async () => {
+    fetchMock.mockResolvedValueOnce(jsonResponse(201, { id: "u-1" }));
+    vi.stubGlobal("navigator", {});
+    renderCard();
+
+    fireEvent.click(screen.getByRole("button", { name: "Create login" }));
+    fireEvent.click(await screen.findByRole("button", { name: "Copy" }));
+
+    await waitFor(() => expect(screen.getByText(/copy it by hand/)).toBeTruthy());
+  });
+
+  it("refuses a name made only of spaces without calling the server", async () => {
+    render(<CreateLoginCard tenantId="t-1" defaultEmail="owner@acmefreight.com" defaultName="   " />);
+
+    fireEvent.click(screen.getByRole("button", { name: "Create login" }));
+
+    await screen.findByText("Enter a name for this login.");
+    expect(fetchMock).not.toHaveBeenCalled();
+  });
+
   it("goes back to the form after Done so the password is no longer on screen", async () => {
     fetchMock.mockResolvedValueOnce(jsonResponse(201, { id: "u-1" }));
     renderCard();

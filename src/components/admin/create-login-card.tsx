@@ -6,7 +6,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { createUser } from "@/lib/api";
+import { createCarrierLogin } from "@/lib/api";
 import { generatePassword } from "@/lib/password";
 
 export function CreateLoginCard({
@@ -31,15 +31,17 @@ export function CreateLoginCard({
     const form = new FormData(e.currentTarget);
     // The backend matches emails exactly, so store them the way people type them at sign-in
     const email = (form.get("login_email") as string).trim().toLowerCase();
+    const name = (form.get("login_name") as string).trim();
+    // "required" lets a name of only spaces through
+    if (!name) {
+      setError("Enter a name for this login.");
+      setLoading(false);
+      return;
+    }
     const password = generatePassword();
 
     try {
-      await createUser({
-        email,
-        password,
-        name: (form.get("login_name") as string).trim(),
-        tenant_id: tenantId,
-      });
+      await createCarrierLogin({ email, password, name, tenant_id: tenantId });
       setCreated({ email, password });
       setCopyState("idle");
     } catch (err) {
@@ -49,12 +51,15 @@ export function CreateLoginCard({
     }
   }
 
-  function copyPassword() {
+  async function copyPassword() {
     if (!created) return;
-    navigator.clipboard
-      .writeText(created.password)
-      .then(() => setCopyState("copied"))
-      .catch(() => setCopyState("failed"));
+    // navigator.clipboard is missing outside secure contexts, so a missing API counts as a failed copy too
+    try {
+      await navigator.clipboard.writeText(created.password);
+      setCopyState("copied");
+    } catch {
+      setCopyState("failed");
+    }
   }
 
   return (

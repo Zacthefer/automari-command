@@ -646,7 +646,7 @@ export async function createTenant(data: {
 
 // ── Users ────────────────────────────────────────────
 
-export async function createUser(data: {
+export async function createCarrierLogin(data: {
   email: string;
   password: string;
   name: string;
