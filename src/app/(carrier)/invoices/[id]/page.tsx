@@ -34,6 +34,7 @@ import {
   ApiError,
 } from "@/lib/api";
 import type { Invoice, BOL } from "@/types";
+import { BlurFadeStack } from "@/components/ui/blur-fade";
 
 function formatCurrency(amount: number): string {
   return new Intl.NumberFormat("en-US", {
@@ -191,7 +192,7 @@ export default function InvoiceDetailPage() {
   const canMarkPaid = ["sent", "viewed", "overdue"].includes(invoice.status);
 
   return (
-    <div className="space-y-6">
+    <BlurFadeStack className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
@@ -471,6 +472,6 @@ export default function InvoiceDetailPage() {
           </Card>
         )}
       </div>
-    </div>
+    </BlurFadeStack>
   );
 }

@@ -39,6 +39,7 @@ const SEGMENT_LABELS: Record<string, string> = {
   drivers: "Drivers",
   trips: "Trips",
   expenses: "Expenses",
+  integrations: "Integrations",
   new: "New",
 };
 

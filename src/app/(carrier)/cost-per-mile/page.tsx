@@ -16,6 +16,7 @@ import { CpmBarChart } from "@/components/cost-per-mile/cpm-bar-chart";
 import { ExpenseDonutChart } from "@/components/cost-per-mile/expense-donut-chart";
 import { getFleetOverview, getCpmSummary } from "@/lib/api-cpm";
 import type { FleetOverview, CpmSummaryResponse } from "@/types/cost-per-mile";
+import { BlurFadeStack } from "@/components/ui/blur-fade";
 
 function formatCurrency(amount: number): string {
   return new Intl.NumberFormat("en-US", {
@@ -81,7 +82,7 @@ export default function CostPerMilePage() {
   if (loading) return <PageSkeleton />;
 
   return (
-    <div className="space-y-8">
+    <BlurFadeStack className="space-y-8">
       <PageHeader
         title="Cost Per Mile"
         description="Fleet-wide cost analytics and expense tracking."
@@ -178,6 +179,6 @@ export default function CostPerMilePage() {
           </div>
         </>
       )}
-    </div>
+    </BlurFadeStack>
   );
 }

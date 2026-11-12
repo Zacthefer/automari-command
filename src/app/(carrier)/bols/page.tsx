@@ -7,6 +7,7 @@ import { BolTable } from "@/components/bols/bol-table";
 import { Button } from "@/components/ui/button";
 import { getBols, uploadBol } from "@/lib/api";
 import type { BOL } from "@/types";
+import { BlurFadeStack } from "@/components/ui/blur-fade";
 
 export default function BolsPage() {
   const [bols, setBols] = useState<BOL[]>([]);
@@ -48,7 +49,7 @@ export default function BolsPage() {
   if (loading) return <PageSkeleton />;
 
   return (
-    <div className="space-y-6">
+    <BlurFadeStack className="space-y-6">
       <PageHeader
         title="Bills of Lading"
         description="All BOLs submitted by drivers via text message or upload."
@@ -76,6 +77,6 @@ export default function BolsPage() {
         </div>
       )}
       <BolTable bols={bols} />
-    </div>
+    </BlurFadeStack>
   );
 }

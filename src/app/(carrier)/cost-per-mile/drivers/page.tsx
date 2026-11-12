@@ -22,6 +22,7 @@ import { useImportHighlight } from "@/components/imports/use-import-highlight";
 import { getDrivers } from "@/lib/api-cpm";
 import { cn } from "@/lib/utils";
 import type { Driver } from "@/types/cost-per-mile";
+import { BlurFadeStack } from "@/components/ui/blur-fade";
 
 const statusStyles: Record<string, string> = {
   active: "bg-emerald-50 text-emerald-700 hover:bg-emerald-50",
@@ -73,7 +74,7 @@ export default function DriversPage() {
   );
 
   return (
-    <div className="space-y-6">
+    <BlurFadeStack className="space-y-6">
       <div className="flex items-center gap-4">
         <Link
           href="/cost-per-mile"
@@ -178,6 +179,6 @@ export default function DriversPage() {
 
       {/* The review panel (motion, table) loads only when an import starts */}
       {importer.panelOpen ? <LazyImportSheet importer={importer} /> : null}
-    </div>
+    </BlurFadeStack>
   );
 }

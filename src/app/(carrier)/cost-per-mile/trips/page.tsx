@@ -17,6 +17,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import { PageSkeleton } from "@/components/layout/page-skeleton";
 import { getTrips } from "@/lib/api-cpm";
 import type { Trip } from "@/types/cost-per-mile";
+import { BlurFadeStack } from "@/components/ui/blur-fade";
 
 const statusStyles: Record<string, string> = {
   completed: "bg-emerald-50 text-emerald-700 hover:bg-emerald-50",
@@ -60,7 +61,7 @@ export default function TripsPage() {
   if (loading) return <PageSkeleton />;
 
   return (
-    <div className="space-y-6">
+    <BlurFadeStack className="space-y-6">
       <div className="flex items-center gap-4">
         <Link
           href="/cost-per-mile"
@@ -142,6 +143,6 @@ export default function TripsPage() {
           </Table>
         </div>
       )}
-    </div>
+    </BlurFadeStack>
   );
 }

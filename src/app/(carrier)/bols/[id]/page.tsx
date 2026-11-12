@@ -13,6 +13,7 @@ import { PageSkeleton } from "@/components/layout/page-skeleton";
 import { BolStatusChip } from "@/components/bols/bol-status-chip";
 import { getBol, getLoads, attachDocument } from "@/lib/api";
 import type { BOL, LoadSummary } from "@/types";
+import { BlurFadeStack } from "@/components/ui/blur-fade";
 
 function Field({ label, value }: { label: string; value: string | null | undefined }) {
   return (
@@ -89,7 +90,7 @@ export default function BolDetailPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <BlurFadeStack className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Link
@@ -291,6 +292,6 @@ export default function BolDetailPage() {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </BlurFadeStack>
   );
 }

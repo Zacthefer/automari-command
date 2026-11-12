@@ -17,6 +17,7 @@ import { PageHeader } from "@/components/layout/page-header";
 import { PageSkeleton } from "@/components/layout/page-skeleton";
 import { getExpenses } from "@/lib/api-cpm";
 import type { Expense } from "@/types/cost-per-mile";
+import { BlurFadeStack } from "@/components/ui/blur-fade";
 
 const categoryLabels: Record<string, string> = {
   fuel: "Fuel",
@@ -63,7 +64,7 @@ export default function ExpensesPage() {
   if (loading) return <PageSkeleton />;
 
   return (
-    <div className="space-y-6">
+    <BlurFadeStack className="space-y-6">
       <div className="flex items-center gap-4">
         <Link
           href="/cost-per-mile"
@@ -148,6 +149,6 @@ export default function ExpensesPage() {
           </Table>
         </div>
       )}
-    </div>
+    </BlurFadeStack>
   );
 }

@@ -7,6 +7,7 @@ import { LoadsTable } from "@/components/loads/loads-table";
 import { Button } from "@/components/ui/button";
 import { getLoads, uploadRateCon } from "@/lib/api";
 import type { LoadSummary } from "@/types";
+import { BlurFadeStack } from "@/components/ui/blur-fade";
 
 const STATUS_TABS = [
   { label: "All", value: "" },
@@ -74,7 +75,7 @@ export default function LoadsPage() {
   if (loading && loads.length === 0) return <PageSkeleton />;
 
   return (
-    <div className="space-y-6">
+    <BlurFadeStack className="space-y-6">
       <PageHeader
         title="Loads"
         description="Rate confirmations, billing packets, and payment tracking."
@@ -120,6 +121,6 @@ export default function LoadsPage() {
       )}
 
       <LoadsTable loads={loads} filtered={statusFilter !== ""} />
-    </div>
+    </BlurFadeStack>
   );
 }

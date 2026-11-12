@@ -9,6 +9,7 @@ import { ComplianceTable } from "@/components/compliance/compliance-table";
 import { Button } from "@/components/ui/button";
 import { getComplianceDocuments } from "@/lib/api";
 import type { ComplianceDocument } from "@/types";
+import { BlurFadeStack } from "@/components/ui/blur-fade";
 
 export default function CompliancePage() {
   const [documents, setDocuments] = useState<ComplianceDocument[]>([]);
@@ -23,7 +24,7 @@ export default function CompliancePage() {
   if (loading) return <PageSkeleton />;
 
   return (
-    <div className="space-y-6">
+    <BlurFadeStack className="space-y-6">
       <PageHeader
         title="Compliance"
         description="Track document expirations and stay audit-ready."
@@ -37,6 +38,6 @@ export default function CompliancePage() {
         }
       />
       <ComplianceTable documents={documents} />
-    </div>
+    </BlurFadeStack>
   );
 }

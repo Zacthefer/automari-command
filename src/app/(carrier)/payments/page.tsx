@@ -20,6 +20,7 @@ import {
 } from "@/components/ui/table";
 import { getLoads, getPaymentSummary } from "@/lib/api";
 import type { LoadSummary, PaymentSummaryResponse } from "@/types";
+import { BlurFadeStack } from "@/components/ui/blur-fade";
 
 // The backend caps one page of loads at 200
 const LOAD_LIMIT = 200;
@@ -99,10 +100,10 @@ export default function PaymentsPage() {
 
   if (!summary) {
     return (
-      <div className="space-y-6">
+      <BlurFadeStack className="space-y-6">
         {header}
         <ErrorBanner message={error ?? "Couldn't load payment data."} onRetry={retry} />
-      </div>
+      </BlurFadeStack>
     );
   }
 
@@ -111,7 +112,7 @@ export default function PaymentsPage() {
   const avgDays = summary.avg_days_to_payment;
 
   return (
-    <div className="space-y-6">
+    <BlurFadeStack className="space-y-6">
       {header}
 
       {error ? <ErrorBanner message={error} onRetry={retry} /> : null}
@@ -257,6 +258,6 @@ export default function PaymentsPage() {
           Showing the {LOAD_LIMIT} most recent loads awaiting payment. Totals above include every load.
         </p>
       ) : null}
-    </div>
+    </BlurFadeStack>
   );
 }

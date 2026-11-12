@@ -326,3 +326,30 @@ export interface PaymentSummaryResponse {
   aging_buckets: AgingBucket[];
   by_broker: BrokerPaymentSummary[];
 }
+
+// ── Integrations ──────────────────────────────────────
+
+export type IntegrationStatus = "connected" | "needs_reconnect" | "disconnected";
+
+/** One ELD connection. Credentials are never sent to the browser. */
+export interface IntegrationConnection {
+  id: string;
+  provider: string;
+  status: IntegrationStatus;
+  external_account_id: string | null;
+  token_expires_at: string | null;
+  scopes: string | null;
+  last_synced_at: string | null;
+  last_error: string | null;
+  created_at: string;
+}
+
+export interface MotiveSyncCounts {
+  trucks_created: number;
+  trucks_updated: number;
+  trucks_matched: number;
+  trucks_skipped: number;
+  drivers_created: number;
+  drivers_updated: number;
+  drivers_matched: number;
+}

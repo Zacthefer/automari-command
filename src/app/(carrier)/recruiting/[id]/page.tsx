@@ -21,6 +21,7 @@ import {
   updateApplicant,
 } from "@/lib/api";
 import type { Applicant, ApplicantStatus } from "@/types";
+import { BlurFadeStack } from "@/components/ui/blur-fade";
 
 const statusOptions: { value: ApplicantStatus; label: string }[] = [
   { value: "new", label: "New" },
@@ -114,7 +115,7 @@ export default function ApplicantDetailPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <BlurFadeStack className="space-y-6">
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
           <Link
@@ -310,6 +311,6 @@ export default function ApplicantDetailPage() {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </BlurFadeStack>
   );
 }

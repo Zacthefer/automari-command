@@ -18,6 +18,7 @@ import {
   createPortalSession,
 } from "@/lib/api";
 import type { Tenant, BillingStatus } from "@/types";
+import { BlurFadeStack } from "@/components/ui/blur-fade";
 
 function Field({
   label,
@@ -127,7 +128,7 @@ export default function ClientDetailPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <BlurFadeStack className="space-y-6">
       <div className="flex items-center gap-4">
         <Link
           href="/admin/clients"
@@ -353,6 +354,6 @@ export default function ClientDetailPage() {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </BlurFadeStack>
   );
 }

@@ -10,6 +10,7 @@ import { Button } from "@/components/ui/button";
 import { getApplicants } from "@/lib/api";
 import type { Applicant, ApplicantStatus } from "@/types";
 import { cn } from "@/lib/utils";
+import { BlurFadeStack } from "@/components/ui/blur-fade";
 
 const statusFilters: { value: ApplicantStatus | "all"; label: string }[] = [
   { value: "all", label: "All" },
@@ -40,7 +41,7 @@ export default function RecruitingPage() {
   if (loading) return <PageSkeleton />;
 
   return (
-    <div className="space-y-6">
+    <BlurFadeStack className="space-y-6">
       <PageHeader
         title="Driver Recruiting"
         description="Track inbound driver applicants and move them through your hiring pipeline."
@@ -73,6 +74,6 @@ export default function RecruitingPage() {
       </div>
 
       <ApplicantTable applicants={applicants} />
-    </div>
+    </BlurFadeStack>
   );
 }
