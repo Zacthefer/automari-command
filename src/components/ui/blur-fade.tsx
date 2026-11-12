@@ -1,6 +1,6 @@
 "use client";
 
-import { Children, isValidElement, type ReactNode } from "react";
+import { Children, Fragment, isValidElement, type ReactNode } from "react";
 import { m, type Variants } from "motion/react";
 
 // Ported from Magic UI's Blur Fade (21st.dev): a short fade-and-rise, delayed per item so a
@@ -43,14 +43,28 @@ export function staggerDelay(index: number) {
   return Math.min(index, MAX_STAGGER_STEPS) * STAGGER_SECONDS;
 }
 
+/**
+ * The page's sections, with fragments opened up: a `<>...</>` group of sections must get one
+ * wrapper (and one gap) per section, not one wrapper around the whole group.
+ */
+function sections(children: ReactNode, keyPrefix = ""): { key: string; child: ReactNode }[] {
+  return Children.toArray(children).flatMap((child, index) => {
+    const key = `${keyPrefix}${isValidElement(child) ? child.key : index}`;
+    if (isValidElement<{ children?: ReactNode }>(child) && child.type === Fragment) {
+      return sections(child.props.children, key);
+    }
+    return [{ key, child }];
+  });
+}
+
 /** A page's top-level stack: each section fades up, one after another. */
 export function BlurFadeStack({ children, className }: { children: ReactNode; className?: string }) {
   return (
     <div className={className}>
-      {Children.toArray(children).map((child, index) => (
+      {sections(children).map(({ key, child }, index) => (
         // A section that renders nothing must not leave an empty wrapper (and its gap) behind
         <BlurFade
-          key={isValidElement(child) && child.key != null ? child.key : index}
+          key={key}
           delay={staggerDelay(index)}
           className="empty:hidden"
         >

@@ -35,6 +35,25 @@ describe("BlurFadeStack", () => {
     expect(Array.from(stack.children).map((w) => w.textContent)).toEqual(["Title", "Body"]);
   });
 
+  it("gives each section inside a fragment its own wrapper, so the stack's gaps still apply", () => {
+    const { container } = render(
+      <LazyMotion features={domAnimation} strict>
+        <BlurFadeStack>
+          <h1>Title</h1>
+          <>
+            <p>Stats</p>
+            <>
+              <p>Charts</p>
+            </>
+            <p>Totals</p>
+          </>
+        </BlurFadeStack>
+      </LazyMotion>
+    );
+    const wrappers = Array.from(container.firstElementChild!.children);
+    expect(wrappers.map((w) => w.textContent)).toEqual(["Title", "Stats", "Charts", "Totals"]);
+  });
+
   it("hides the wrapper of a section that renders nothing, so it leaves no gap", () => {
     const { container } = render(
       <LazyMotion features={domAnimation} strict>
