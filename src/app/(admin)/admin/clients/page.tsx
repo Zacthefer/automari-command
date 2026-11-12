@@ -9,6 +9,7 @@ import { PageSkeleton } from "@/components/layout/page-skeleton";
 import { ClientTable } from "@/components/admin/client-table";
 import { getTenants } from "@/lib/api";
 import type { Tenant } from "@/types";
+import { BlurFadeStack } from "@/components/ui/blur-fade";
 
 export default function ClientsPage() {
   const [clients, setClients] = useState<Tenant[]>([]);
@@ -23,7 +24,7 @@ export default function ClientsPage() {
   if (loading) return <PageSkeleton />;
 
   return (
-    <div className="space-y-6">
+    <BlurFadeStack className="space-y-6">
       <PageHeader
         title="Clients"
         description="Manage carrier companies on the platform."
@@ -37,6 +38,6 @@ export default function ClientsPage() {
         }
       />
       <ClientTable clients={clients} />
-    </div>
+    </BlurFadeStack>
   );
 }

@@ -703,4 +703,25 @@ export async function getPaymentSummary() {
   );
 }
 
+// ── Integrations ──────────────────────────────────────
+
+export async function getIntegrations() {
+  return request<import("@/types").IntegrationConnection[]>("/api/integrations");
+}
+
+/** Where to send the browser to log in to Motive. */
+export async function startMotiveConnect() {
+  return request<{ authorize_url: string }>("/api/integrations/motive/connect");
+}
+
+export async function syncMotive() {
+  return request<import("@/types").MotiveSyncCounts>("/api/integrations/motive/sync", {
+    method: "POST",
+  });
+}
+
+export async function disconnectMotive() {
+  return request<void>("/api/integrations/motive", { method: "DELETE" });
+}
+
 export { ApiError, getToken, clearToken };

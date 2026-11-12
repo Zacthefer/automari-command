@@ -27,6 +27,7 @@ import {
   deleteComplianceDocument,
 } from "@/lib/api";
 import type { ComplianceDocument } from "@/types";
+import { BlurFadeStack } from "@/components/ui/blur-fade";
 
 const documentTypeLabels: Record<string, string> = {
   cdl: "CDL",
@@ -146,7 +147,7 @@ export default function ComplianceDetailPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <BlurFadeStack className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
@@ -353,6 +354,6 @@ export default function ComplianceDetailPage() {
           </CardContent>
         </Card>
       </div>
-    </div>
+    </BlurFadeStack>
   );
 }

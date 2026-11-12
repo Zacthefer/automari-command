@@ -40,6 +40,7 @@ import type {
   RateConfirmation,
   PaymentPath,
 } from "@/types";
+import { BlurFadeStack } from "@/components/ui/blur-fade";
 
 function formatCurrency(amount: number | null): string {
   if (amount == null) return "—";
@@ -423,7 +424,7 @@ export default function LoadDetailPage() {
   );
 
   return (
-    <div className="space-y-6">
+    <BlurFadeStack className="space-y-6">
       {/* Header */}
       <div className="flex items-center justify-between">
         <div className="flex items-center gap-4">
@@ -849,6 +850,6 @@ export default function LoadDetailPage() {
           </Card>
         )}
       </div>
-    </div>
+    </BlurFadeStack>
   );
 }

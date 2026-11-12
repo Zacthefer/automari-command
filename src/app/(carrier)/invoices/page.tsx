@@ -6,6 +6,7 @@ import { PageSkeleton } from "@/components/layout/page-skeleton";
 import { InvoiceTable } from "@/components/invoices/invoice-table";
 import { getInvoices } from "@/lib/api";
 import type { Invoice } from "@/types";
+import { BlurFadeStack } from "@/components/ui/blur-fade";
 
 export default function InvoicesPage() {
   const [invoices, setInvoices] = useState<Invoice[]>([]);
@@ -20,12 +21,12 @@ export default function InvoicesPage() {
   if (loading) return <PageSkeleton />;
 
   return (
-    <div className="space-y-6">
+    <BlurFadeStack className="space-y-6">
       <PageHeader
         title="Invoices"
         description="All invoices generated from processed BOLs."
       />
       <InvoiceTable invoices={invoices} />
-    </div>
+    </BlurFadeStack>
   );
 }

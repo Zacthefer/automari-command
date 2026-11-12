@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { LazyMotion, MotionConfig, domAnimation } from "motion/react";
 import { SidebarInset, SidebarProvider } from "@/components/ui/sidebar";
 import { TooltipProvider } from "@/components/ui/tooltip";
 import { Sidebar } from "@/components/layout/sidebar";
@@ -26,7 +27,12 @@ export function AppShell({ children }: { children: React.ReactNode }) {
             className="pointer-events-none absolute inset-x-0 top-0 h-[520px] [background:radial-gradient(125%_125%_at_50%_-50%,#d6f3ff_40%,transparent_100%)]"
           />
           <Header />
-          <div className="relative px-4 py-6 sm:px-6 lg:px-10 lg:py-10">{children}</div>
+          {/* Pages fade up on arrival (BlurFadeStack); reduced-motion users get the fade without the movement */}
+          <LazyMotion features={domAnimation}>
+            <MotionConfig reducedMotion="user">
+              <div className="relative px-4 py-6 sm:px-6 lg:px-10 lg:py-10">{children}</div>
+            </MotionConfig>
+          </LazyMotion>
         </SidebarInset>
       </SidebarProvider>
     </TooltipProvider>

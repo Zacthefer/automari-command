@@ -15,11 +15,13 @@ import {
   FlaskConical,
   Wallet,
   CreditCard,
+  Cable,
   type LucideIcon,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
 import { openCarrierBillingPortal } from "@/lib/billing";
 import { isTestSectionEnabled } from "@/lib/test-section";
+import { canSeeIntegrations } from "@/lib/integrations-access";
 import { BrandMark } from "@/components/layout/brand-mark";
 import { TruckMark } from "@/components/icons/brand-marks";
 import {
@@ -68,25 +70,33 @@ const testItems: NavItem[] = isTestSectionEnabled()
   ? [{ label: "Test Section", href: "/admin/test", icon: FlaskConical }]
   : [];
 
-const carrierNav: NavGroup[] = [
-  { label: "Overview", items: [{ label: "Dashboard", href: "/dashboard", icon: LayoutDashboard }] },
-  operations,
-  finance,
-  ...(testItems.length ? [{ label: "Dev", items: testItems }] : []),
-];
+const integrations: NavItem = { label: "Integrations", href: "/integrations", icon: Cable };
 
-const adminNav: NavGroup[] = [
-  {
-    label: "Admin",
-    items: [
-      { label: "Overview", href: "/dashboard", icon: LayoutDashboard },
-      { label: "Clients", href: "/admin/clients", icon: Building2 },
-      ...testItems,
-    ],
-  },
-  operations,
-  finance,
-];
+function carrierNav(showIntegrations: boolean): NavGroup[] {
+  return [
+    { label: "Overview", items: [{ label: "Dashboard", href: "/dashboard", icon: LayoutDashboard }] },
+    operations,
+    finance,
+    ...(showIntegrations ? [{ label: "Setup", items: [integrations] }] : []),
+    ...(testItems.length ? [{ label: "Dev", items: testItems }] : []),
+  ];
+}
+
+function adminNav(showIntegrations: boolean): NavGroup[] {
+  return [
+    {
+      label: "Admin",
+      items: [
+        { label: "Overview", href: "/dashboard", icon: LayoutDashboard },
+        { label: "Clients", href: "/admin/clients", icon: Building2 },
+        ...(showIntegrations ? [integrations] : []),
+        ...testItems,
+      ],
+    },
+    operations,
+    finance,
+  ];
+}
 
 export function Sidebar() {
   const pathname = usePathname();
@@ -96,7 +106,8 @@ export function Sidebar() {
   const [billingLoading, setBillingLoading] = useState(false);
 
   const isAdmin = user?.role === "admin";
-  const groups = isAdmin ? adminNav : carrierNav;
+  const showIntegrations = canSeeIntegrations(user);
+  const groups = isAdmin ? adminNav(showIntegrations) : carrierNav(showIntegrations);
 
   async function handleBilling() {
     setBillingError(null);

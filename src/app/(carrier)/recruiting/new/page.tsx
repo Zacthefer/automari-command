@@ -9,6 +9,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { createApplicant } from "@/lib/api";
+import { BlurFadeStack } from "@/components/ui/blur-fade";
 
 const cdlClasses = [
   { value: "A", label: "Class A" },
@@ -72,7 +73,7 @@ export default function NewApplicantPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <BlurFadeStack className="space-y-6">
       <div className="flex items-center gap-4">
         <Link
           href="/recruiting"
@@ -214,6 +215,6 @@ export default function NewApplicantPage() {
           </Button>
         </div>
       </form>
-    </div>
+    </BlurFadeStack>
   );
 }

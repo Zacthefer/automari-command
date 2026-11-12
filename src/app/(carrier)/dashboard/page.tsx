@@ -24,6 +24,7 @@ import {
   getMyBillingStatus,
 } from "@/lib/api";
 import type { DashboardStats, AdminStats, BOL } from "@/types";
+import { BlurFadeStack } from "@/components/ui/blur-fade";
 
 function formatCurrency(amount: number): string {
   return new Intl.NumberFormat("en-US", {
@@ -73,7 +74,7 @@ export default function DashboardPage() {
   if (loading) return <PageSkeleton />;
 
   return (
-    <div className="space-y-8">
+    <BlurFadeStack className="space-y-8">
       <PageHeader
         title={isAdmin ? "Admin Overview" : "Dashboard"}
         description={
@@ -229,6 +230,6 @@ export default function DashboardPage() {
         </div>
         <BolTable bols={recentBols} />
       </div>
-    </div>
+    </BlurFadeStack>
   );
 }
