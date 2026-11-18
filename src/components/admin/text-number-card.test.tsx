@@ -51,6 +51,10 @@ describe("TextNumberCard", () => {
     save(" (269) 555-0142 ");
 
     await vi.waitFor(() => expect(onSaved).toHaveBeenCalledWith(updated));
+    expect(await screen.findByText("Saved. Drivers text BOLs to (269) 555-0142.")).toBeTruthy();
+
+    fireEvent.change(screen.getByLabelText("Phone number"), { target: { value: "269" } });
+    expect(screen.queryByText(/^Saved\./)).toBeNull();
     const [url, init] = fetchMock.mock.calls[0] as [string, RequestInit];
     expect(url).toMatch(/\/api\/tenants\/t-1$/);
     expect(init.method).toBe("PATCH");

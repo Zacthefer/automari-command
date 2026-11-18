@@ -26,19 +26,21 @@ export function TextNumberCard({
 }) {
   const [saving, setSaving] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [saved, setSaved] = useState(false);
+  // What the server stored on the last save: undefined = nothing saved yet, null = cleared
+  const [saved, setSaved] = useState<string | null | undefined>(undefined);
 
   async function handleSubmit(e: FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setSaving(true);
     setError(null);
-    setSaved(false);
+    setSaved(undefined);
 
     const typed = (new FormData(e.currentTarget).get("text_number") as string).trim();
     try {
       // The backend stores it as +1XXXXXXXXXX and refuses a number another carrier already has
-      onSaved(await updateTenant(tenantId, { twilio_phone: typed || null }));
-      setSaved(true);
+      const tenant = await updateTenant(tenantId, { twilio_phone: typed || null });
+      onSaved(tenant);
+      setSaved(tenant.twilio_phone);
     } catch (err) {
       setError(err instanceof Error ? err.message : "Failed to save the text number");
     } finally {
@@ -69,10 +71,10 @@ export function TextNumberCard({
               {error}
             </div>
           )}
-          {saved && (
+          {saved !== undefined && (
             <div className="rounded-lg bg-emerald-50 px-4 py-3 text-sm text-emerald-700">
-              {currentNumber
-                ? `Saved. Drivers text BOLs to ${formatTextNumber(currentNumber)}.`
+              {saved
+                ? `Saved. Drivers text BOLs to ${formatTextNumber(saved)}.`
                 : "Saved. This company no longer has a text number."}
             </div>
           )}
@@ -84,6 +86,7 @@ export function TextNumberCard({
               type="tel"
               placeholder="(269) 555-0142"
               defaultValue={formatTextNumber(currentNumber)}
+              onChange={() => setSaved(undefined)}
             />
           </div>
           <Button type="submit" disabled={saving}>
