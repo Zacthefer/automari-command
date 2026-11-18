@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Separator } from "@/components/ui/separator";
 import { PageSkeleton } from "@/components/layout/page-skeleton";
 import { CreateLoginCard } from "@/components/admin/create-login-card";
+import { TextNumberCard } from "@/components/admin/text-number-card";
 import {
   getTenant,
   getBillingStatus,
@@ -162,7 +163,6 @@ export default function ClientDetailPage() {
             <Field label="Contact Name" value={client.contact_name} />
             <Field label="Contact Email" value={client.contact_email} />
             <Field label="Phone" value={client.contact_phone} />
-            <Field label="Twilio Phone" value={client.twilio_phone} />
           </CardContent>
         </Card>
 
@@ -310,6 +310,12 @@ export default function ClientDetailPage() {
             )}
           </CardContent>
         </Card>
+
+        <TextNumberCard
+          tenantId={client.id}
+          currentNumber={client.twilio_phone}
+          onSaved={setClient}
+        />
 
         <CreateLoginCard
           tenantId={client.id}
