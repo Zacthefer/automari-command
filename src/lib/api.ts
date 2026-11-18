@@ -644,6 +644,13 @@ export async function createTenant(data: {
   });
 }
 
+export async function updateTenant(id: string, data: { twilio_phone?: string | null }) {
+  return request<import("@/types").Tenant>(`/api/tenants/${id}`, {
+    method: "PATCH",
+    body: JSON.stringify(data),
+  });
+}
+
 // ── Users ────────────────────────────────────────────
 
 export async function createCarrierLogin(data: {
