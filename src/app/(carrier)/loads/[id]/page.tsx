@@ -508,6 +508,12 @@ export default function LoadDetailPage() {
                   </button>
                 ))}
               </div>
+              {submitPath !== "direct" ? (
+                <p className="mt-2 text-xs text-muted-foreground">
+                  Automari doesn&apos;t send this to your {submitPath === "quickpay" ? "broker" : "factoring company"} yet.
+                  Submit the packet in their portal, then record it here.
+                </p>
+              ) : null}
             </div>
             <div>
               <Label htmlFor="submit_ref">
@@ -522,15 +528,15 @@ export default function LoadDetailPage() {
             </div>
             <div className="flex gap-2">
               <UndoCountdownButton
-                label="Submit"
+                label={submitPath === "direct" ? "Email packet to broker" : "Mark as submitted"}
                 onCommit={handleSubmitPayment}
                 onError={(err) =>
                   setError(err instanceof Error ? err.message : "Submission failed")
                 }
                 onBusyChange={setSubmitBusy}
                 undoLabel="Undo submit"
-                committingLabel="Submitting…"
-                doneLabel="Submitted"
+                committingLabel={submitPath === "direct" ? "Emailing…" : "Saving…"}
+                doneLabel={submitPath === "direct" ? "Emailed" : "Marked as submitted"}
                 disabled={actionLoading}
               />
               <Button

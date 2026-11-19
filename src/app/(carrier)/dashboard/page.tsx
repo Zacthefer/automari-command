@@ -10,6 +10,7 @@ import {
   Route,
 } from "lucide-react";
 import { openCarrierBillingPortal } from "@/lib/billing";
+import { ErrorBanner } from "@/components/layout/error-banner";
 import { PageHeader } from "@/components/layout/page-header";
 import { PageSkeleton } from "@/components/layout/page-skeleton";
 import { StatCard } from "@/components/dashboard/stat-card";
@@ -41,6 +42,7 @@ export default function DashboardPage() {
   const [adminStats, setAdminStats] = useState<AdminStats | null>(null);
   const [recentBols, setRecentBols] = useState<BOL[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadFailed, setLoadFailed] = useState(false);
   const [pastDue, setPastDue] = useState(false);
   const [billingError, setBillingError] = useState<string | null>(null);
 
@@ -63,7 +65,8 @@ export default function DashboardPage() {
             .catch(() => {});
         }
       } catch {
-        // errors handled by api client
+        // The api client only handles 401 (sign-in); anything else must not look like an empty dashboard
+        setLoadFailed(true);
       } finally {
         setLoading(false);
       }
@@ -83,6 +86,13 @@ export default function DashboardPage() {
             : `Welcome back, ${user?.name?.split(" ")[0]}.`
         }
       />
+
+      {loadFailed ? (
+        <ErrorBanner
+          message="Couldn't load your dashboard. These numbers may be incomplete."
+          onRetry={() => window.location.reload()}
+        />
+      ) : null}
 
       {!isAdmin && pastDue ? (
         <div

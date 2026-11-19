@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { ErrorBanner } from "@/components/layout/error-banner";
 import { PageHeader } from "@/components/layout/page-header";
 import { PageSkeleton } from "@/components/layout/page-skeleton";
 import { FleetStatCard } from "@/components/cost-per-mile/fleet-stat-card";
@@ -60,6 +61,7 @@ export default function CostPerMilePage() {
   const [truckSummary, setTruckSummary] =
     useState<CpmSummaryResponse | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadFailed, setLoadFailed] = useState(false);
 
   useEffect(() => {
     async function load() {
@@ -71,7 +73,8 @@ export default function CostPerMilePage() {
         setOverview(ov);
         setTruckSummary(ts);
       } catch {
-        // handled by api client
+        // The api client only handles 401 (sign-in); anything else must not look like a fleet with no costs
+        setLoadFailed(true);
       } finally {
         setLoading(false);
       }
@@ -87,6 +90,13 @@ export default function CostPerMilePage() {
         title="Cost Per Mile"
         description="Fleet-wide cost analytics and expense tracking."
       />
+
+      {loadFailed ? (
+        <ErrorBanner
+          message="Couldn't load cost per mile. These numbers may be incomplete."
+          onRetry={() => window.location.reload()}
+        />
+      ) : null}
 
       {overview && (
         <>

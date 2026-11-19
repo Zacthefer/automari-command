@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { format } from "date-fns";
 import { ArrowLeft } from "lucide-react";
@@ -13,6 +13,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { ErrorBanner } from "@/components/layout/error-banner";
 import { PageHeader } from "@/components/layout/page-header";
 import { PageSkeleton } from "@/components/layout/page-skeleton";
 import { getExpenses } from "@/lib/api-cpm";
@@ -53,13 +54,23 @@ function formatCurrency(amount: number): string {
 export default function ExpensesPage() {
   const [expenses, setExpenses] = useState<Expense[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadFailed, setLoadFailed] = useState(false);
+
+  const load = useCallback(
+    () =>
+      getExpenses({ limit: 100 })
+        .then((list) => {
+          setExpenses(list);
+          setLoadFailed(false);
+        })
+        .catch(() => setLoadFailed(true))
+        .finally(() => setLoading(false)),
+    []
+  );
 
   useEffect(() => {
-    getExpenses({ limit: 100 })
-      .then(setExpenses)
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, []);
+    void load();
+  }, [load]);
 
   if (loading) return <PageSkeleton />;
 
@@ -78,7 +89,15 @@ export default function ExpensesPage() {
         />
       </div>
 
-      {expenses.length === 0 ? (
+      {loadFailed ? (
+        <ErrorBanner
+          message="Couldn't load your expenses. Check your connection and try again."
+          onRetry={() => {
+            setLoading(true);
+            void load();
+          }}
+        />
+      ) : expenses.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-2xl border border-border bg-card py-16 shadow-[var(--shadow-elevated-1)]">
           <p className="text-sm text-subtle-foreground">No expenses found</p>
           <p className="mt-1 text-xs text-subtle-foreground">
