@@ -353,3 +353,48 @@ export interface MotiveSyncCounts {
   drivers_updated: number;
   drivers_matched: number;
 }
+
+/** Same counts for every ELD's sync. */
+export type SyncCounts = MotiveSyncCounts;
+
+export interface SamsaraConnectResult {
+  connection: IntegrationConnection;
+  sync: SyncCounts | null;
+  /** Set when the token was saved but the first sync didn't finish. */
+  sync_problem: "fleet_busy" | "sync_failed" | "missing_permission" | "unauthorized" | null;
+}
+
+// ── Live map ──────────────────────────────────────────
+
+export type TruckMapStatus = "moving" | "stopped" | "stale";
+
+/** One truck's latest known position, from whichever ELD reported it. */
+export interface TruckPosition {
+  truck_id: string;
+  unit_number: string;
+  provider: string;
+  latitude: number;
+  longitude: number;
+  speed_mph: number | null;
+  heading_deg: number | null;
+  address: string | null;
+  located_at: string;
+  status: TruckMapStatus;
+  driver_name: string | null;
+}
+
+export interface LiveMapProvider {
+  provider: string;
+  status: IntegrationStatus;
+  last_error: string | null;
+  /** False for a connected ELD whose trucks aren't on the map yet. */
+  on_map: boolean;
+}
+
+export interface LiveMap {
+  trucks: TruckPosition[];
+  trucks_without_location: number;
+  providers: LiveMapProvider[];
+  refresh_seconds: number;
+  stale_after_minutes: number;
+}
