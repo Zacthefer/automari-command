@@ -22,12 +22,14 @@ export function lastSeen(locatedAt: string, now: Date): string {
   return `Last seen ${formatDistanceStrict(new Date(locatedAt), now)} ago`;
 }
 
+/** Speed only says something while moving: "Stopped · 0 mph" is noise. */
 export function speedText(truck: Pick<TruckPosition, "speed_mph" | "status">): string | null {
-  if (truck.status === "stale" || truck.speed_mph == null) return null;
+  if (truck.status !== "moving" || truck.speed_mph == null) return null;
   return `${Math.round(truck.speed_mph)} mph`;
 }
 
-/** The 🚚 emoji faces left; flip it when the truck is heading anywhere east. */
+/** The 🚚 emoji faces left (checked on macOS; other platforms' artwork may differ);
+ * flip it when the truck is heading anywhere east. The heading arrow is exact everywhere. */
 export function facesRight(heading: number | null): boolean {
   if (heading == null) return false;
   const normalized = ((heading % 360) + 360) % 360;

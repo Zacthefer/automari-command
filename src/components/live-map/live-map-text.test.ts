@@ -68,9 +68,10 @@ describe("words", () => {
     expect(lastSeen("2026-11-18T10:05:00Z", now)).toBe("Last seen 2 hours ago");
   });
 
-  it("shows speed except for stale trucks", () => {
+  it("shows speed only for moving trucks", () => {
     expect(speedText(truck({ speed_mph: 61.6 }))).toBe("62 mph");
     expect(speedText(truck({ status: "stale" }))).toBeNull();
+    expect(speedText(truck({ status: "stopped", speed_mph: 0 }))).toBeNull();
     expect(speedText(truck({ speed_mph: null }))).toBeNull();
   });
 
