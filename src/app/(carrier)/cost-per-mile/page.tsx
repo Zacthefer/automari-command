@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import { ErrorBanner } from "@/components/layout/error-banner";
 import { PageHeader } from "@/components/layout/page-header";
 import { PageSkeleton } from "@/components/layout/page-skeleton";
@@ -63,24 +63,23 @@ export default function CostPerMilePage() {
   const [loading, setLoading] = useState(true);
   const [loadFailed, setLoadFailed] = useState(false);
 
-  useEffect(() => {
-    async function load() {
-      try {
-        const [ov, ts] = await Promise.all([
-          getFleetOverview(),
-          getCpmSummary({ group_by: "truck" }),
-        ]);
-        setOverview(ov);
-        setTruckSummary(ts);
-      } catch {
+  const load = useCallback(
+    () =>
+      Promise.all([getFleetOverview(), getCpmSummary({ group_by: "truck" })])
+        .then(([ov, ts]) => {
+          setOverview(ov);
+          setTruckSummary(ts);
+          setLoadFailed(false);
+        })
         // The api client only handles 401 (sign-in); anything else must not look like a fleet with no costs
-        setLoadFailed(true);
-      } finally {
-        setLoading(false);
-      }
-    }
-    load();
-  }, []);
+        .catch(() => setLoadFailed(true))
+        .finally(() => setLoading(false)),
+    []
+  );
+
+  useEffect(() => {
+    void load();
+  }, [load]);
 
   if (loading) return <PageSkeleton />;
 
@@ -94,7 +93,10 @@ export default function CostPerMilePage() {
       {loadFailed ? (
         <ErrorBanner
           message="Couldn't load cost per mile. These numbers may be incomplete."
-          onRetry={() => window.location.reload()}
+          onRetry={() => {
+            setLoading(true);
+            void load();
+          }}
         />
       ) : null}
 

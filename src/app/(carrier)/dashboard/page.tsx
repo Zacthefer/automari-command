@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import {
   FileText,
@@ -48,31 +48,31 @@ export default function DashboardPage() {
 
   const isAdmin = user?.role === "admin";
 
-  useEffect(() => {
-    async function load() {
-      try {
-        const [bols] = await Promise.all([
-          getBols({ limit: 5 }),
-          isAdmin
-            ? getAdminStats().then(setAdminStats)
-            : getDashboardStats().then(setCarrierStats),
-        ]);
-        setRecentBols(bols);
-        if (!isAdmin) {
-          // Optional banner: billing may not be configured yet, so failures are ignored
-          getMyBillingStatus()
-            .then((b) => setPastDue(b.subscription_status === "past_due"))
-            .catch(() => {});
-        }
-      } catch {
+  const load = useCallback(
+    () =>
+      Promise.all([
+        getBols({ limit: 5 }),
+        isAdmin ? getAdminStats().then(setAdminStats) : getDashboardStats().then(setCarrierStats),
+      ])
+        .then(([bols]) => {
+          setRecentBols(bols);
+          setLoadFailed(false);
+          if (!isAdmin) {
+            // Optional banner: billing may not be configured yet, so failures are ignored
+            getMyBillingStatus()
+              .then((b) => setPastDue(b.subscription_status === "past_due"))
+              .catch(() => {});
+          }
+        })
         // The api client only handles 401 (sign-in); anything else must not look like an empty dashboard
-        setLoadFailed(true);
-      } finally {
-        setLoading(false);
-      }
-    }
-    load();
-  }, [isAdmin]);
+        .catch(() => setLoadFailed(true))
+        .finally(() => setLoading(false)),
+    [isAdmin]
+  );
+
+  useEffect(() => {
+    void load();
+  }, [load]);
 
   if (loading) return <PageSkeleton />;
 
@@ -90,7 +90,10 @@ export default function DashboardPage() {
       {loadFailed ? (
         <ErrorBanner
           message="Couldn't load your dashboard. These numbers may be incomplete."
-          onRetry={() => window.location.reload()}
+          onRetry={() => {
+            setLoading(true);
+            void load();
+          }}
         />
       ) : null}
 
