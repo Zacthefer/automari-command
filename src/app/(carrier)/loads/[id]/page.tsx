@@ -94,7 +94,7 @@ function Field({
   );
 }
 
-function PipelineViz({ steps }: { steps: PipelineStep[] }) {
+function PipelineViz({ steps, dueAt }: { steps: PipelineStep[]; dueAt: string | null }) {
   const stateIcon = (state: string) => {
     switch (state) {
       case "done":
@@ -127,6 +127,17 @@ function PipelineViz({ steps }: { steps: PipelineStep[] }) {
             <span className="text-[10px] text-muted-foreground">
               {step.detail || stateLabel[step.state] || step.state}
             </span>
+            {/* The rate con step's detail already reads "v2 $2,300.00" */}
+            {step.amount != null && step.key !== "rate_con" && (
+              <span className="text-[10px] font-medium text-foreground tabular-nums">
+                {formatCurrency(step.amount)}
+              </span>
+            )}
+            {step.at ? (
+              <span className="text-[10px] text-muted-foreground">{safeFormatDate(step.at, "MMM d")}</span>
+            ) : step.key === "payment" && dueAt ? (
+              <span className="text-[10px] text-muted-foreground">Due {safeFormatDate(dueAt, "MMM d")}</span>
+            ) : null}
           </div>
           {i < steps.length - 1 && (
             <div className="mt-2 h-px w-6 bg-border flex-shrink-0" />
@@ -475,7 +486,7 @@ export default function LoadDetailPage() {
       {load.pipeline.length > 0 && (
         <Card className="border-slate-200 shadow-sm">
           <CardContent className="pt-5 pb-4">
-            <PipelineViz steps={load.pipeline} />
+            <PipelineViz steps={load.pipeline} dueAt={load.due_at} />
           </CardContent>
         </Card>
       )}

@@ -704,8 +704,8 @@ export async function createMyPortalSession() {
 
 // ── Payments ─────────────────────────────────────────
 
-export async function getPaymentSummary() {
-  return request<import("@/types").PaymentSummaryResponse>(
+export async function getMoneyBoard() {
+  return request<import("@/types").MoneyBoard>(
     "/api/loads/payments/summary"
   );
 }

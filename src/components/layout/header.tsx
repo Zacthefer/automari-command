@@ -31,7 +31,7 @@ const SEGMENT_LABELS: Record<string, string> = {
   loads: "Loads",
   bols: "BOLs",
   invoices: "Invoices",
-  payments: "Payments",
+  payments: "Money",
   compliance: "Compliance",
   recruiting: "Recruiting",
   "cost-per-mile": "Cost Per Mile",
