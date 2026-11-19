@@ -19,5 +19,5 @@ export function doneText(entity: ImportEntity, created: number, filled: number) 
     return `${created} ${nounFor(entity, created)} added${filled > 0 ? `, ${filled} updated` : ""} ✓`;
   }
   if (filled > 0) return `${filled} ${nounFor(entity, filled)} updated ✓`;
-  return "Your fleet is already up to date ✓";
+  return entity === "fuel" ? "These purchases were already imported ✓" : "Your fleet is already up to date ✓";
 }

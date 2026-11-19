@@ -19,3 +19,12 @@ describe("import-text", () => {
     expect(doneText("trucks", 0, 0)).toBe("Your fleet is already up to date ✓");
   });
 });
+
+describe("fuel import wording", () => {
+  it("names fuel purchases and says when everything was already imported", () => {
+    expect(doneText("fuel", 3, 0)).toBe("3 fuel purchases added ✓");
+    expect(doneText("fuel", 1, 0)).toBe("1 fuel purchase added ✓");
+    expect(doneText("fuel", 0, 0)).toBe("These purchases were already imported ✓");
+    expect(doneText("trucks", 0, 0)).toBe("Your fleet is already up to date ✓");
+  });
+});

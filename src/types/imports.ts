@@ -1,6 +1,6 @@
 // Mirrors automari-freight app/modules/imports/schemas.py (branch feature/csv-import). Update both together.
 
-export type ImportEntity = "trucks" | "drivers";
+export type ImportEntity = "trucks" | "drivers" | "fuel";
 export type ImportSeverity = "error" | "warning";
 export type ImportRowAction = "create" | "fill" | "unchanged" | "skip_error";
 export type ImportResponseStatus = "previewed" | "committed";
@@ -85,11 +85,24 @@ export const FIELD_LABELS: Record<string, string> = {
   phone: "Phone",
   cdl_number: "CDL number",
   cdl_state: "CDL state",
+  date: "Date",
+  time: "Time",
+  card: "Card number",
+  product: "Fuel type",
+  gallons: "Gallons",
+  volume_unit: "Gallons/Liters",
+  currency: "Currency",
+  amount: "Amount",
+  state: "State",
+  vendor: "Station",
+  odometer: "Odometer",
+  reference: "Transaction ID",
 };
 
 export const ENTITY_NOUN = {
   trucks: ["truck", "trucks"],
   drivers: ["driver", "drivers"],
+  fuel: ["fuel purchase", "fuel purchases"],
 } as const;
 
 // Shown when the server gives no usable text (Q6b). Here, not in api-imports, so the page

@@ -22,6 +22,9 @@ describe("ExpensesPage load states", () => {
 
     expect(await screen.findByText("No expenses found")).toBeTruthy();
     expect(screen.queryByRole("alert")).toBeNull();
+    // An empty fleet is invited to upload a fuel card export
+    expect(screen.getByText(/Motive, EFS or your own spreadsheet/)).toBeTruthy();
+    expect(screen.getAllByText("Upload CSV").length).toBeGreaterThan(0);
   });
 
   it("shows a retryable error, never 'No expenses found', when loading fails", async () => {
