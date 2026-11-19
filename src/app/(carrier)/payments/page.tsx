@@ -49,6 +49,7 @@ function wholeDollars(amount: number): string {
   return new Intl.NumberFormat("en-US", {
     style: "currency",
     currency: "USD",
+    minimumFractionDigits: 0,
     maximumFractionDigits: 0,
   }).format(amount);
 }
@@ -171,7 +172,7 @@ function NotConnectedCard({ buckets }: { buckets: MoneyBucket[] }) {
 }
 
 function DueCell({ row }: { row: MoneyRow }) {
-  if (row.bucket === "paid" && row.paid_at) return <>Paid {shortDate(row.paid_at)}</>;
+  if (row.bucket === "paid") return row.paid_at ? <>Paid {shortDate(row.paid_at)}</> : <>Paid</>;
   if (!row.due_at) return <>—</>;
   if (row.bucket === "past_due") {
     return <span className="font-medium text-red-700">Past due since {shortDate(row.due_at)}</span>;

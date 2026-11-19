@@ -126,6 +126,15 @@ describe("MoneyBoardPage", () => {
     expect(table().getByText("Paid Nov 17")).toBeTruthy();
   });
 
+  it("never shows a due date on a paid row, even when the paid date is missing", async () => {
+    getMoneyBoard.mockResolvedValue({ ...BOARD, rows: [row({ bucket: "paid", paid_at: null })], rows_total: 1 });
+    render(<MoneyBoardPage />);
+
+    expect(await screen.findByRole("table")).toBeTruthy();
+    expect(table().getByText("Paid")).toBeTruthy();
+    expect(table().queryByText(/^Due [A-Z]/)).toBeNull();
+  });
+
   it("explains an empty board and a box with nothing in it", async () => {
     getMoneyBoard.mockResolvedValue({ ...BOARD, rows: [], rows_total: 0, coverage: { counted: 0, total: 0, missing: [] } });
     render(<MoneyBoardPage />);
