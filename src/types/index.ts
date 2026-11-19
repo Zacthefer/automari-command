@@ -240,6 +240,8 @@ export interface PipelineStep {
   key: string;
   state: "done" | "pending" | "ready" | "attention";
   detail: string | null;
+  at: string | null;
+  amount: number | null;
 }
 
 export interface PacketDocument {
@@ -291,6 +293,8 @@ export interface LoadDetail extends LoadSummary {
   payment_external_ref: string | null;
   payment_note: string | null;
   payment_status_at: string | null;
+  /** Submit date + payment terms */
+  due_at: string | null;
   aging_days: number | null;
   pipeline: PipelineStep[];
   packet: BillingPacket;
@@ -311,20 +315,56 @@ export interface AgingBucket {
   total_amount: number;
 }
 
-export interface BrokerPaymentSummary {
-  broker_name: string;
-  count: number;
-  total_amount: number;
-  oldest_days: number;
+export type MoneyBucketKey =
+  | "not_billed"
+  | "waiting"
+  | "past_due"
+  | "action"
+  | "paid"
+  | "funded"
+  | "reserve"
+  | "short_paid";
+
+/** One Money Board box. Unconnected boxes (factoring) have null count/total, never 0. */
+export interface MoneyBucket {
+  key: MoneyBucketKey;
+  label: string;
+  source: string;
+  connected: boolean;
+  count: number | null;
+  total: number | null;
 }
 
-export interface PaymentSummaryResponse {
+/** A load or unlinked invoice in exactly one box; amount null = we can't vouch for it. */
+export interface MoneyRow {
+  kind: "load" | "invoice";
+  id: string;
+  number: string | null;
+  broker_name: string | null;
+  bucket: MoneyBucketKey;
+  amount: number | null;
+  days: number | null;
+  due_at: string | null;
+  paid_at: string | null;
+}
+
+export interface MoneyBoard {
+  as_of: string;
+  buckets: MoneyBucket[];
+  coverage: {
+    counted: number;
+    total: number;
+    missing: { kind: "load" | "invoice"; id: string; number: string | null; reason: string }[];
+  };
+  /** confirmed = paid items backed by a factor or bank record */
+  confirmation: { paid: number; confirmed: number };
+  rows: MoneyRow[];
+  rows_total: number;
   total_outstanding: number;
   total_paid_30d: number;
   action_required_count: number;
   avg_days_to_payment: number | null;
   aging_buckets: AgingBucket[];
-  by_broker: BrokerPaymentSummary[];
 }
 
 // ── Integrations ──────────────────────────────────────

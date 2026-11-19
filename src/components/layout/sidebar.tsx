@@ -62,7 +62,7 @@ const finance: NavGroup = {
   label: "Finance",
   items: [
     { label: "Invoices", href: "/invoices", icon: Receipt },
-    { label: "Payments", href: "/payments", icon: Wallet },
+    { label: "Money", href: "/payments", icon: Wallet },
     { label: "Cost Per Mile", href: "/cost-per-mile", icon: TrendingUp },
   ],
 };
