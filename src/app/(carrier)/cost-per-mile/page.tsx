@@ -1,6 +1,7 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
+import { ErrorBanner } from "@/components/layout/error-banner";
 import { PageHeader } from "@/components/layout/page-header";
 import { PageSkeleton } from "@/components/layout/page-skeleton";
 import { FleetStatCard } from "@/components/cost-per-mile/fleet-stat-card";
@@ -60,24 +61,25 @@ export default function CostPerMilePage() {
   const [truckSummary, setTruckSummary] =
     useState<CpmSummaryResponse | null>(null);
   const [loading, setLoading] = useState(true);
+  const [loadFailed, setLoadFailed] = useState(false);
+
+  const load = useCallback(
+    () =>
+      Promise.all([getFleetOverview(), getCpmSummary({ group_by: "truck" })])
+        .then(([ov, ts]) => {
+          setOverview(ov);
+          setTruckSummary(ts);
+          setLoadFailed(false);
+        })
+        // The api client only handles 401 (sign-in); anything else must not look like a fleet with no costs
+        .catch(() => setLoadFailed(true))
+        .finally(() => setLoading(false)),
+    []
+  );
 
   useEffect(() => {
-    async function load() {
-      try {
-        const [ov, ts] = await Promise.all([
-          getFleetOverview(),
-          getCpmSummary({ group_by: "truck" }),
-        ]);
-        setOverview(ov);
-        setTruckSummary(ts);
-      } catch {
-        // handled by api client
-      } finally {
-        setLoading(false);
-      }
-    }
-    load();
-  }, []);
+    void load();
+  }, [load]);
 
   if (loading) return <PageSkeleton />;
 
@@ -87,6 +89,16 @@ export default function CostPerMilePage() {
         title="Cost Per Mile"
         description="Fleet-wide cost analytics and expense tracking."
       />
+
+      {loadFailed ? (
+        <ErrorBanner
+          message="Couldn't load cost per mile. These numbers may be incomplete."
+          onRetry={() => {
+            setLoading(true);
+            void load();
+          }}
+        />
+      ) : null}
 
       {overview && (
         <>

@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import { format } from "date-fns";
 import { ArrowLeft } from "lucide-react";
@@ -13,6 +13,7 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
+import { ErrorBanner } from "@/components/layout/error-banner";
 import { PageHeader } from "@/components/layout/page-header";
 import { PageSkeleton } from "@/components/layout/page-skeleton";
 import { getTrips } from "@/lib/api-cpm";
@@ -50,13 +51,23 @@ function formatNumber(n: number): string {
 export default function TripsPage() {
   const [trips, setTrips] = useState<Trip[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadFailed, setLoadFailed] = useState(false);
+
+  const load = useCallback(
+    () =>
+      getTrips({ limit: 100 })
+        .then((list) => {
+          setTrips(list);
+          setLoadFailed(false);
+        })
+        .catch(() => setLoadFailed(true))
+        .finally(() => setLoading(false)),
+    []
+  );
 
   useEffect(() => {
-    getTrips({ limit: 100 })
-      .then(setTrips)
-      .catch(() => {})
-      .finally(() => setLoading(false));
-  }, []);
+    void load();
+  }, [load]);
 
   if (loading) return <PageSkeleton />;
 
@@ -75,7 +86,15 @@ export default function TripsPage() {
         />
       </div>
 
-      {trips.length === 0 ? (
+      {loadFailed ? (
+        <ErrorBanner
+          message="Couldn't load your trips. Check your connection and try again."
+          onRetry={() => {
+            setLoading(true);
+            void load();
+          }}
+        />
+      ) : trips.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-2xl border border-border bg-card py-16 shadow-[var(--shadow-elevated-1)]">
           <p className="text-sm text-subtle-foreground">No trips found</p>
           <p className="mt-1 text-xs text-subtle-foreground">

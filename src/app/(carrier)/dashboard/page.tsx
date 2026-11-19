@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useCallback, useEffect, useState } from "react";
 import Link from "next/link";
 import {
   FileText,
@@ -10,6 +10,7 @@ import {
   Route,
 } from "lucide-react";
 import { openCarrierBillingPortal } from "@/lib/billing";
+import { ErrorBanner } from "@/components/layout/error-banner";
 import { PageHeader } from "@/components/layout/page-header";
 import { PageSkeleton } from "@/components/layout/page-skeleton";
 import { StatCard } from "@/components/dashboard/stat-card";
@@ -41,35 +42,37 @@ export default function DashboardPage() {
   const [adminStats, setAdminStats] = useState<AdminStats | null>(null);
   const [recentBols, setRecentBols] = useState<BOL[]>([]);
   const [loading, setLoading] = useState(true);
+  const [loadFailed, setLoadFailed] = useState(false);
   const [pastDue, setPastDue] = useState(false);
   const [billingError, setBillingError] = useState<string | null>(null);
 
   const isAdmin = user?.role === "admin";
 
+  const load = useCallback(
+    () =>
+      Promise.all([
+        getBols({ limit: 5 }),
+        isAdmin ? getAdminStats().then(setAdminStats) : getDashboardStats().then(setCarrierStats),
+      ])
+        .then(([bols]) => {
+          setRecentBols(bols);
+          setLoadFailed(false);
+          if (!isAdmin) {
+            // Optional banner: billing may not be configured yet, so failures are ignored
+            getMyBillingStatus()
+              .then((b) => setPastDue(b.subscription_status === "past_due"))
+              .catch(() => {});
+          }
+        })
+        // The api client only handles 401 (sign-in); anything else must not look like an empty dashboard
+        .catch(() => setLoadFailed(true))
+        .finally(() => setLoading(false)),
+    [isAdmin]
+  );
+
   useEffect(() => {
-    async function load() {
-      try {
-        const [bols] = await Promise.all([
-          getBols({ limit: 5 }),
-          isAdmin
-            ? getAdminStats().then(setAdminStats)
-            : getDashboardStats().then(setCarrierStats),
-        ]);
-        setRecentBols(bols);
-        if (!isAdmin) {
-          // Optional banner: billing may not be configured yet, so failures are ignored
-          getMyBillingStatus()
-            .then((b) => setPastDue(b.subscription_status === "past_due"))
-            .catch(() => {});
-        }
-      } catch {
-        // errors handled by api client
-      } finally {
-        setLoading(false);
-      }
-    }
-    load();
-  }, [isAdmin]);
+    void load();
+  }, [load]);
 
   if (loading) return <PageSkeleton />;
 
@@ -83,6 +86,16 @@ export default function DashboardPage() {
             : `Welcome back, ${user?.name?.split(" ")[0]}.`
         }
       />
+
+      {loadFailed ? (
+        <ErrorBanner
+          message="Couldn't load your dashboard. These numbers may be incomplete."
+          onRetry={() => {
+            setLoading(true);
+            void load();
+          }}
+        />
+      ) : null}
 
       {!isAdmin && pastDue ? (
         <div
