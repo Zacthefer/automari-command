@@ -14,6 +14,11 @@ import {
 } from "@/components/ui/table";
 import { Badge } from "@/components/ui/badge";
 import { ErrorBanner } from "@/components/layout/error-banner";
+import { LazyImportSheet } from "@/components/imports/lazy-import-sheet";
+import { UploadCsvButton } from "@/components/imports/upload-csv-button";
+import { useCsvImport } from "@/components/imports/use-csv-import";
+import { useImportHighlight } from "@/components/imports/use-import-highlight";
+import { cn } from "@/lib/utils";
 import { PageHeader } from "@/components/layout/page-header";
 import { PageSkeleton } from "@/components/layout/page-skeleton";
 import { getExpenses } from "@/lib/api-cpm";
@@ -68,11 +73,25 @@ export default function ExpensesPage() {
     []
   );
 
+  const { highlight, onImported } = useImportHighlight(load);
+  const importer = useCsvImport("fuel", { onImported });
+
   useEffect(() => {
     void load();
   }, [load]);
 
   if (loading) return <PageSkeleton />;
+
+  const uploadButton = (className?: string) => (
+    <UploadCsvButton
+      state={importer.state}
+      onPick={(file) => void importer.pick(file)}
+      onRetry={importer.retry}
+      inputRef={importer.inputRef}
+      triggerRef={importer.triggerRef}
+      className={className}
+    />
+  );
 
   return (
     <BlurFadeStack className="space-y-6">
@@ -83,10 +102,13 @@ export default function ExpensesPage() {
         >
           <ArrowLeft className="h-4 w-4" />
         </Link>
-        <PageHeader
-          title="Expenses"
-          description="All logged expenses across the fleet."
-        />
+        <div className="flex-1">
+          <PageHeader
+            title="Expenses"
+            description="All logged expenses across the fleet. Upload a fuel card export to add fuel purchases."
+            action={!loadFailed && expenses.length > 0 ? uploadButton() : undefined}
+          />
+        </div>
       </div>
 
       {loadFailed ? (
@@ -100,9 +122,11 @@ export default function ExpensesPage() {
       ) : expenses.length === 0 ? (
         <div className="flex flex-col items-center justify-center rounded-2xl border border-border bg-card py-16 shadow-[var(--shadow-elevated-1)]">
           <p className="text-sm text-subtle-foreground">No expenses found</p>
-          <p className="mt-1 text-xs text-subtle-foreground">
-            Log expenses to start tracking cost per mile.
+          <p className="mt-1 max-w-md text-center text-xs text-subtle-foreground">
+            Upload a fuel card export (Motive, EFS or your own spreadsheet). We&apos;ll show you every
+            purchase and which truck it belongs to before anything is saved.
           </p>
+          <div className="mt-5">{uploadButton("items-center text-center")}</div>
         </div>
       ) : (
         <div className="overflow-hidden rounded-2xl border border-border bg-card shadow-[var(--shadow-elevated-1)]">
@@ -133,7 +157,7 @@ export default function ExpensesPage() {
               {expenses.map((expense) => (
                 <TableRow
                   key={expense.id}
-                  className="group h-11 border-slate-100"
+                  className={cn("group h-11 border-slate-100", highlight.has(expense.id) && "import-row-glow")}
                 >
                   <TableCell className="text-[13px] text-foreground tabular-nums">
                     {format(new Date(expense.expense_date), "MMM d, yyyy")}
@@ -168,6 +192,7 @@ export default function ExpensesPage() {
           </Table>
         </div>
       )}
+      {importer.panelOpen ? <LazyImportSheet importer={importer} /> : null}
     </BlurFadeStack>
   );
 }
