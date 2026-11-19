@@ -16,6 +16,7 @@ import {
   Wallet,
   CreditCard,
   Cable,
+  MapPin,
   type LucideIcon,
 } from "lucide-react";
 import { useAuth } from "@/lib/auth";
@@ -71,11 +72,13 @@ const testItems: NavItem[] = isTestSectionEnabled()
   : [];
 
 const integrations: NavItem = { label: "Integrations", href: "/integrations", icon: Cable };
+// Fed by the ELD integrations, so it opens to the same people
+const trucksLive: NavItem = { label: "Trucks Live", href: "/trucks-live", icon: MapPin };
 
 function carrierNav(showIntegrations: boolean): NavGroup[] {
   return [
     { label: "Overview", items: [{ label: "Dashboard", href: "/dashboard", icon: LayoutDashboard }] },
-    operations,
+    showIntegrations ? { ...operations, items: [trucksLive, ...operations.items] } : operations,
     finance,
     ...(showIntegrations ? [{ label: "Setup", items: [integrations] }] : []),
     ...(testItems.length ? [{ label: "Dev", items: testItems }] : []),

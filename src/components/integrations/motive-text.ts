@@ -69,7 +69,7 @@ function parts(entries: [number, string][]) {
 }
 
 /** "Trucks: 4 added, 2 updated. Drivers: 3 added." */
-export function syncSummary(counts: MotiveSyncCounts): string {
+export function syncSummary(counts: MotiveSyncCounts, provider = "Motive"): string {
   const trucks = parts([
     [counts.trucks_created, "added"],
     [counts.trucks_updated, "updated"],
@@ -81,7 +81,7 @@ export function syncSummary(counts: MotiveSyncCounts): string {
     [counts.drivers_updated, "updated"],
     [counts.drivers_matched, "already in Automari"],
   ]);
-  if (!trucks.length && !drivers.length) return "Motive has no trucks or drivers to bring in yet.";
+  if (!trucks.length && !drivers.length) return `${provider} has no trucks or drivers to bring in yet.`;
   return [
     trucks.length ? `Trucks: ${trucks.join(", ")}.` : null,
     drivers.length ? `Drivers: ${drivers.join(", ")}.` : null,

@@ -731,4 +731,29 @@ export async function disconnectMotive() {
   return request<void>("/api/integrations/motive", { method: "DELETE" });
 }
 
+/** Check a Samsara API token the carrier created, save it, and bring in their fleet. */
+export async function connectSamsara(apiToken: string) {
+  return request<import("@/types").SamsaraConnectResult>("/api/integrations/samsara/connect", {
+    method: "POST",
+    body: JSON.stringify({ api_token: apiToken }),
+  });
+}
+
+export async function syncSamsara() {
+  return request<import("@/types").SyncCounts>("/api/integrations/samsara/sync", {
+    method: "POST",
+  });
+}
+
+export async function disconnectSamsara() {
+  return request<void>("/api/integrations/samsara", { method: "DELETE" });
+}
+
+// ── Live map ──────────────────────────────────────────
+
+/** Every truck's latest position from the carrier's connected ELDs. */
+export async function getLiveMap() {
+  return request<import("@/types").LiveMap>("/api/live-map/trucks");
+}
+
 export { ApiError, getToken, clearToken };

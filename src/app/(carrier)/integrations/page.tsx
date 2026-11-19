@@ -7,6 +7,8 @@ import { ErrorBanner } from "@/components/layout/error-banner";
 import { CallbackBanner } from "@/components/integrations/callback-banner";
 import { MotiveCard } from "@/components/integrations/motive-card";
 import { activeMotiveConnection } from "@/components/integrations/motive-text";
+import { SamsaraCard } from "@/components/integrations/samsara-card";
+import { activeSamsaraConnection } from "@/components/integrations/samsara-text";
 import { BlurFadeStack } from "@/components/ui/blur-fade";
 import { ApiError, getIntegrations } from "@/lib/api";
 import type { IntegrationConnection } from "@/types";
@@ -26,7 +28,7 @@ export default function IntegrationsPage() {
         .catch((err) =>
           setError(
             err instanceof ApiError && err.status === 403
-              ? "Integrations connect a carrier's own account. Sign in with a carrier login to connect Motive."
+              ? "Integrations connect a carrier's own account. Sign in with a carrier login to connect an ELD."
               : "Couldn't load your integrations."
           )
         ),
@@ -49,7 +51,12 @@ export default function IntegrationsPage() {
         <CallbackBanner />
       </Suspense>
       {error ? <ErrorBanner message={error} onRetry={load} /> : null}
-      {connections ? <MotiveCard connection={activeMotiveConnection(connections)} onChanged={load} /> : null}
+      {connections ? (
+        <>
+          <SamsaraCard connection={activeSamsaraConnection(connections)} onChanged={load} />
+          <MotiveCard connection={activeMotiveConnection(connections)} onChanged={load} />
+        </>
+      ) : null}
     </BlurFadeStack>
   );
 }
